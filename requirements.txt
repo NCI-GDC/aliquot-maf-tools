@@ -1,0 +1,2 @@
+pysam==0.14.1
+git+ssh://git@github.com/NCI-GDC/maf-lib.git@d1c2579175b3237eb583c8a62e1ba71573ac4a29#egg=maf-lib
