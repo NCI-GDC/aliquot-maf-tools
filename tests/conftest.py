@@ -1,5 +1,6 @@
 import logging
 import pytest
+import os
 from collections import OrderedDict, namedtuple
 
 from maflib.schemes import MafScheme
@@ -41,3 +42,10 @@ def get_empty_maf_record():
         return MafRecord(line_number=line_number, validation_stringency=stringency)
 
     return _get_empty_maf_record()
+
+@pytest.fixture
+def get_test_file():
+    def _get_test_file(name):
+        curr = os.path.dirname(os.path.abspath(__file__))
+        return os.path.join(curr, 'data/{0}'.format(name))
+    return _get_test_file

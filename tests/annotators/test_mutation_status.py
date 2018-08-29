@@ -2,8 +2,29 @@
 Tests for the ``aliquotmaf.annotators.MutationStatus`` class.
 """
 import pytest
+from collections import OrderedDict
 
 from maflib.column_values import MutationStatusEnum
+from maflib.column_types import MutationStatus
+from aliquotmaf.annotators import MutationStatus as MutationStatusAnnotator
+
+@pytest.fixture
+def setup_mutation_status():
+    created = []
+    def _make_mutation_status(scheme, caller):
+        curr = MutationStatusAnnotator.setup(scheme, caller)
+        created.append(curr)
+        return curr
+
+    yield _make_mutation_status
+
+    for record in created:
+        record.shutdown()
+
+@pytest.fixture
+def test_scheme(get_test_scheme):
+    coldict = OrderedDict([("Mutation_Status", MutationStatus)])
+    return get_test_scheme(coldict)
 
 def test_setup_mutation_status(test_scheme, setup_mutation_status):
     """Test setting up mutation status annotator class"""
