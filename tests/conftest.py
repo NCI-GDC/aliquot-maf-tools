@@ -43,7 +43,7 @@ def get_empty_maf_record():
 
     return _get_empty_maf_record()
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def get_test_file():
     def _get_test_file(name):
         curr = os.path.dirname(os.path.abspath(__file__))
