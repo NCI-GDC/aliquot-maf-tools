@@ -92,6 +92,24 @@ def test_cosmic_snp(test_scheme, setup_annotator, get_test_file,
     assert maf_record['COSMIC'].value == ['COSM0003']
     assert maf_record['dbSNP_RS'].value == [] 
 
+    ## setup no overlap alleles
+    vcf_record = get_test_vcf_record(chrom=record.chrom, pos=record.pos, alleles=(record.ref, 'G'), ref=record.ref, alts=tuple('G'))
+    maf_record['COSMIC'] = get_builder('COSMIC', test_scheme, value=None) 
+    maf_record['dbSNP_RS'] = get_builder('dbSNP_RS', test_scheme, value='novel') 
+    maf_record = annotator.annotate(maf_record, vcf_record, var_allele_idx=1) 
+  
+    assert maf_record['COSMIC'].value == []
+    assert maf_record['dbSNP_RS'].value == ['novel'] 
+
+    ## setup no overlap pos 
+    vcf_record = get_test_vcf_record(chrom=record.chrom, pos=101, alleles=(record.ref, 'G'), ref=record.ref, alts=tuple('G'))
+    maf_record['COSMIC'] = get_builder('COSMIC', test_scheme, value=None) 
+    maf_record['dbSNP_RS'] = get_builder('dbSNP_RS', test_scheme, value='novel') 
+    maf_record = annotator.annotate(maf_record, vcf_record, var_allele_idx=1) 
+  
+    assert maf_record['COSMIC'].value == []
+    assert maf_record['dbSNP_RS'].value == ['novel'] 
+
 def test_cosmic_del(test_scheme, setup_annotator, get_test_file, 
                     get_empty_maf_record, vcf_gen, get_test_vcf_record):
     vcf_path = get_test_file('ex2.vcf.gz')
