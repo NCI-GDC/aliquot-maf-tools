@@ -3,7 +3,7 @@ Subcommand for converting a VEP annotated VCF to a protected
 aliquot MAF.
 """
 from aliquotmaf.subcommands.base import Subcommand
-from aliquotmaf.subcommands.vcf_to_protected.runners import GDC_1_0_1_Protected
+from aliquotmaf.subcommands.vcf_to_protected.runners import GDC_1_2_0_Protected
 
 class VcfToProtected(Subcommand):
     @classmethod
@@ -18,7 +18,7 @@ class VcfToProtected(Subcommand):
         subparsers = parser.add_subparsers(dest="subcommand")
         subparsers.reqqqquired = True
 
-        GDC_1_0_1_Protected.add(subparsers=subparsers)
+        GDC_1_2_0_Protected.add(subparsers=subparsers)
 
     @classmethod
     def __get_description__(cls):
