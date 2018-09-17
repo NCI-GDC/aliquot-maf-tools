@@ -27,7 +27,7 @@ def test_scheme(get_test_scheme):
     coldict = OrderedDict([("CONTEXT", StringColumn)])
     return get_test_scheme(coldict)
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def vcf_gen(get_test_file):
     VcfRec = namedtuple("VcfRec", ["snp", "deletion", "insertion"])
     created = []

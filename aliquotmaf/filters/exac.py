@@ -1,5 +1,5 @@
 """
-Applies the common in ExAC filter.
+Applies the common in non-tcga ExAC filter.
 """
 from __future__ import absolute_import
 
@@ -10,9 +10,9 @@ class ExAC(Filter):
         super().__init__(name='CommonInExAC')
         self.tags = ['common_in_exac']
         self.cutoff = cutoff
-        self.subpops = ['ExAC_AF_Adj', 'ExAC_AF', 'ExAC_AF_AFR', 'ExAC_AF_AMR',
-                        'ExAC_AF_EAS', 'ExAC_AF_FIN', 'ExAC_AF_NFE', 'ExAC_AF_OTH', 
-                        'ExAC_AF_SAS']
+        self.subpops = ['nontcga_ExAC_AF_Adj', 'nontcga_ExAC_AF', 'nontcga_ExAC_AF_AFR', 'nontcga_ExAC_AF_AMR',
+                        'nontcga_ExAC_AF_EAS', 'nontcga_ExAC_AF_FIN', 'nontcga_ExAC_AF_NFE', 'nontcga_ExAC_AF_OTH', 
+                        'nontcga_ExAC_AF_SAS']
         self.logger.info("Using ExAC frequency cutoff of {0}".format(cutoff))
 
     @classmethod

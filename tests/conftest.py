@@ -10,7 +10,7 @@ from maflib.record import MafRecord
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
-GenericVcfRecord = namedtuple("GenericVcfRecord", ["samples", "info"])
+GenericVcfRecord = namedtuple("GenericVcfRecord", ["chrom", "pos", "alleles", "ref", "alts", "samples", "info"])
 
 @pytest.fixture
 def get_test_scheme():
@@ -25,8 +25,13 @@ def get_test_scheme():
 
 @pytest.fixture
 def get_test_vcf_record():
-    def generate_vcf_record(samples={}, info={}):
+    def generate_vcf_record(chrom=None, pos=None, alleles=(), ref=None, alts=(), samples={}, info={}):
         tpe = GenericVcfRecord(
+            chrom=chrom,
+            pos=pos,
+            alleles=alleles,
+            ref=ref,
+            alts=alts,
             samples=samples,
             info=info
         )
@@ -43,7 +48,7 @@ def get_empty_maf_record():
 
     return _get_empty_maf_record()
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def get_test_file():
     def _get_test_file(name):
         curr = os.path.dirname(os.path.abspath(__file__))

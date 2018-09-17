@@ -7,6 +7,12 @@ setup(
     description = "Tools for creating and filtering aliquot-level MAFs",
     license = "Apache 2.0",
     packages = find_packages(),
+    setup_requires = [
+        "pytest-runner"
+    ],
+    tests_require = [
+        "pytest"
+    ],
     classifiers = [
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
