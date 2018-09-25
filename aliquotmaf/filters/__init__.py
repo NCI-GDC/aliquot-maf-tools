@@ -6,6 +6,7 @@ from .normal_depth import NormalDepth
 from .gdc_pon import GdcPon
 from .multiallelic import Multiallelic
 from .nonexonic import NonExonic
+from .offtarget import OffTarget
 
 __all__ = [
     ExAC,
@@ -13,5 +14,6 @@ __all__ = [
     NormalDepth,
     GdcPon,
     Multiallelic,
-    NonExonic
+    NonExonic,
+    OffTarget
 ]

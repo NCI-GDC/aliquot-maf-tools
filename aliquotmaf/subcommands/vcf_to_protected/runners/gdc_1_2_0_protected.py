@@ -63,7 +63,8 @@ class GDC_1_2_0_Protected(BaseRunner):
             'normal_depth': None,
             'gdc_pon': None,
             'multiallelic': None,
-            'nonexonic': None
+            'nonexonic': None,
+            'offtarget': None
         }
 
     @classmethod
@@ -151,6 +152,9 @@ class GDC_1_2_0_Protected(BaseRunner):
         filt.add_argument('--nonexonic_intervals', type=str, default=None,
             help='Flag variants outside of this tabix-indexed bed file ' +
                  'as NonExonic')
+        filt.add_argument('--target_intervals', action='append',
+            help='Flag variants outside of these tabix-indexed bed files ' +
+                 'as off_target. Use one or more times.')
 
     def setup_maf_header(self):
         """
@@ -397,7 +401,7 @@ class GDC_1_2_0_Protected(BaseRunner):
                 collection.add(column=k, value=v)
         else: 
             for k in ['n_depth', 'n_ref_count', 'n_alt_count']:
-                collection.add(column=k, value=0)
+                collection.add(column=k, value=None)
 
         for k in data['selected_effect']:
             if k in self._colset and k not in collection._colset:
@@ -535,6 +539,11 @@ class GDC_1_2_0_Protected(BaseRunner):
         if self.options['nonexonic_intervals']:
             self.filters['nonexonic'] = Filters.NonExonic.setup(
                 self.options['nonexonic_intervals']
+            )
+
+        if self.options['target_intervals']:
+            self.filters['off_target'] = Filters.OffTarget.setup(
+                self.options['target_intervals']
             )
 
     @classmethod
