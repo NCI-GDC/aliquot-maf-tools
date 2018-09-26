@@ -53,7 +53,7 @@ class NonTcgaExac(Annotator):
 
         # Overall
         maf_record['nontcga_ExAC_AF'] = get_builder("nontcga_ExAC_AF", self.scheme, value=raw_af)
-        maf_record['nontcga_ExAC_AF_Adj'] = get_builder("nontcga_ExAC_AF_Adj", self.scheme, value=adj_af) 
+        maf_record['nontcga_ExAC_AF_Adj'] = get_builder("nontcga_ExAC_AF_Adj", self.scheme, value=adj_af)
 
         # pops
         for p in self.popkeys: 
