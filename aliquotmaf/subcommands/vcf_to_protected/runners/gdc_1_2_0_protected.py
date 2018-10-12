@@ -55,7 +55,8 @@ class GDC_1_2_0_Protected(BaseRunner):
             'reference_context': None,
             'cosmic_id': None,
             'mutation_status': None,
-            'non_tcga_exac': None
+            'non_tcga_exac': None,
+            'hotspots': None
         }
 
         # Filters
@@ -139,6 +140,8 @@ class GDC_1_2_0_Protected(BaseRunner):
             help="Optional COSMIC VCF for annotating")
         anno.add_argument('--non_tcga_exac_vcf', default=None,
             help="Optional non-TCGA ExAC VCF for annotating and filtering")
+        anno.add_argument('--hotspot_tsv', default=None,
+            help="Optional hotspot TSV") 
 
         filt = parser.add_argument_group(title="Filtering Options")
         filt.add_argument('--exac_freq_cutoff', default=0.001, type=float,
@@ -485,6 +488,13 @@ class GDC_1_2_0_Protected(BaseRunner):
                 var_allele_idx=data['var_allele_idx']
             )
 
+        if self.annotators['hotspots']:
+            maf_record = self.annotators['hotspots'].annotate(
+                maf_record
+            )
+        else:
+            maf_record["hotspot"] = get_builder("hotspot", self._scheme, value=None)
+
         maf_record = self.annotators['reference_context'].annotate(maf_record, vcf_record)
         maf_record = self.annotators['mutation_status'].annotate(
             maf_record, vcf_record, self.options['tumor_vcf_id'])
@@ -532,6 +542,12 @@ class GDC_1_2_0_Protected(BaseRunner):
             self.annotators['non_tcga_exac'] = Annotators.NonTcgaExac.setup(
                 self._scheme,
                 self.options['non_tcga_exac_vcf']
+            )
+
+        if self.options['hotspot_tsv']:
+            self.annotators['hotspots'] = Annotators.Hotspot.setup(
+                self._scheme,
+                self.options['hotspot_tsv']
             )
 
     def setup_filters(self):

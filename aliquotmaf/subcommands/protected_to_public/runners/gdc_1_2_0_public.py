@@ -157,8 +157,8 @@ class GDC_1_2_0_Public(BaseRunner):
                 if hgvsp:
                     if hgvsp in self._hotspots[gene]:
                         return True
-                    else:
-                        print(gene, hgvsp, self._hotspots[gene].keys())
+                    #else:
+                    #    print(gene, hgvsp, self._hotspots[gene].keys())
         return False
 
     def write_record(self, record):
