@@ -1,11 +1,13 @@
-"""Main vcf2maf logic for spec gdc-1.0.1-protected"""
+"""Main vcf2maf logic for spec gdc-1.2.0-protected"""
 import pysam
 import urllib.parse
+
 from operator import itemgetter
 
 from maflib.header import MafHeader
 from maflib.writer import MafWriter
-from maflib.sort_order import Coordinate
+from maflib.sort_order import BarcodesAndCoordinate
+from maflib.sorter import MafSorter
 from maflib.header import MafHeaderRecord
 
 import aliquotmaf.annotators as Annotators
@@ -31,9 +33,9 @@ from aliquotmaf.converters.formatters import (
     format_vcf_columns
 )
 
-class GDC_1_0_1_Protected(BaseRunner):
+class GDC_1_2_0_Protected(BaseRunner):
     def __init__(self, options=dict()):
-        super(GDC_1_0_1_Protected, self).__init__(options)
+        super(GDC_1_2_0_Protected, self).__init__(options)
 
         # Load the resource files
         self.logger.info("Loading priority files")
@@ -45,14 +47,15 @@ class GDC_1_0_1_Protected(BaseRunner):
 
         # Schema
         self.options['version'] = 'gdc-1.0.0'
-        self.options['annotation'] = 'gdc-1.0.1-protected'
+        self.options['annotation'] = 'gdc-1.2.0-protected'
 
         # Annotators
         self.annotators = {
             'dbsnp_priority_db': None,
             'reference_context': None,
             'cosmic_id': None,
-            'mutation_status': None
+            'mutation_status': None,
+            'non_tcga_exac': None
         }
 
         # Filters
@@ -62,7 +65,8 @@ class GDC_1_0_1_Protected(BaseRunner):
             'normal_depth': None,
             'gdc_pon': None,
             'multiallelic': None,
-            'nonexonic': None
+            'nonexonic': None,
+            'offtarget': None
         }
 
     @classmethod
@@ -126,16 +130,20 @@ class GDC_1_0_1_Protected(BaseRunner):
             help="DBSNP priority sqlite database")
         anno.add_argument('--reference_fasta', required=True,
             help="Reference fasta file")
+        anno.add_argument('--reference_fasta_index', required=True,
+            help="Reference fasta fai file")
         anno.add_argument('--reference_context_size', type=int, default=5,
             help="Number of BP to add both upstream and " +
                  "downstream from variant for reference context")
         anno.add_argument('--cosmic_vcf', default=None,
             help="Optional COSMIC VCF for annotating")
+        anno.add_argument('--non_tcga_exac_vcf', default=None,
+            help="Optional non-TCGA ExAC VCF for annotating and filtering")
 
         filt = parser.add_argument_group(title="Filtering Options")
-        filt.add_argument('--exac_freq_cutoff', default=0.0004, type=float,
+        filt.add_argument('--exac_freq_cutoff', default=0.001, type=float,
             help='Flag variants where the allele frequency in any ExAC population ' +
-                 'is great than this value as common_in_exac [0.0004]')
+                 'is great than this value as common_in_exac [0.001]')
         filt.add_argument('--gdc_blacklist', type=str, default=None, 
             help='The file containing the blacklist tags and tumor aliquot uuids to ' +
                  'apply them to.')
@@ -148,6 +156,9 @@ class GDC_1_0_1_Protected(BaseRunner):
         filt.add_argument('--nonexonic_intervals', type=str, default=None,
             help='Flag variants outside of this tabix-indexed bed file ' +
                  'as NonExonic')
+        filt.add_argument('--target_intervals', action='append',
+            help='Flag variants outside of these tabix-indexed bed files ' +
+                 'as off_target. Use one or more times.')
 
     def setup_maf_header(self):
         """
@@ -156,7 +167,7 @@ class GDC_1_0_1_Protected(BaseRunner):
         self.maf_header = MafHeader.from_defaults(
             version=self.options['version'],
             annotation=self.options['annotation'],
-            sort_order=Coordinate())
+            sort_order=BarcodesAndCoordinate())
 
         header_date = BaseRunner.get_header_date()
         self.maf_header[header_date.key] = header_date
@@ -183,8 +194,14 @@ class GDC_1_0_1_Protected(BaseRunner):
 
         self.maf_writer = MafWriter.from_path(
             path=self.options['output_maf'],
-            header=self.maf_header,
-            assume_sorted=True)
+            header=self.maf_header)
+
+        sorter = MafSorter(
+            max_objects_in_ram=100000,
+            sort_order_name=BarcodesAndCoordinate.name(),
+            scheme=self.maf_writer.header().scheme(),
+            fasta_index=self.options["reference_fasta_index"]
+        )
 
         self._scheme = self.maf_header.scheme()
         self._columns = get_columns_from_header(self.maf_header)
@@ -221,23 +238,38 @@ class GDC_1_0_1_Protected(BaseRunner):
                                     tumor_idx, normal_idx, ann_cols_format, vep_key,
                                     vcf_record, is_tumor_only)
 
-                ## Transform
+                # Transform
                 maf_record = self.transform(vcf_record, data, is_tumor_only, line_number=line)
 
-                self.maf_writer += maf_record
+                # Add to sorter 
+                sorter += maf_record
                 line += 1
+
+            # Write
+            self.logger.info("Writing {0} sorted records...".format(line))
+            counter = 1
+            for record in sorter:
+                if counter % 1000 == 0:
+                    self.logger.info("Wrote {0} records...".format(counter))
+                self.maf_writer += record
+                counter += 1
 
         finally:
             vcf_object.close()
             self.maf_writer.close()
+            sorter.close()
             for anno in self.annotators:
                 if self.annotators[anno]:
                     self.annotators[anno].shutdown()
 
-    
+        self.logger.info("Finished")
+
     def extract(self, tumor_sample_id, normal_sample_id,
                 tumor_idx, normal_idx, ann_cols, vep_key,
                 record, is_tumor_only):
+        """
+        Extract the VCF information needed to transform into MAF.
+        """
         dic = {
             "var_allele_idx": None,
             "tumor_gt": None,
@@ -394,11 +426,10 @@ class GDC_1_0_1_Protected(BaseRunner):
                 collection.add(column=k, value=v)
         else: 
             for k in ['n_depth', 'n_ref_count', 'n_alt_count']:
-                collection.add(column=k, value=0)
+                collection.add(column=k, value=None)
 
         for k in data['selected_effect']:
             if k in self._colset and k not in collection._colset:
-                #if k == 'Feature_type': print(data['selected_effect'][k])
                 collection.add(column=k, value=data['selected_effect'][k])
 
         # Set other uuids
@@ -407,10 +438,10 @@ class GDC_1_0_1_Protected(BaseRunner):
         collection.add(column="normal_bam_uuid", value=self.options['normal_bam_uuid'])
         collection.add(column="case_id", value=self.options['case_uuid'])
 
-        # Validation
-        collection.add(column="GDC_Validation_Status", value="Unknown")
-        collection.add(column="GDC_Valid_Somatic", value="False")
-        collection.add(column="MC3_Overlap", value="Unknown")
+        ## Validation
+        #collection.add(column="GDC_Validation_Status", value="Unknown")
+        #collection.add(column="GDC_Valid_Somatic", value="False")
+        #collection.add(column="MC3_Overlap", value="Unknown")
 
         # VCF columns
         collection.add(column="FILTER", value=';'.join(sorted(list(vcf_record.filter))))
@@ -446,6 +477,14 @@ class GDC_1_0_1_Protected(BaseRunner):
             maf_record = self.annotators['cosmic_id'].annotate(maf_record, vcf_record)
         else:
             maf_record["COSMIC"] = get_builder("COSMIC", self._scheme, value=None)
+
+        if self.annotators['non_tcga_exac']:
+            maf_record = self.annotators['non_tcga_exac'].annotate(
+                maf_record, 
+                vcf_record, 
+                var_allele_idx=data['var_allele_idx']
+            )
+
         maf_record = self.annotators['reference_context'].annotate(maf_record, vcf_record)
         maf_record = self.annotators['mutation_status'].annotate(
             maf_record, vcf_record, self.options['tumor_vcf_id'])
@@ -489,6 +528,12 @@ class GDC_1_0_1_Protected(BaseRunner):
                 self.options['cosmic_vcf']
             )
 
+        if self.options['non_tcga_exac_vcf']:
+            self.annotators['non_tcga_exac'] = Annotators.NonTcgaExac.setup(
+                self._scheme,
+                self.options['non_tcga_exac_vcf']
+            )
+
     def setup_filters(self):
         """
         Sets up all filter classes.
@@ -520,6 +565,11 @@ class GDC_1_0_1_Protected(BaseRunner):
                 self.options['nonexonic_intervals']
             )
 
+        if self.options['target_intervals']:
+            self.filters['off_target'] = Filters.OffTarget.setup(
+                self.options['target_intervals']
+            )
+
     @classmethod
     def __tool_name__(cls):
-        return "gdc-1.0.1-protected"
+        return "gdc-1.2.0-protected"
