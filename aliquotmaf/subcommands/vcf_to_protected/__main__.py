@@ -16,7 +16,7 @@ class VcfToProtected(Subcommand):
         
         # subparsers
         subparsers = parser.add_subparsers(dest="subcommand")
-        subparsers.reqqqquired = True
+        subparsers.required = True
 
         GDC_1_2_0_Protected.add(subparsers=subparsers)
 

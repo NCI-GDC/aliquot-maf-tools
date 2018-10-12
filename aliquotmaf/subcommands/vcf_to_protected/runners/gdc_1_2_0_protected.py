@@ -1,11 +1,13 @@
-"""Main vcf2maf logic for spec gdc-1.0.1-protected"""
+"""Main vcf2maf logic for spec gdc-1.2.0-protected"""
 import pysam
 import urllib.parse
+
 from operator import itemgetter
 
 from maflib.header import MafHeader
 from maflib.writer import MafWriter
-from maflib.sort_order import Coordinate
+from maflib.sort_order import BarcodesAndCoordinate
+from maflib.sorter import MafSorter
 from maflib.header import MafHeaderRecord
 
 import aliquotmaf.annotators as Annotators
@@ -128,6 +130,8 @@ class GDC_1_2_0_Protected(BaseRunner):
             help="DBSNP priority sqlite database")
         anno.add_argument('--reference_fasta', required=True,
             help="Reference fasta file")
+        anno.add_argument('--reference_fasta_index', required=True,
+            help="Reference fasta fai file")
         anno.add_argument('--reference_context_size', type=int, default=5,
             help="Number of BP to add both upstream and " +
                  "downstream from variant for reference context")
@@ -163,7 +167,7 @@ class GDC_1_2_0_Protected(BaseRunner):
         self.maf_header = MafHeader.from_defaults(
             version=self.options['version'],
             annotation=self.options['annotation'],
-            sort_order=Coordinate())
+            sort_order=BarcodesAndCoordinate())
 
         header_date = BaseRunner.get_header_date()
         self.maf_header[header_date.key] = header_date
@@ -190,8 +194,14 @@ class GDC_1_2_0_Protected(BaseRunner):
 
         self.maf_writer = MafWriter.from_path(
             path=self.options['output_maf'],
-            header=self.maf_header,
-            assume_sorted=True)
+            header=self.maf_header)
+
+        sorter = MafSorter(
+            max_objects_in_ram=100000,
+            sort_order_name=BarcodesAndCoordinate.name(),
+            scheme=self.maf_writer.header().scheme(),
+            fasta_index=self.options["reference_fasta_index"]
+        )
 
         self._scheme = self.maf_header.scheme()
         self._columns = get_columns_from_header(self.maf_header)
@@ -228,23 +238,38 @@ class GDC_1_2_0_Protected(BaseRunner):
                                     tumor_idx, normal_idx, ann_cols_format, vep_key,
                                     vcf_record, is_tumor_only)
 
-                ## Transform
+                # Transform
                 maf_record = self.transform(vcf_record, data, is_tumor_only, line_number=line)
 
-                self.maf_writer += maf_record
+                # Add to sorter 
+                sorter += maf_record
                 line += 1
+
+            # Write
+            self.logger.info("Writing {0} sorted records...".format(line))
+            counter = 1
+            for record in sorter:
+                if counter % 1000 == 0:
+                    self.logger.info("Wrote {0} records...".format(counter))
+                self.maf_writer += record
+                counter += 1
 
         finally:
             vcf_object.close()
             self.maf_writer.close()
+            sorter.close()
             for anno in self.annotators:
                 if self.annotators[anno]:
                     self.annotators[anno].shutdown()
 
-    
+        self.logger.info("Finished")
+
     def extract(self, tumor_sample_id, normal_sample_id,
                 tumor_idx, normal_idx, ann_cols, vep_key,
                 record, is_tumor_only):
+        """
+        Extract the VCF information needed to transform into MAF.
+        """
         dic = {
             "var_allele_idx": None,
             "tumor_gt": None,
@@ -405,7 +430,6 @@ class GDC_1_2_0_Protected(BaseRunner):
 
         for k in data['selected_effect']:
             if k in self._colset and k not in collection._colset:
-                #if k == 'Feature_type': print(data['selected_effect'][k])
                 collection.add(column=k, value=data['selected_effect'][k])
 
         # Set other uuids
@@ -414,10 +438,10 @@ class GDC_1_2_0_Protected(BaseRunner):
         collection.add(column="normal_bam_uuid", value=self.options['normal_bam_uuid'])
         collection.add(column="case_id", value=self.options['case_uuid'])
 
-        # Validation
-        collection.add(column="GDC_Validation_Status", value="Unknown")
-        collection.add(column="GDC_Valid_Somatic", value="False")
-        collection.add(column="MC3_Overlap", value="Unknown")
+        ## Validation
+        #collection.add(column="GDC_Validation_Status", value="Unknown")
+        #collection.add(column="GDC_Valid_Somatic", value="False")
+        #collection.add(column="MC3_Overlap", value="Unknown")
 
         # VCF columns
         collection.add(column="FILTER", value=';'.join(sorted(list(vcf_record.filter))))
