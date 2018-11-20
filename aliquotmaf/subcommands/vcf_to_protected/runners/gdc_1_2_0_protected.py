@@ -9,6 +9,7 @@ from maflib.writer import MafWriter
 from maflib.sort_order import BarcodesAndCoordinate
 from maflib.sorter import MafSorter
 from maflib.header import MafHeaderRecord
+from maflib.validation import ValidationStringency
 
 import aliquotmaf.annotators as Annotators
 import aliquotmaf.filters as Filters
@@ -55,7 +56,8 @@ class GDC_1_2_0_Protected(BaseRunner):
             'reference_context': None,
             'cosmic_id': None,
             'mutation_status': None,
-            'non_tcga_exac': None
+            'non_tcga_exac': None,
+            'hotspots': None
         }
 
         # Filters
@@ -139,6 +141,8 @@ class GDC_1_2_0_Protected(BaseRunner):
             help="Optional COSMIC VCF for annotating")
         anno.add_argument('--non_tcga_exac_vcf', default=None,
             help="Optional non-TCGA ExAC VCF for annotating and filtering")
+        anno.add_argument('--hotspot_tsv', default=None,
+            help="Optional hotspot TSV") 
 
         filt = parser.add_argument_group(title="Filtering Options")
         filt.add_argument('--exac_freq_cutoff', default=0.001, type=float,
@@ -167,7 +171,8 @@ class GDC_1_2_0_Protected(BaseRunner):
         self.maf_header = MafHeader.from_defaults(
             version=self.options['version'],
             annotation=self.options['annotation'],
-            sort_order=BarcodesAndCoordinate())
+            sort_order=BarcodesAndCoordinate(),
+            fasta_index=self.options['reference_fasta_index'])
 
         header_date = BaseRunner.get_header_date()
         self.maf_header[header_date.key] = header_date
@@ -192,14 +197,10 @@ class GDC_1_2_0_Protected(BaseRunner):
         # Initialize the maf file
         self.setup_maf_header()
 
-        self.maf_writer = MafWriter.from_path(
-            path=self.options['output_maf'],
-            header=self.maf_header)
-
         sorter = MafSorter(
             max_objects_in_ram=100000,
             sort_order_name=BarcodesAndCoordinate.name(),
-            scheme=self.maf_writer.header().scheme(),
+            scheme=self.maf_header.scheme(),
             fasta_index=self.options["reference_fasta_index"]
         )
 
@@ -216,7 +217,8 @@ class GDC_1_2_0_Protected(BaseRunner):
         try:
             # Validate samples
             tumor_idx = assert_sample_in_header(vcf_object, self.options['tumor_vcf_id'])
-            normal_idx = assert_sample_in_header(vcf_object, self.options['normal_vcf_id'], can_fail=is_tumor_only)
+            normal_idx = assert_sample_in_header(vcf_object, self.options['normal_vcf_id'], 
+                can_fail=is_tumor_only)
 
             # extract annotation from header
             ann_cols_format, vep_key = extract_annotation_from_header(vcf_object, vep_key='CSQ')
@@ -247,6 +249,11 @@ class GDC_1_2_0_Protected(BaseRunner):
 
             # Write
             self.logger.info("Writing {0} sorted records...".format(line))
+            self.maf_writer = MafWriter.from_path(
+                path=self.options['output_maf'],
+                header=self.maf_header,
+                validation_stringency=ValidationStringency.Strict)
+
             counter = 1
             for record in sorter:
                 if counter % 1000 == 0:
@@ -254,10 +261,13 @@ class GDC_1_2_0_Protected(BaseRunner):
                 self.maf_writer += record
                 counter += 1
 
+            self.logger.info("Finsihed writing {0} records".format(counter))
+
         finally:
             vcf_object.close()
-            self.maf_writer.close()
             sorter.close()
+            if self.maf_writer:
+                self.maf_writer.close()
             for anno in self.annotators:
                 if self.annotators[anno]:
                     self.annotators[anno].shutdown()
@@ -438,11 +448,6 @@ class GDC_1_2_0_Protected(BaseRunner):
         collection.add(column="normal_bam_uuid", value=self.options['normal_bam_uuid'])
         collection.add(column="case_id", value=self.options['case_uuid'])
 
-        ## Validation
-        #collection.add(column="GDC_Validation_Status", value="Unknown")
-        #collection.add(column="GDC_Valid_Somatic", value="False")
-        #collection.add(column="MC3_Overlap", value="Unknown")
-
         # VCF columns
         collection.add(column="FILTER", value=';'.join(sorted(list(vcf_record.filter))))
         collection.add(column="vcf_region", value=data['vcf_columns']['vcf_region'])
@@ -471,7 +476,8 @@ class GDC_1_2_0_Protected(BaseRunner):
         if self.annotators['dbsnp_priority_db']:
             maf_record = self.annotators['dbsnp_priority_db'].annotate(maf_record)
         else:
-            maf_record["dbSNP_Val_Status"] = get_builder("dbSNP_Val_Status", self._scheme, value=None)
+            maf_record["dbSNP_Val_Status"] = get_builder(
+                "dbSNP_Val_Status", self._scheme, value=None)
 
         if self.annotators['cosmic_id']:
             maf_record = self.annotators['cosmic_id'].annotate(maf_record, vcf_record)
@@ -485,6 +491,13 @@ class GDC_1_2_0_Protected(BaseRunner):
                 var_allele_idx=data['var_allele_idx']
             )
 
+        if self.annotators['hotspots']:
+            maf_record = self.annotators['hotspots'].annotate(
+                maf_record
+            )
+        else:
+            maf_record["hotspot"] = get_builder("hotspot", self._scheme, value=None)
+
         maf_record = self.annotators['reference_context'].annotate(maf_record, vcf_record)
         maf_record = self.annotators['mutation_status'].annotate(
             maf_record, vcf_record, self.options['tumor_vcf_id'])
@@ -496,7 +509,10 @@ class GDC_1_2_0_Protected(BaseRunner):
             if filt_obj and filt_obj.filter(maf_record):
                 gdc_filters.extend(filt_obj.tags)
 
-        maf_record["GDC_FILTER"] = get_builder("GDC_FILTER", self._scheme, value=';'.join(sorted(gdc_filters)))
+        maf_record["GDC_FILTER"] = get_builder(
+            "GDC_FILTER", 
+            self._scheme, 
+            value=';'.join(sorted(gdc_filters)))
        
         return maf_record
 
@@ -532,6 +548,12 @@ class GDC_1_2_0_Protected(BaseRunner):
             self.annotators['non_tcga_exac'] = Annotators.NonTcgaExac.setup(
                 self._scheme,
                 self.options['non_tcga_exac_vcf']
+            )
+
+        if self.options['hotspot_tsv']:
+            self.annotators['hotspots'] = Annotators.Hotspot.setup(
+                self._scheme,
+                self.options['hotspot_tsv']
             )
 
     def setup_filters(self):
