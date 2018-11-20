@@ -83,7 +83,7 @@ class GenericSequenceBuilder(Builder):
         elif value is None and scheme.column_class(key).is_nullable():
             return scheme.column_class(key).build_nullable(key, scheme=scheme)
         elif isinstance(value, list):
-            return MafColumnRecord.build(key, ','.join(sorted(value)), scheme=scheme)
+            return MafColumnRecord.build(key, ';'.join(sorted(value)), scheme=scheme)
         else:
             return MafColumnRecord.build(key, value, scheme=scheme)
 
