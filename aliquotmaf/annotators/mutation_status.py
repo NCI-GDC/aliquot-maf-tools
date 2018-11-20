@@ -18,7 +18,9 @@ class MutationStatus(Annotator):
             'GATK4 MuTect2': self._mutect2,
             'SomaticSniper': self._somaticsniper,
             'MuSE': self._muse,
-            'VarScan2': self._varscan
+            'VarScan2': self._varscan,
+            'Pindel': self._muse,
+            'VarDict': self._vardict
         }
 
     @classmethod
@@ -58,6 +60,19 @@ class MutationStatus(Annotator):
             3: 'LOH', 4: 'Post-transcriptional modification', 5: 'Unknown'}
         ss = record.samples[tumor_sample]['SS']
         return lookup[ss]
+
+    def _vardict(self, record, tumor_sample):
+        """VarDict parser from INFO"""
+        lookup = {
+            'LikelyLOH': 'LOH',
+            'StrongLOH': 'LOH',
+            'LikelySomatic': 'Somatic',
+            'Germline': 'Germline',
+            'AFDiff': 'Unknown',
+            'StrongSomatic': 'Somatic'
+        }
+        val = record.info['STATUS']
+        return lookup[val]
 
     def shutdown(self):
         pass 

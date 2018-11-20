@@ -3,24 +3,17 @@ from collections import Counter
 
 class MafMetricsCollection:
     def __init__(self):
-        self.total_records = 0
-        self.vcf_filters = Counter() 
-        self.gdc_filters = Counter()
+        self.input_records = 0
+        self.output_records = 0
         self.variant_classification = Counter()
         self.variant_type = Counter()
-        self.known = {'novel': 0, 'dbsnp': 0, 'cosmic': 0}
+        self.known = {'novel': 0, 'dbsnp': 0, 'cosmic': 0, 'common_in_exac': 0}
 
-    def collect(self, record):
+    def collect_output(self, record):
         """
-        Collect metrics from the record.
+        Collect metrics from the record that you will output.
         """
-        self.total_records += 1
-        # filters
-        if record['FILTER'].value and record['FILTER'].value != ['PASS']:
-            self.vcf_filters[str(record['FILTER'])] += 1
-
-        if record['GDC_FILTER'].value: 
-            self.gdc_filters[str(record['GDC_FILTER'])] += 1
+        self.output_records += 1
 
         # variant clasification
         self.variant_classification[record['Variant_Classification'].value.value] += 1
@@ -29,10 +22,15 @@ class MafMetricsCollection:
         self.variant_type[record['Variant_Type'].value.value] += 1
 
         # known
+        is_common = 'common_in_exac' in record['FILTER'].value
+        if is_common:
+            self.known['common_in_exac'] += 1
+
         if record['dbSNP_RS'].value:
             curr = record['dbSNP_RS'].value
             if curr == ['novel']:
-                self.known['novel'] += 1
+                if not is_common:
+                    self.known['novel'] += 1
             else:
                 self.known['dbsnp'] += 1
 
@@ -41,9 +39,8 @@ class MafMetricsCollection:
 
     def to_json(self):
         return {
-            'total_records': self.total_records,
-            'vcf_filters': self.vcf_filters,
-            'gdc_filters': self.gdc_filters,
+            'input_records': self.input_records,
+            'output_records': self.output_records,
             'variant_classification': self.variant_classification,
             'variant_type': self.variant_type,
             'known': self.known

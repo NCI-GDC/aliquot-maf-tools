@@ -40,8 +40,10 @@ class Hotspot(Annotator):
         if gene in self.data:
             hgvsp = None if not maf_record['HGVSp_Short'].value else \
                 maf_record['HGVSp_Short'].value.lstrip('p.')
+            if hgvsp and 'fs*' in hgvsp:
+                idx = hgvsp.index('fs')
+                hgvsp = hgvsp[:idx-1] + 'fs'
             if hgvsp and hgvsp in self.data[gene]:
-                self.logger.info(hgvsp)
                 mval = "Y"
         maf_record['hotspot'] = get_builder("hotspot", self.scheme, value=mval)
         return maf_record
