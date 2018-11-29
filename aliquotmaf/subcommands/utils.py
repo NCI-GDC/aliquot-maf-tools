@@ -1,4 +1,4 @@
-"""Ulitity functions"""
+"""Utility functions for subcommands"""
 import gzip
 import re
 import json

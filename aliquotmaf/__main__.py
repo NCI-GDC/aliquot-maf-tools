@@ -11,6 +11,7 @@ from aliquotmaf.logger import Logger
 
 from aliquotmaf.subcommands.vcf_to_protected.__main__ import VcfToProtected
 from aliquotmaf.subcommands.protected_to_public.__main__ import ProtectedToPublic
+from aliquotmaf.subcommands.merge_protected.__main__ import MergeProtected
 
 signal(SIGPIPE, SIG_DFL)
 
@@ -37,7 +38,8 @@ def main(args=None):
 
     VcfToProtected.add(subparsers=subparsers)
     ProtectedToPublic.add(subparsers=subparsers)
-    
+    MergeProtected.add(subparsers=subparsers) 
+
     options = p.parse_args(args)
 
     # Run
