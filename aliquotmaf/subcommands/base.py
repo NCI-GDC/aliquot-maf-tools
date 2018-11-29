@@ -1,3 +1,6 @@
+"""
+Abstract base class for all subcommands in aliquot-maf-tool.
+"""
 from abc import ABCMeta, abstractmethod
 
 class Subcommand(metaclass=ABCMeta):

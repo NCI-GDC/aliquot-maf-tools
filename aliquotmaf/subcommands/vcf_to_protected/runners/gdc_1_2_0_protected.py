@@ -152,8 +152,7 @@ class GDC_1_2_0_Protected(BaseRunner):
             help='The file containing the blacklist tags and tumor aliquot uuids to ' +
                  'apply them to.')
         filt.add_argument('--min_n_depth', default=7, type=int, 
-            help='Flag variants where normal depth is > INT (NOTE: Not ' +
-                 'including) as ndp [7].')
+            help='Flag variants where normal depth is <= INT as ndp [7].')
         filt.add_argument('--gdc_pon_vcf', type=str, default=None, 
             help='The tabix-indexed panel of normals VCF for applying the gdc ' +
                  'pon filter') 
@@ -261,7 +260,7 @@ class GDC_1_2_0_Protected(BaseRunner):
                 self.maf_writer += record
                 counter += 1
 
-            self.logger.info("Finsihed writing {0} records".format(counter))
+            self.logger.info("Finished writing {0} records".format(counter))
 
         finally:
             vcf_object.close()
