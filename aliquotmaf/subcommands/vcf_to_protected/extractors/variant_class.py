@@ -6,11 +6,11 @@ import re
 from aliquotmaf.subcommands.vcf_to_protected.extractors import Extractor
 
 class VariantClassExtractor(Extractor):
+    """
+    Maps the selected effect to the MAF variant class options.
+    """
     @classmethod
     def extract(cls, cons, var_type, inframe):
-        #cons     = kwargs['cons']
-        #var_type = kwargs['var_type']
-        #inframe  = kwargs['inframe']
 
         # Splice_Site
         if re.search(r'^(splice_acceptor_variant|splice_donor_variant|transcript_ablation|exon_loss_variant)$', cons):
