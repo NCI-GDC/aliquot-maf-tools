@@ -55,7 +55,18 @@ class MafRecordMerger_1_0_0(BaseMafRecordMerger,
 
     def merge_records(self, results, tumor_only=False): 
         """
-        Returns one or more merged MAF records.
+        Returns one or more merged MAF records. This implementation is:
+
+        1. If singleton -> format and write
+        2. elif only one caller has overlaps -> loop over all records, format,
+           and write
+        3. elif there are multiple callers with only a single allele annotated 
+           -> merge into single record with most columns copied from caller
+           based on self.caller_order()
+        4. elif there are multiple variant types ->
+               if there is a majority vote -> merge and write 
+               else -> collapse by self.caller_type_order (see self.collapse_by_caller_type)
+        5. else -> collapse by self.caller_type_order (see self.collapse_by_caller_type)
         """
         maf_records = []
 
