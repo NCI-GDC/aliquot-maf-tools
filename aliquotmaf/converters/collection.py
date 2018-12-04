@@ -5,7 +5,10 @@ MAF columns.
 from aliquotmaf.converters.builder import get_builder
 
 class InputCollection:
-    """Holds the data you want to transform into MafColumnRecords."""
+    """
+    Holds the data you want to transform into MafColumnRecords. You add builders
+    to the instance and then use transform to convert to MAF columns.
+    """
     def __init__(self):
         self._from_data = []
         self._colset = {}
