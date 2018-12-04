@@ -33,10 +33,9 @@ class FilteringPeekableIterator:
           - Isn't Somatic
           - Is larger than 50bp
           - Failed caller filters
-            - Tier1 allowed
-            - If it is a hotspot, allow panel_of_normals
+            - Tier1,2,3,4; panel_of_normals allowed
         """
-        vflt_ignore = set(['Tier1'])
+        vflt_ignore = set(['Tier1', 'Tier2', 'Tier3', 'Tier4', 'panel_of_normals'])
         can_skip = True
         while can_skip:
             self._peek = next(self._iter, None)
@@ -49,11 +48,10 @@ class FilteringPeekableIterator:
 
                 if status == 'Somatic' and size <= 50:
                     vflt = set([i for i in self._peek['FILTER'].value \
-                        if i != 'PASS']) - vflt_ignore
+                        if i and i != 'PASS']) - vflt_ignore
 
-                    if (not vflt) or (self._peek['hotspot'].value.value == 'Y' \
-                    and len(vflt - set(['panel_of_normals']))==0):
-                         can_skip = False
+                    if not vflt:
+                        can_skip = False
             else:
                 can_skip = False
 
