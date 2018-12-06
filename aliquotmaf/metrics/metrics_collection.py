@@ -8,7 +8,16 @@ class MafMetricsCollection:
         self.variant_classification = Counter()
         self.variant_type = Counter()
         self.known = {'novel': 0, 'dbsnp': 0, 'cosmic': 0, 'common_in_exac': 0}
+        self.sample_swaps = {'total': 0, 'common_in_exac': 0}
 
+    def add_sample_swap_metric(self, record):
+        self.sample_swaps['total'] += 1
+
+        # known
+        is_common = 'common_in_exac' in record['GDC_FILTER'].value
+        if is_common:
+            self.sample_swaps['common_in_exac'] += 1
+        
     def collect_output(self, record):
         """
         Collect metrics from the record that you will output.
@@ -22,7 +31,7 @@ class MafMetricsCollection:
         self.variant_type[record['Variant_Type'].value.value] += 1
 
         # known
-        is_common = 'common_in_exac' in record['FILTER'].value
+        is_common = 'common_in_exac' in record['GDC_FILTER'].value
         if is_common:
             self.known['common_in_exac'] += 1
 
@@ -43,5 +52,6 @@ class MafMetricsCollection:
             'output_records': self.output_records,
             'variant_classification': self.variant_classification,
             'variant_type': self.variant_type,
-            'known': self.known
+            'known': self.known,
+            'sample_swaps': self.sample_swaps
         }

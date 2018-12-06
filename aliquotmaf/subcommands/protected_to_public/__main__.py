@@ -2,7 +2,7 @@
 Subcommand for converting a protected aliquot MAF to a public aliquot MAF.
 """
 from aliquotmaf.subcommands.base import Subcommand
-from aliquotmaf.subcommands.protected_to_public.runners import GDC_1_2_0_Public
+from aliquotmaf.subcommands.protected_to_public.runners import GDC_1_0_0_Merged_Public
 
 class ProtectedToPublic(Subcommand):
     @classmethod
@@ -17,7 +17,7 @@ class ProtectedToPublic(Subcommand):
         subparsers = parser.add_subparsers(dest="subcommand")
         subparsers.required = True
 
-        GDC_1_2_0_Public.add(subparsers=subparsers)
+        GDC_1_0_0_Merged_Public.add(subparsers=subparsers)
 
     @classmethod
     def __get_description__(cls):
