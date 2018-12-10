@@ -157,3 +157,32 @@ optional arguments:
                         This is performed after averaging depths across
                         callers [7]
 ```
+
+## Filter Merged Protected MAF
+
+All of the implementations use the format:
+
+```
+aliquot-maf-tools ProtectedToPublic \
+    --input_maff <path to input merged MAF> \
+    --output_maf <path to output filtered MAF> \
+    <schema version> <OPTIONS>
+```
+
+### `gdc-1.0.0-merged-public` Options
+
+```
+usage: GDC Aliquot MAF Tools ProtectedToPublic gdc-1.0.0-merged-public
+       [-h] [--tumor_only] [--reference_fasta_index REFERENCE_FASTA_INDEX]
+       [--min_callers MIN_CALLERS]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --tumor_only          Is this a tumor-only VCF?
+  --reference_fasta_index REFERENCE_FASTA_INDEX
+                        Path to the reference fasta fai file if the input MAF
+                        is not sorted
+  --min_callers MIN_CALLERS
+                        Minimum number of callers required [2]
+
+```
