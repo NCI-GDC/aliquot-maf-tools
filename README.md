@@ -123,3 +123,37 @@ Filtering Options:
                         Flag variants outside of these tabix-indexed bed files
                         as off_target. Use one or more times.
 ```
+
+## Merge per-caller protected MAFs
+
+Merge two or more per-caller protected MAFs from the same tumor/normal pair. All
+implementations use the format:
+
+```
+aliquot-maf-tools MergeProtected \
+    --output_maf <path to output merged MAF> \
+    <schema version> <OPTIONS>
+```
+
+### `gdc-1.0.0-merged-protected` Options
+
+```
+usage: GDC Aliquot MAF Tools MergeProtected gdc-1.0.0-merged-protected
+       [-h] [--mutect2 MUTECT2] [--muse MUSE] [--vardict VARDICT]
+       [--varscan2 VARSCAN2] [--somaticsniper SOMATICSNIPER] [--pindel PINDEL]
+       [--min_n_depth MIN_N_DEPTH]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --mutect2 MUTECT2     Path to input protected MuTect2 MAF file
+  --muse MUSE           Path to input protected MuSE MAF file
+  --vardict VARDICT     Path to input protected VarDict MAF file
+  --varscan2 VARSCAN2   Path to input protected VarScan2 MAF file
+  --somaticsniper SOMATICSNIPER
+                        Path to input protected SomaticSniper MAF file
+  --pindel PINDEL       Path to input protected Pindel MAF file
+  --min_n_depth MIN_N_DEPTH
+                        Flag variants where normal depth is <= INT as ndp.
+                        This is performed after averaging depths across
+                        callers [7]
+```
