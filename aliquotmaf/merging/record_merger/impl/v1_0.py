@@ -97,10 +97,15 @@ class MafRecordMerger_1_0_0(BaseMafRecordMerger,
                         _max = ct
                     elif ct > 1 and ct == _max:
                         curr.append(allele)
+
                 if len(curr) == 1:
                     val = results.locus_allele_map[curr[0]]
                     callers = sorted(list(val.keys()))
-                    maf_records = [self.maf_from_first_element(val, callers, tumor_only=tumor_only)]
+                    all_callers = set(results.callers)
+                    star_callers = sorted(list(all_callers - set(callers)))
+                    maf_records = [self.maf_from_first_element(
+                        val, callers, star_callers = star_callers, 
+                        tumor_only=tumor_only)]
 
                 else:
                     maf_records = [self.collapse_by_caller_type(results, tumor_only=tumor_only)]
@@ -162,10 +167,14 @@ class MafRecordMerger_1_0_0(BaseMafRecordMerger,
 
             key = ':'.join(list(map(str, [record['Start_Position'], record['End_Position'],
                 record['Allele']])))
-            other_matches = {k : results.locus_allele_map[key][k] for k in results.locus_allele_map[key] if k != selected_key[0]}
+            other_matches = {k : results.locus_allele_map[key][k] \
+                for k in results.locus_allele_map[key] \
+                if k != selected_key[0]}
             new_rec.update(other_matches)
             star_callers = sorted(list(all_callers - set(new_rec.keys())))
-            maf_record = self.maf_from_first_element(new_rec, sorted(list(new_rec.keys())), star_callers=star_callers, tumor_only=tumor_only)
+            maf_record = self.maf_from_first_element(
+                new_rec, sorted(list(new_rec.keys())), 
+                star_callers=star_callers, tumor_only=tumor_only)
             return maf_record
 
         # When multiple overlapping records for selected caller-type, we
@@ -187,7 +196,9 @@ class MafRecordMerger_1_0_0(BaseMafRecordMerger,
                 if k != selected_key[0]}
             new_rec.update(other_matches)
             star_callers = sorted(list(all_callers - set(new_rec.keys())))
-            maf_record = self.maf_from_first_element(new_rec, sorted(list(new_rec.keys())), star_callers=star_callers, tumor_only=tumor_only)
+            maf_record = self.maf_from_first_element(
+                new_rec, sorted(list(new_rec.keys())), 
+                star_callers=star_callers, tumor_only=tumor_only)
             return maf_record
 
     def format_dic_to_record(self, maf_dic, callers, star_callers=[], tumor_only=False):
