@@ -124,11 +124,17 @@ class GDC_1_0_0_Merged_Public(BaseRunner):
             self.maf_writer.close()
 
     def is_hotspot(self, record):
+        """
+        Helper function to test if the record is marked as a hotspot.
+        """
         if record['hotspot'].value and record['hotspot'].value.value == 'Y':
             return True
         return False
 
     def write_record(self, record):
+        """
+        Helper function to write out the formatted merged public record.
+        """
         self.metrics.collect_output(record)
         to_null = (
             'Match_Norm_Seq_Allele1', 'Match_Norm_Seq_Allele2', 'Match_Norm_Validation_Allele1', 
