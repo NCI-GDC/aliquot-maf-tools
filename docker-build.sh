@@ -16,6 +16,14 @@ popd () {
     command popd "$@" > /dev/null
 }
 
+docker_build () {
+    command docker build \
+        --build-arg http_proxy=$http_proxy \
+        --build-arg https_proxy=$https_proxy \
+        --build-arg no_proxy=$no_proxy \
+        "$@"
+}
+
 # Parses requirements.txt and clones all private repos in dependencies to a specific hash
 for i in $(grep '^-e\|\.git' requirements.txt | sed -n 's/.*git+\([^ ]*\)#egg.*/\1/p')
 do
@@ -35,7 +43,7 @@ grep -v "^-e\|\.git" requirements.txt > docker-requirements.txt
 
 # tag
 quay="quay.io/ncigdc/aliquot-maf-tools"
-version="latest"
+version=$(git log --first-parent --max-count=1 --format=format:%H)
 imagetag="${quay}:${version}"
 
 echo "Building tag: $imagetag"
