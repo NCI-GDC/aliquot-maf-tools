@@ -100,7 +100,7 @@ class GenotypeAndDepthsExtractor(Extractor):
         ## If we have REF/ALT allele depths but not DP, then set DP equal to sum of all ADs
         if ((depths[0] is not None and depths[var_allele_idx] is not None) \
         and ('DP' not in genotype or genotype['DP'] is None or genotype['DP'] == '.')):
-            cls.logger.warn('Missing DP field. setting DP equal to sum of ADs!!')
+            #cls.logger.warn('Missing DP field. setting DP equal to sum of ADs!!')
             new_gt['DP'] = sum([i for i in depths if i and i != '.'])
 
         ## Set the formatted AD and alleles

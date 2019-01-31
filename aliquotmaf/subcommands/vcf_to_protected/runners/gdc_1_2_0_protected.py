@@ -229,8 +229,11 @@ class GDC_1_2_0_Protected(BaseRunner):
             self.setup_filters()
 
             # Convert
-            line = 1
+            line = 0
             for vcf_record in vcf_object.fetch():
+
+                line += 1
+
                 if line % 1000 == 0:
                     self.logger.info("Processed {0} records...".format(line))
 
@@ -244,7 +247,6 @@ class GDC_1_2_0_Protected(BaseRunner):
 
                 # Add to sorter 
                 sorter += maf_record
-                line += 1
 
             # Write
             self.logger.info("Writing {0} sorted records...".format(line))
@@ -253,12 +255,16 @@ class GDC_1_2_0_Protected(BaseRunner):
                 header=self.maf_header,
                 validation_stringency=ValidationStringency.Strict)
 
-            counter = 1
+            counter = 0
             for record in sorter:
+
+                counter += 1
+
                 if counter % 1000 == 0:
                     self.logger.info("Wrote {0} records...".format(counter))
+
                 self.maf_writer += record
-                counter += 1
+
 
             self.logger.info("Finished writing {0} records".format(counter))
 
