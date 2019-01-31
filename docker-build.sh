@@ -17,7 +17,7 @@ popd () {
 }
 
 # Parses requirements.txt and clones all private repos in dependencies to a specific hash
-for i in $(grep '^-e' requirements.txt | sed -n 's/.*git+\([^ ]*\)#egg.*/\1/p')
+for i in $(grep '^-e\|\.git' requirements.txt | sed -n 's/.*git+\([^ ]*\)#egg.*/\1/p')
 do
   echo "Git Repo:${i%@*} Git Hash:${i##*@}"
   pushd ${D_DIR}
@@ -31,4 +31,16 @@ do
 done
 
 # Creating requirements file with remaining modules
-grep -v "^-e" requirements.txt > docker-requirements.txt
+grep -v "^-e\|\.git" requirements.txt > docker-requirements.txt
+
+# tag
+quay="quay.io/ncigdc/aliquot-maf-tools"
+version="latest"
+imagetag="${quay}:${version}"
+
+echo "Building tag: $imagetag"
+docker_build -t $imagetag .
+
+# Cleanup
+rm docker-requirements.txt
+if [[ -d ${D_DIR} ]]; then rm -rf ${D_DIR}; fi
