@@ -4,16 +4,16 @@ Tools for creating, merging, and filtering aliquot-level GDC MAFs. These tools d
 [maf-lib](https://github.com/NCI-GDC/maf-lib) library and requires strict schema definitions.
 There are three main utilities in the `aliquot-maf-tools` software:
 
-* `VcfToProtected` - Converts a single GDC annotated VCF to a caller-specific protected MAF
-* `MergeProtected` - Takes 2 or more caller-specific MAFs for a single tumor/normal pair and merges into a merged protected multi-caller MAF
-* `ProtectedToPublic` - Filters the merged protected multi-caller MAF
+* `VcfToAliquotMaf` - Converts a single GDC annotated VCF to a caller-specific aliquot MAF
+* `MergeAliquotMafs` - Takes 2 or more caller-specific aliquot MAFs for a single tumor/normal pair and merges into a merged multi-caller MAF
+* `MaskMergedAliquotMaf` - Filters the merged multi-caller MAF
 
-## Convert VCF to Protected MAF
+## Convert VCF to Aliquot MAF
 
 All of the implementations use the format:
 
 ```
-aliquot-maf-tools VcfToProtected \
+aliquot-maf-tools VcfToAliquotMaf \
     --input_vcf <path to input annotated VCF> \
     --output_maf <path to output MAF> \
     <schema version> <OPTIONS>
@@ -21,12 +21,12 @@ aliquot-maf-tools VcfToProtected \
 
 We expect the VCF file to come from the annotation workflow using VEP.
 
-### `gdc-1.2.0-protected` Options
+### `gdc-1.0.0-aliquot` Options
 
 **Note: tumor only isn't fully supported yet**
 
 ```
-usage: GDC Aliquot MAF Tools VcfToProtected gdc-1.2.0-protected
+usage: GDC Aliquot MAF Tools VcfToAliquotMaf gdc-1.0.0-aliquot
        [-h] [--tumor_only] [-t TUMOR_VCF_ID] [-n NORMAL_VCF_ID] --caller_id
        CALLER_ID --src_vcf_uuid SRC_VCF_UUID --case_uuid CASE_UUID
        --tumor_submitter_id TUMOR_SUBMITTER_ID --tumor_aliquot_uuid
@@ -124,21 +124,21 @@ Filtering Options:
                         as off_target. Use one or more times.
 ```
 
-## Merge per-caller protected MAFs
+## Merge per-caller aliquot MAFs
 
-Merge two or more per-caller protected MAFs from the same tumor/normal pair. All
+Merge two or more per-caller aliquot MAFs from the same tumor/normal pair. All
 implementations use the format:
 
 ```
-aliquot-maf-tools MergeProtected \
+aliquot-maf-tools MergeAliquotMafs \
     --output_maf <path to output merged MAF> \
     <schema version> <OPTIONS>
 ```
 
-### `gdc-1.0.0-merged-protected` Options
+### `gdc-1.0.0-aliquot-merged` Options
 
 ```
-usage: GDC Aliquot MAF Tools MergeProtected gdc-1.0.0-merged-protected
+usage: GDC Aliquot MAF Tools MergeAliquotMafs gdc-1.0.0-aliquot-merged
        [-h] [--mutect2 MUTECT2] [--muse MUSE] [--vardict VARDICT]
        [--varscan2 VARSCAN2] [--somaticsniper SOMATICSNIPER] [--pindel PINDEL]
        [--min_n_depth MIN_N_DEPTH]
@@ -158,21 +158,21 @@ optional arguments:
                         callers [7]
 ```
 
-## Filter Merged Protected MAF
+## Masked Merged Aliquot MAF
 
 All of the implementations use the format:
 
 ```
-aliquot-maf-tools ProtectedToPublic \
+aliquot-maf-tools MaskMergedAliquotMaf \
     --input_maff <path to input merged MAF> \
     --output_maf <path to output filtered MAF> \
     <schema version> <OPTIONS>
 ```
 
-### `gdc-1.0.0-merged-public` Options
+### `gdc-1.0.0-aliquot-merged-masked` Options
 
 ```
-usage: GDC Aliquot MAF Tools ProtectedToPublic gdc-1.0.0-merged-public
+usage: GDC Aliquot MAF Tools MaskMergedAliquotMaf gdc-1.0.0-aliquot-merged-masked
        [-h] [--tumor_only] [--reference_fasta_index REFERENCE_FASTA_INDEX]
        [--min_callers MIN_CALLERS]
 
@@ -184,5 +184,4 @@ optional arguments:
                         is not sorted
   --min_callers MIN_CALLERS
                         Minimum number of callers required [2]
-
 ```
