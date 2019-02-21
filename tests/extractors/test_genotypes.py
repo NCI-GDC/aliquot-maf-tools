@@ -3,7 +3,7 @@ Tests the extractors in aliquotmaf.subcommands.vcf_to_protected.extractors.genot
 """
 import pytest
 
-from aliquotmaf.subcommands.vcf_to_protected.extractors.genotypes import (
+from aliquotmaf.subcommands.vcf_to_aliquot.extractors.genotypes import (
     VariantAlleleIndexExtractor,
     GenotypeAndDepthsExtractor
 )

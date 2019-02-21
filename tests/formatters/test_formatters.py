@@ -5,7 +5,7 @@ format particular MAF column values.
 import pytest
 
 import aliquotmaf.converters.formatters as Formatters
-import aliquotmaf.subcommands.vcf_to_protected.extractors as Extractors
+import aliquotmaf.subcommands.vcf_to_aliquot.extractors as Extractors
 
 @pytest.mark.parametrize("genotype, ref_allele, var_allele, position, alleles, expected", [
     (

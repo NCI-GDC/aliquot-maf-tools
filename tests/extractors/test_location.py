@@ -1,9 +1,9 @@
 """
-Tests the extractors in aliquotmaf.subcommands.vcf_to_protected.extractors.location
+Tests the extractors in aliquotmaf.subcommands.vcf_to_aliquot.extractors.location
 """
 import pytest
 
-from aliquotmaf.subcommands.vcf_to_protected.extractors.location import LocationDataExtractor 
+from aliquotmaf.subcommands.vcf_to_aliquot.extractors.location import LocationDataExtractor 
 
 # VariantAlleleIndexExtractor -> GenotypeAndDepthsExtractor -> LocationDataExtractor -> EffectsExtractor -> SelectOneEffectExtractor -> PopulationFrequencyExtractor -> VariantClassExtractor
 
