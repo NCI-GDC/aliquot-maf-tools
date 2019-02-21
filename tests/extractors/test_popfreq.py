@@ -1,9 +1,9 @@
 """
-Tests the extractors in aliquotmaf.subcommands.vcf_to_protected.extractors.population_frequency
+Tests the extractors in aliquotmaf.subcommands.vcf_to_aliquot.extractors.population_frequency
 """
 import pytest
 
-from aliquotmaf.subcommands.vcf_to_protected.extractors.population_frequency import PopulationFrequencyExtractor
+from aliquotmaf.subcommands.vcf_to_aliquot.extractors.population_frequency import PopulationFrequencyExtractor
 
 # VariantAlleleIndexExtractor -> GenotypeAndDepthsExtractor -> LocationDataExtractor -> EffectsExtractor -> SelectOneEffectExtractor -> PopulationFrequencyExtractor -> VariantClassExtractor
 

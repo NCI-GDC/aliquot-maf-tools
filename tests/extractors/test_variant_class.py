@@ -1,9 +1,9 @@
 """
-Tests the extractors in aliquotmaf.subcommands.vcf_to_protected.extractors.variant_class
+Tests the extractors in aliquotmaf.subcommands.vcf_to_aliquot.extractors.variant_class
 """
 import pytest
 
-from aliquotmaf.subcommands.vcf_to_protected.extractors.variant_class import VariantClassExtractor
+from aliquotmaf.subcommands.vcf_to_aliquot.extractors.variant_class import VariantClassExtractor
 
 @pytest.mark.parametrize("cons, var_type, inframe, expected", [
     ('splice_donor_variant', '', '', 'Splice_Site'),
