@@ -15,4 +15,4 @@ install:
 before_script:
   - pip freeze
 
-script: "python -m pytest tests/"
+script: "python -m pytest -v tests/"
