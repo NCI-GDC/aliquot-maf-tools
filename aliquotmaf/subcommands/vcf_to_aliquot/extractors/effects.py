@@ -6,7 +6,7 @@ some input source, mostly engineered for VEP annotated VCF files.
 """
 import re
 
-from aliquotmaf.subcommands.vcf_to_protected.extractors import Extractor
+from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
 
 class EffectsExtractor(Extractor):
     """A `~maf_converter_lib.extractor.Extractor` class that takes the VEP

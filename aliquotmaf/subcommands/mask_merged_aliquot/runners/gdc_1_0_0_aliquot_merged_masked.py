@@ -1,6 +1,6 @@
 """
-Main logic for filtering protected MAF to public for spec
-gdc-1.2.0-public.
+Main logic for filtering merged aliquot MAFs for spec
+gdc-1.0.0-aliquot-merged-masked.
 """
 import json
 
@@ -10,18 +10,18 @@ from maflib.writer import MafWriter
 from maflib.sort_order import BarcodesAndCoordinate
 from maflib.validation import ValidationStringency 
 
-from aliquotmaf.subcommands.protected_to_public.runners import BaseRunner
+from aliquotmaf.subcommands.mask_merged_aliquot.runners import BaseRunner
 from aliquotmaf.converters.utils import init_empty_maf_record, get_columns_from_header
 from aliquotmaf.converters.builder import get_builder
 
 
-class GDC_1_2_0_Public(BaseRunner):
+class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
     def __init__(self, options=dict()):
-        super(GDC_1_2_0_Public, self).__init__(options)
+        super(GDC_1_0_0_Aliquot_Merged_Masked, self).__init__(options)
 
         # Schema
         self.options['version'] = 'gdc-1.0.0'
-        self.options['annotation'] = 'gdc-1.2.0-public'
+        self.options['annotation'] = 'gdc-1.0.0-aliquot-merged-masked'
 
     @classmethod
     def __add_arguments__(cls, parser):
@@ -30,6 +30,8 @@ class GDC_1_2_0_Public(BaseRunner):
             help='Is this a tumor-only VCF?')
         parser.add_argument('--reference_fasta_index', required=False,
             help='Path to the reference fasta fai file if the input MAF is not sorted')
+        parser.add_argument('--min_callers', default=2, type=int, 
+            help='Minimum number of callers required [2]')
 
     def setup_maf_header(self):
         """
@@ -90,10 +92,6 @@ class GDC_1_2_0_Public(BaseRunner):
         self._columns = get_columns_from_header(self.maf_header)
         self._colset = set(self._columns)
 
-        # tag sets
-        non_validated_overrides = set(['panel_of_normals'])
-        gdc_skip_set = set(['ndp', 'NonExonic', 'off_target', 'gdc_pon'])
-
         # Counts
         processed = 0
         try:
@@ -102,24 +100,20 @@ class GDC_1_2_0_Public(BaseRunner):
                 if processed > 0 and processed % 1000 == 0:
                     self.logger.info("Processed {0} records...".format(processed))
 
-                filters = record['FILTER'].value
-                fset = set(filters if filters != ['PASS'] else [])
-                gdc_filters = record['GDC_FILTER'].value
-                gfset = set(gdc_filters)
-                hotspot_gdc_set = set(['gdc_pon', 'common_in_exac'])
-                hotspot_vcf_set = set(['panel_of_normals'])
-                if record['Mutation_Status'].value.value == 'Somatic':
-                    if 'multiallelic' not in gfset:
+                callers = record['callers'].value
+                if len(callers) >= self.options['min_callers']:
+                    self.metrics.add_sample_swap_metric(record)
+
+                    gdc_filters = record['GDC_FILTER'].value
+                    gfset = set(gdc_filters)
+                    hotspot_gdc_set = set(['gdc_pon', 'common_in_exac', 'ndp'])
+                    if record['Mutation_Status'].value.value == 'Somatic':
                         if self.is_hotspot(record):
-                            if len(gfset - hotspot_gdc_set) == 0 and len(fset - hotspot_vcf_set) == 0:
+                            if len(gfset - hotspot_gdc_set) == 0:
                                 self.write_record(record)
-                        # Check caller filter
-                        if len(fset - non_validated_overrides) == 0:
-                            if len(gfset & gdc_skip_set) == 0: 
-                                if "1" in record["SOMATIC"].value:
-                                    print("NOW HERE")
-                                elif not record["dbSNP_RS"].value or record["dbSNP_RS"].value == ["novel"]:
-                                    self.write_record(record) 
+
+                        elif not gfset: 
+                            self.write_record(record) 
                 processed += 1
                 self.metrics.input_records += 1
 
@@ -130,11 +124,17 @@ class GDC_1_2_0_Public(BaseRunner):
             self.maf_writer.close()
 
     def is_hotspot(self, record):
+        """
+        Helper function to test if the record is marked as a hotspot.
+        """
         if record['hotspot'].value and record['hotspot'].value.value == 'Y':
             return True
         return False
 
     def write_record(self, record):
+        """
+        Helper function to write out the formatted merged public record.
+        """
         self.metrics.collect_output(record)
         to_null = (
             'Match_Norm_Seq_Allele1', 'Match_Norm_Seq_Allele2', 'Match_Norm_Validation_Allele1', 
@@ -150,4 +150,4 @@ class GDC_1_2_0_Public(BaseRunner):
  
     @classmethod
     def __tool_name__(cls):
-        return "gdc-1.2.0-public"
+        return "gdc-1.0.0-aliquot-merged-masked"

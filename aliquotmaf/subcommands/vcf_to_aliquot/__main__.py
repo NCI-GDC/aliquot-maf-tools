@@ -1,11 +1,11 @@
 """
-Subcommand for converting a VEP annotated VCF to a protected
+Subcommand for converting a VEP annotated VCF to a raw 
 aliquot MAF.
 """
 from aliquotmaf.subcommands.base import Subcommand
-from aliquotmaf.subcommands.vcf_to_protected.runners import GDC_1_2_0_Protected
+from aliquotmaf.subcommands.vcf_to_aliquot.runners import GDC_1_0_0_Aliquot
 
-class VcfToProtected(Subcommand):
+class VcfToAliquotMaf(Subcommand):
     @classmethod
     def __add_arguments__(cls, parser):
         """Add the arguments to the parser"""
@@ -18,14 +18,14 @@ class VcfToProtected(Subcommand):
         subparsers = parser.add_subparsers(dest="subcommand")
         subparsers.required = True
 
-        GDC_1_2_0_Protected.add(subparsers=subparsers)
+        GDC_1_0_0_Aliquot.add(subparsers=subparsers)
 
     @classmethod
     def __get_description__(cls):
         """
         Optionally returns description
         """
-        return "Convert VEP annotated VCF to an aliquot-level protected MAF" 
+        return "Convert VEP annotated VCF to an aliquot-level raw MAF" 
 
     @classmethod
     def __tool_name__(cls):

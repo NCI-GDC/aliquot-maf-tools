@@ -9,8 +9,10 @@ from signal import signal, SIGPIPE, SIG_DFL
 
 from aliquotmaf.logger import Logger
 
-from aliquotmaf.subcommands.vcf_to_protected.__main__ import VcfToProtected
-from aliquotmaf.subcommands.protected_to_public.__main__ import ProtectedToPublic
+from aliquotmaf.subcommands.vcf_to_aliquot.__main__ import VcfToAliquotMaf
+from aliquotmaf.subcommands.merge_aliquot.__main__ import MergeAliquotMafs
+from aliquotmaf.subcommands.mask_merged_aliquot.__main__ import MaskMergedAliquotMaf 
+
 
 signal(SIGPIPE, SIG_DFL)
 
@@ -35,9 +37,10 @@ def main(args=None):
     subparsers = p.add_subparsers(dest="subcommand")
     subparsers.required = True
 
-    VcfToProtected.add(subparsers=subparsers)
-    ProtectedToPublic.add(subparsers=subparsers)
-    
+    VcfToAliquotMaf.add(subparsers=subparsers)
+    MergeAliquotMafs.add(subparsers=subparsers) 
+    MaskMergedAliquotMaf.add(subparsers=subparsers)
+
     options = p.parse_args(args)
 
     # Run

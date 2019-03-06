@@ -35,24 +35,6 @@ def test_scheme(get_test_scheme):
     coldict = OrderedDict(vals)
     return get_test_scheme(coldict)
 
-#@pytest.fixture
-#def vcf_gen(get_test_file):
-#    VcfRec = namedtuple("VcfRec", ["snp1", "deletion", "insertion", "snp2"])
-#    created = []
-#
-#    def _vcf_gen(name):
-#        vcf_path = get_test_file(name)
-#        vcf_obj = pysam.VariantFile(vcf_path)
-#        created.append(vcf_obj)
-#        gen = vcf_obj.fetch()
-#        curr = VcfRec(snp1=next(gen), deletion=next(gen), insertion=next(gen), snp2=next(gen))
-#        return curr
-#
-#    yield _vcf_gen
-#
-#    for obj in created:
-#        obj.close()
-
 def test_setup_exac(test_scheme, setup_annotator, get_test_file):
     vcf_path = get_test_file('fake_exac.vcf.gz')
     annotator = setup_annotator(test_scheme, source=vcf_path) 

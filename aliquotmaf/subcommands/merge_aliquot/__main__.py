@@ -1,30 +1,29 @@
 """
-Subcommand for converting a protected aliquot MAF to a public aliquot MAF.
+Subcommand for merging single caller raw aliquot MAFs to merged raw MAFs. 
 """
 from aliquotmaf.subcommands.base import Subcommand
-from aliquotmaf.subcommands.protected_to_public.runners import GDC_1_2_0_Public
+from aliquotmaf.subcommands.merge_aliquot.runners import GDC_1_0_0_Aliquot_Merged
 
-class ProtectedToPublic(Subcommand):
+class MergeAliquotMafs(Subcommand):
     @classmethod
     def __add_arguments__(cls, parser):
         """Add the arguments to the parser"""
         # Input group
         p_input = parser.add_argument_group(title="Input/Output Options")
-        p_input.add_argument('--input_maf', required=True, help='Path to input protected MAF file')
         p_input.add_argument('--output_maf', required=True, help='Path to output public MAF file')
         
         # subparsers
         subparsers = parser.add_subparsers(dest="subcommand")
         subparsers.required = True
 
-        GDC_1_2_0_Public.add(subparsers=subparsers)
+        GDC_1_0_0_Aliquot_Merged.add(subparsers=subparsers)
 
     @classmethod
     def __get_description__(cls):
         """
         Optionally returns description
         """
-        return "Filter and convert a protected aliquot-level MAF to a public aliquot-level MAF" 
+        return "Merge raw aliquot MAFs from multiple callers within the same aliquot"
 
     @classmethod
     def __tool_name__(cls):

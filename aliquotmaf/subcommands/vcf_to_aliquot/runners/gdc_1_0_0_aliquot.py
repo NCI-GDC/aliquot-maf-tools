@@ -1,4 +1,4 @@
-"""Main vcf2maf logic for spec gdc-1.2.0-protected"""
+"""Main vcf2maf logic for spec gdc-1.0.0-aliquot"""
 import pysam
 import urllib.parse
 
@@ -13,9 +13,9 @@ from maflib.validation import ValidationStringency
 
 import aliquotmaf.annotators as Annotators
 import aliquotmaf.filters as Filters
-import aliquotmaf.subcommands.vcf_to_protected.extractors as Extractors 
+import aliquotmaf.subcommands.vcf_to_aliquot.extractors as Extractors 
 
-from aliquotmaf.subcommands.vcf_to_protected.runners import BaseRunner
+from aliquotmaf.subcommands.vcf_to_aliquot.runners import BaseRunner
 from aliquotmaf.converters.utils import init_empty_maf_record, get_columns_from_header
 from aliquotmaf.converters.collection import InputCollection
 from aliquotmaf.converters.builder import get_builder
@@ -34,9 +34,9 @@ from aliquotmaf.converters.formatters import (
     format_vcf_columns
 )
 
-class GDC_1_2_0_Protected(BaseRunner):
+class GDC_1_0_0_Aliquot(BaseRunner):
     def __init__(self, options=dict()):
-        super(GDC_1_2_0_Protected, self).__init__(options)
+        super(GDC_1_0_0_Aliquot, self).__init__(options)
 
         # Load the resource files
         self.logger.info("Loading priority files")
@@ -48,7 +48,7 @@ class GDC_1_2_0_Protected(BaseRunner):
 
         # Schema
         self.options['version'] = 'gdc-1.0.0'
-        self.options['annotation'] = 'gdc-1.2.0-protected'
+        self.options['annotation'] = 'gdc-1.0.0-aliquot'
 
         # Annotators
         self.annotators = {
@@ -152,8 +152,7 @@ class GDC_1_2_0_Protected(BaseRunner):
             help='The file containing the blacklist tags and tumor aliquot uuids to ' +
                  'apply them to.')
         filt.add_argument('--min_n_depth', default=7, type=int, 
-            help='Flag variants where normal depth is > INT (NOTE: Not ' +
-                 'including) as ndp [7].')
+            help='Flag variants where normal depth is <= INT as ndp [7].')
         filt.add_argument('--gdc_pon_vcf', type=str, default=None, 
             help='The tabix-indexed panel of normals VCF for applying the gdc ' +
                  'pon filter') 
@@ -230,8 +229,11 @@ class GDC_1_2_0_Protected(BaseRunner):
             self.setup_filters()
 
             # Convert
-            line = 1
+            line = 0
             for vcf_record in vcf_object.fetch():
+
+                line += 1
+
                 if line % 1000 == 0:
                     self.logger.info("Processed {0} records...".format(line))
 
@@ -245,7 +247,6 @@ class GDC_1_2_0_Protected(BaseRunner):
 
                 # Add to sorter 
                 sorter += maf_record
-                line += 1
 
             # Write
             self.logger.info("Writing {0} sorted records...".format(line))
@@ -254,14 +255,18 @@ class GDC_1_2_0_Protected(BaseRunner):
                 header=self.maf_header,
                 validation_stringency=ValidationStringency.Strict)
 
-            counter = 1
+            counter = 0
             for record in sorter:
-                if counter % 1000 == 0:
-                    self.logger.info("Wrote {0} records...".format(counter))
-                self.maf_writer += record
+
                 counter += 1
 
-            self.logger.info("Finsihed writing {0} records".format(counter))
+                if counter % 1000 == 0:
+                    self.logger.info("Wrote {0} records...".format(counter))
+
+                self.maf_writer += record
+
+
+            self.logger.info("Finished writing {0} records".format(counter))
 
         finally:
             vcf_object.close()
@@ -594,4 +599,4 @@ class GDC_1_2_0_Protected(BaseRunner):
 
     @classmethod
     def __tool_name__(cls):
-        return "gdc-1.2.0-protected"
+        return "gdc-1.0.0-aliquot"

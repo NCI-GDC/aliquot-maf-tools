@@ -1,9 +1,13 @@
 """
 Extractor class for genomic region data.
 """
-from aliquotmaf.subcommands.vcf_to_protected.extractors import Extractor
+from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
 
 class LocationDataExtractor(Extractor):
+    """
+    Extracts the start, stop, variant type, and inframe values from the provided
+    data. Mutates alleles based on normalizing the ref and alt alleles.
+    """
     NP_TYPE = {1: 'SNP', 2: 'DNP', 3: 'TNP'}
 
     @classmethod
@@ -12,8 +16,9 @@ class LocationDataExtractor(Extractor):
 
         # Remove any prefixed reference bps from all alleles, using "=" for simple indels
         while ref_allele and var_allele and \
-        ref_allele[0] == var_allele[0] and \
-        ref_allele != var_allele:
+            ref_allele[0] == var_allele[0] and \
+            ref_allele != var_allele:
+
             ref_allele = ref_allele[1:] if len(ref_allele) > 1 else "-"
             var_allele = var_allele[1:] if len(var_allele) > 1 else "-"
             alleles = [i[1:] if len(i) > 1 else '-' for i in alleles]

@@ -3,7 +3,7 @@ Extractor class for population frequency.
 """
 import re
 
-from aliquotmaf.subcommands.vcf_to_protected.extractors import Extractor
+from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
 
 class PopulationFrequencyExtractor(Extractor):
     @classmethod
