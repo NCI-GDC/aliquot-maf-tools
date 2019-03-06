@@ -12,7 +12,7 @@ class GdcBlacklist(Filter):
         super().__init__(name='GDCBlacklist', source=source)
         self.tags = []
         self.data = data 
-        self.logger.info("Using ExAC frequency cutoff of {0}".format(cutoff))
+        self.logger.info("Using GDC Blacklist {0}".format(source))
 
     @classmethod
     def setup(cls, source):
