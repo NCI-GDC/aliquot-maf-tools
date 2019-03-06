@@ -25,13 +25,12 @@ class OffTarget(Filter):
         vcf_region = maf_record['vcf_region'].value.split(':')
         pos = int(vcf_region[1])
         region = '{0}:{1}-{2}'.format(vcf_region[0], pos, maf_record['End_Position'])
-        try:
-            for source in self.fs:
+        for source in self.fs:
+            try:
                 for record in source.fetch(region=region):
-                    flag = False
-                    break
-        except ValueError:
-            pass
+                    return False
+            except ValueError:
+                pass
         return flag 
 
     def shutdown(self):
