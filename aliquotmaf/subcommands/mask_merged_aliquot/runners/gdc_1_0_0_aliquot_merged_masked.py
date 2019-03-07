@@ -94,6 +94,8 @@ class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
 
         # Counts
         processed = 0
+        hotspot_gdc_set = set(['gdc_pon', 'common_in_exac'])
+
         try:
             for record in self.maf_reader:
 
@@ -101,25 +103,29 @@ class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
                     self.logger.info("Processed {0} records...".format(processed))
 
                 callers = record['callers'].value
-                if len(callers) >= self.options['min_callers']:
+                if len(callers) >= self.options['min_callers'] and \
+                  record['Mutation_Status'].value.value == 'Somatic':
+
                     self.metrics.add_sample_swap_metric(record)
 
                     gdc_filters = record['GDC_FILTER'].value
                     gfset = set(gdc_filters)
-                    hotspot_gdc_set = set(['gdc_pon', 'common_in_exac', 'ndp'])
-                    if record['Mutation_Status'].value.value == 'Somatic':
-                        if self.is_hotspot(record):
-                            if len(gfset - hotspot_gdc_set) == 0:
-                                self.write_record(record)
 
-                        elif not gfset: 
-                            self.write_record(record) 
+                    if self.is_hotspot(record):
+                        if len(gfset - hotspot_gdc_set) == 0:
+                            self.write_record(record)
+
+                    elif not gfset: 
+                        self.write_record(record) 
+
                 processed += 1
                 self.metrics.input_records += 1
 
             self.logger.info("Processed {0} records.".format(processed))
             print(json.dumps(self.metrics.to_json(), indent=2, sort_keys=True))
+
         finally:
+
             self.maf_reader.close()
             self.maf_writer.close()
 
