@@ -25,10 +25,15 @@ class CosmicID(Annotator):
         alt = vcf_record.alleles[var_allele_idx]
         cosmic_ids = []
         for record in self.f.fetch(region=region):
-            if vcf_record.pos == record.pos and \
-               vcf_record.ref == record.ref and \
-               alt == record.alts[0]:
-                cosmic_ids.append(record.id)
+            try:
+                if vcf_record.pos == record.pos and \
+                   vcf_record.ref == record.ref and \
+                   alt == record.alts[0]:
+                    cosmic_ids.append(record.id)
+            except TypeError:
+                # Weirdly formatted COSMIC variants
+                pass
+
         if cosmic_ids:
             if maf_record['dbSNP_RS'].value == ['novel']:
                 maf_record['dbSNP_RS'] = get_builder("dbSNP_RS", self.scheme, value=None)
