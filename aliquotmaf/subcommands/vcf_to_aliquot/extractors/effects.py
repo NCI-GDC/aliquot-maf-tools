@@ -89,9 +89,12 @@ class EffectsExtractor(Extractor):
 
             # Fix HGVSp_Short for Silent mutations, so it mentions the amino-acid and position
             if 'HGVSp_Short' in effect and effect['HGVSp_Short'] == "p.=":
-                p_pos = re.search(r'^(\d+)(-\d+)?/\d+$', effect['Protein_position']).group(1)
-                aa    = effect['Amino_acids']
-                effect['HGVSp_Short'] = 'p.{0}{1}{0}'.format(aa, p_pos)
+                # Sometimes there are weird things here, especially from Pindel
+                p_pos = re.search(r'^(\d+)(-\d+)?/\d+$', effect['Protein_position'])
+                if p_pos is not None:
+                    p_pos = p_pos.group(1)
+                    aa    = effect['Amino_acids']
+                    effect['HGVSp_Short'] = 'p.{0}{1}{0}'.format(aa, p_pos)
 
             # Copy VEP data into MAF fields that don't share the same identifier
             effect['Transcript_ID'] = effect['Feature']
