@@ -176,12 +176,13 @@ class GDC_1_0_0_Aliquot(BaseRunner):
         header_date = BaseRunner.get_header_date()
         self.maf_header[header_date.key] = header_date
 
-        normal_aliquot = MafHeaderRecord(
-            key="normal.aliquot", 
-            value = self.options["normal_aliquot_uuid"] \
-                if not self.options["tumor_only"] \
-                else "")
-        self.maf_header[normal_aliquot.key] = normal_aliquot
+        if not self.options['tumor_only']:
+            normal_aliquot = MafHeaderRecord(
+                key="normal.aliquot", 
+                value = self.options["normal_aliquot_uuid"] \
+                    if not self.options["tumor_only"] \
+                    else "")
+            self.maf_header[normal_aliquot.key] = normal_aliquot
 
         tumor_aliquot = MafHeaderRecord(
             key="tumor.aliquot", 

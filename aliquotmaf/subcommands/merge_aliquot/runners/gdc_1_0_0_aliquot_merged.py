@@ -34,6 +34,7 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
     @classmethod
     def __add_arguments__(cls, parser):
         """Add the arguments to the parser"""
+        parser.add_argument('--tumor_only', action='store_true', help='If this is a tumor-only MAF')
         parser.add_argument('--mutect2', help='Path to input protected MuTect2 MAF file')
         parser.add_argument('--muse', help='Path to input protected MuSE MAF file')
         parser.add_argument('--vardict', help='Path to input protected VarDict MAF file')
@@ -77,8 +78,9 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
         header_date = BaseRunner.get_header_date()
         self.maf_header[header_date.key] = header_date
 
-        nkey = _hdr["normal.aliquot"]
-        self.maf_header["normal.aliquot"] = nkey
+        if not self.options['tumor_only']:
+            nkey = _hdr["normal.aliquot"]
+            self.maf_header["normal.aliquot"] = nkey
         tkey = _hdr["tumor.aliquot"]
         self.maf_header["tumor.aliquot"] = tkey
 
