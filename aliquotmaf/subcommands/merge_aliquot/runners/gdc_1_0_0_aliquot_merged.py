@@ -129,7 +129,7 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
 
                 result = OverlapSet(record, self.callers)
 
-                for maf_record in self._merger.merge_records(result):
+                for maf_record in self._merger.merge_records(result, tumor_only=self.options['tumor_only']):
                     if maf_record is not None:
                         # Recheck normal depth
                         gdc_filters = maf_record['GDC_FILTER'].value

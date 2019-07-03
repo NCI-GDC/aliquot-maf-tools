@@ -73,6 +73,11 @@ class BaseMafRecordMerger(metaclass=ABCMeta):
                 get_builder('Match_Norm_Seq_Allele1', self.scheme, value=ref)
             maf_dic['Match_Norm_Seq_Allele2'] = \
                 get_builder('Match_Norm_Seq_Allele2', self.scheme, value=ref)
+        else: 
+            maf_dic['Match_Norm_Seq_Allele1'] = \
+                get_builder('Match_Norm_Seq_Allele1', self.scheme, value=None)
+            maf_dic['Match_Norm_Seq_Allele2'] = \
+                get_builder('Match_Norm_Seq_Allele2', self.scheme, value=None)
         return maf_dic
 
     def fix_depths(self, maf_dic, tumor_only=False):

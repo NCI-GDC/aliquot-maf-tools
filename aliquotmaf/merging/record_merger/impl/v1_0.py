@@ -10,12 +10,15 @@ from aliquotmaf.merging.record_merger.mixins import MafMergingAverageColumnsMixi
 class MafRecordMerger_1_0_0(BaseMafRecordMerger,
                             MafMergingAverageColumnsMixin,
                             MafMergingCombineColumnsMixin):
-    def average_columns(self):
+    def average_columns(self, tumor_only=False):
         """
         :return: a ``tuple`` of column names that should be averaged.
         """ 
-        return ('t_depth', 't_ref_count', 't_alt_count', 'n_depth', 
-                'n_ref_count', 'n_alt_count')
+        if not tumor_only: 
+            return ('t_depth', 't_ref_count', 't_alt_count', 'n_depth', 
+                    'n_ref_count', 'n_alt_count')
+        else:
+            return ('t_depth', 't_ref_count', 't_alt_count')
 
     def combine_columns(self):
         """
@@ -36,6 +39,7 @@ class MafRecordMerger_1_0_0(BaseMafRecordMerger,
         in their order of priority. 
         """ 
         return [
+            ('mutect2', 'MNP'),
             ('vardict', 'MNP'),
             ('pindel', 'MNP'),
             ('mutect2', 'DEL'),
@@ -130,7 +134,7 @@ class MafRecordMerger_1_0_0(BaseMafRecordMerger,
             if column in self.allele_columns() or column == 'callers':
                 continue
 
-            elif column in self.average_columns():
+            elif column in self.average_columns(tumor_only=tumor_only):
                 vals = []
                 for caller in callers:
                     curr = results[caller]
