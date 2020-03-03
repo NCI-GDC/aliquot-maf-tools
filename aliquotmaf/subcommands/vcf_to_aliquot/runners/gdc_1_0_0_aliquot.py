@@ -243,6 +243,13 @@ class GDC_1_0_0_Aliquot(BaseRunner):
                                     tumor_idx, normal_idx, ann_cols_format, vep_key,
                                     vcf_record, is_tumor_only)
 
+                # Skip rare occasions where VEP doesn't provide IMPACT or the consequence is ?
+                if not data['selected_effect']['IMPACT'] or data['selected_effect']['One_Consequence'] == '?':
+                    self.logger.warn("Skipping record with unknown impact or consequence: {0} - {1}".format(
+                        data['selected_effect']['IMPACT'], data['selected_effect']['One_Consequence']
+                    ))
+                    continue
+
                 # Transform
                 maf_record = self.transform(vcf_record, data, is_tumor_only, line_number=line)
 
