@@ -2,6 +2,7 @@
 Class containing a set of overlapping records and utilities.
 """
 
+
 class OverlapSet:
     def __init__(self, result, maf_keys):
         """
@@ -20,7 +21,12 @@ class OverlapSet:
         self._variant_types = None
 
         self._type_dic = {
-            'SNP': 'SNP', 'DNP': 'MNP', 'TNP': 'MNP', 'ONP': 'MNP', 'DEL': 'DEL', 'INS': 'INS'
+            "SNP": "SNP",
+            "DNP": "MNP",
+            "TNP": "MNP",
+            "ONP": "MNP",
+            "DEL": "DEL",
+            "INS": "INS",
         }
 
     def __iter__(self):
@@ -45,7 +51,8 @@ class OverlapSet:
         count = 0
         for caller in self._data:
             count += len(self._data[caller])
-        if count == 1: return True
+        if count == 1:
+            return True
         return False
 
     @property
@@ -72,7 +79,7 @@ class OverlapSet:
             lst = []
             for caller in self:
                 for record in self[caller]:
-                    vtype = self._type_dic[record['Variant_Type'].value.value]
+                    vtype = self._type_dic[record["Variant_Type"].value.value]
                     lst.append(vtype)
             self._variant_types = tuple(sorted(list(set(lst))))
         return self._variant_types
@@ -87,10 +94,22 @@ class OverlapSet:
             self._locus_allele_map = {}
             for caller in self._data:
                 for record in self._data[caller]:
-                    key = ':'.join(list(map(str, [record['Start_Position'], record['End_Position'],
-                        record['Allele']])))
-                    if key not in self._locus_allele_map: self._locus_allele_map[key] = {}
-                    if caller not in self._locus_allele_map[key]: self._locus_allele_map[key][caller] = []
+                    key = ":".join(
+                        list(
+                            map(
+                                str,
+                                [
+                                    record["Start_Position"],
+                                    record["End_Position"],
+                                    record["Allele"],
+                                ],
+                            )
+                        )
+                    )
+                    if key not in self._locus_allele_map:
+                        self._locus_allele_map[key] = {}
+                    if caller not in self._locus_allele_map[key]:
+                        self._locus_allele_map[key][caller] = []
                     self._locus_allele_map[key][caller].append(record)
         return self._locus_allele_map
 
@@ -104,7 +123,7 @@ class OverlapSet:
             self._caller_type_map = {}
             for caller in self._data:
                 for record in self._data[caller]:
-                    vtype = self._type_dic[record['Variant_Type'].value.value]
+                    vtype = self._type_dic[record["Variant_Type"].value.value]
                     key = (caller, vtype)
                     if key not in self._caller_type_map:
                         self._caller_type_map[key] = []

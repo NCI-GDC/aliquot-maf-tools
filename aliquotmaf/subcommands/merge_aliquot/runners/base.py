@@ -10,12 +10,13 @@ from maflib.header import MafHeaderRecord
 from aliquotmaf.logger import Logger
 from aliquotmaf.metrics.metrics_collection import MafMetricsCollection
 
+
 class BaseRunner(metaclass=ABCMeta):
     def __init__(self, options=dict()):
         self.logger = Logger.get_logger(self.__class__.__name__)
         self.options = options
 
-        self.maf_readers = [] 
+        self.maf_readers = []
         self.callers = []
         self.maf_writer = None
         self._scheme = None
@@ -23,15 +24,14 @@ class BaseRunner(metaclass=ABCMeta):
         self._colset = None
         self._merger = None
 
-
     @staticmethod
     def get_header_date():
         """
         Returns a MafHeaderRecord of the filedate.
         """
         return MafHeaderRecord(
-             key="filedate",
-             value=datetime.date.today().strftime('%Y%m%d'))
+            key="filedate", value=datetime.date.today().strftime("%Y%m%d")
+        )
 
     @classmethod
     def __validate_options__(cls, options):
@@ -72,8 +72,8 @@ class BaseRunner(metaclass=ABCMeta):
     def add(cls, subparsers):
         """Adds the given subcommand to the subparsers."""
         subparser = subparsers.add_parser(
-            name=cls.__tool_name__(),
-            description=cls.__get_description__())
+            name=cls.__tool_name__(), description=cls.__get_description__()
+        )
 
         cls.__add_arguments__(subparser)
         subparser.set_defaults(func=cls.from_args)

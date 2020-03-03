@@ -9,7 +9,7 @@ class Logger(object):
 
     # NB: do not use an empty string here!
     RootLogger = logging.getLogger("aliquot-maf-tools")
-    LoggerFormat = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    LoggerFormat = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
     @classmethod
     def setup_root_logger(cls):
@@ -40,5 +40,6 @@ class Logger(object):
             handler.setFormatter(formatter)
             logger.addHandler(handler)
         return logger
+
 
 Logger.setup_root_logger()

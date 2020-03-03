@@ -13,5 +13,5 @@ __all__ = [
     CosmicID,
     MutationStatus,
     NonTcgaExac,
-    Hotspot
+    Hotspot,
 ]

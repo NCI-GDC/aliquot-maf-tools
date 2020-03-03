@@ -7,22 +7,26 @@ import sys
 import maflib.column_types as coltypes
 from maflib.column import MafColumnRecord
 
+
 class Builder(metaclass=abc.ABCMeta):
     """
     Specify an abstract interface for creating column builder 
     objects.
     """
+
     @classmethod
     @abc.abstractmethod
     def build(cls, column, value=None, default=None, scheme=None):
         """
         All builder classes must implement the build function.
-        """ 
+        """
+
 
 class BooleanColumnBuilder(Builder):
     """
     Builder class for BooleanColumn types.
     """
+
     @classmethod
     def build(cls, column, value=None, default=None, scheme=None):
         if value is None:
@@ -31,36 +35,42 @@ class BooleanColumnBuilder(Builder):
         else:
             return MafColumnRecord.build(column, value, scheme=scheme)
 
+
 class CanonicalBuilder(Builder):
     """
     Builder class for Canonical types.
     """
+
     @classmethod
     def build(cls, column, value=None, default=None, scheme=None):
         # None must be '' in this case
-        default = default if default is not None else ''
+        default = default if default is not None else ""
         if value is None:
             return MafColumnRecord.build(column, default, scheme=scheme)
         else:
             return MafColumnRecord.build(column, value, scheme=scheme)
+
 
 class MutationStatusBuilder(Builder):
     """
     Builder class for MutationStatus types.
     """
+
     @classmethod
     def build(cls, column, value=None, default=None, scheme=None):
         # None must be '' in this case
-        default = default if default is not None else 'None'
+        default = default if default is not None else "None"
         if value is None:
             return MafColumnRecord.build(column, default, scheme=scheme)
         else:
             return MafColumnRecord.build(column, value, scheme=scheme)
 
+
 class GenericColumnBuilder(Builder):
     """
     Generic builder class that should handle the majority of the cases. 
     """
+
     @classmethod
     def build(cls, key, value, scheme, default=None, fn=None, **kwargs):
         if fn is not None:
@@ -72,10 +82,12 @@ class GenericColumnBuilder(Builder):
         else:
             return MafColumnRecord.build(key, value, scheme=scheme)
 
+
 class GenericSequenceBuilder(Builder):
     """
     Generic sequence builder class that should handle the majority of the cases. 
     """
+
     @classmethod
     def build(cls, key, value, scheme, default=None):
         if value is None and default is not None:
@@ -83,9 +95,10 @@ class GenericSequenceBuilder(Builder):
         elif value is None and scheme.column_class(key).is_nullable():
             return scheme.column_class(key).build_nullable(key, scheme=scheme)
         elif isinstance(value, list):
-            return MafColumnRecord.build(key, ';'.join(sorted(value)), scheme=scheme)
+            return MafColumnRecord.build(key, ";".join(sorted(value)), scheme=scheme)
         else:
             return MafColumnRecord.build(key, value, scheme=scheme)
+
 
 def get_builder(column, scheme, **kwargs):
     """
@@ -96,10 +109,12 @@ def get_builder(column, scheme, **kwargs):
     :returns: an appropriate builder class
     """
     colclassstr = scheme.column_class(column).__name__
-    builderclassstr = '{0}Builder'.format(colclassstr)
+    builderclassstr = "{0}Builder".format(colclassstr)
     try:
-        if builderclassstr.startswith('SequenceOf'):
-            builderclassstr = 'GenericSequenceBuilder'
-        return getattr(sys.modules[__name__], builderclassstr).build(column, scheme=scheme, **kwargs)
+        if builderclassstr.startswith("SequenceOf"):
+            builderclassstr = "GenericSequenceBuilder"
+        return getattr(sys.modules[__name__], builderclassstr).build(
+            column, scheme=scheme, **kwargs
+        )
     except AttributeError:
         return GenericColumnBuilder.build(column, scheme=scheme, **kwargs)

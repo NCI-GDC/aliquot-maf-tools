@@ -3,6 +3,7 @@ Mixins for `BaseMafRecordMerger` classes
 """
 from abc import ABCMeta, abstractmethod
 
+
 class MafMergingAverageColumnsMixin(metaclass=ABCMeta):
     @abstractmethod
     def average_columns(self):
@@ -17,7 +18,7 @@ class MafMergingAverageColumnsMixin(metaclass=ABCMeta):
         :param vals: ``list`` of values to get average
         :return: the mean as an ``int``
         """
-        return int('{0:.0f}'.format(sum(vals) / float(len(vals))))
+        return int("{0:.0f}".format(sum(vals) / float(len(vals))))
 
 
 class MafMergingCombineColumnsMixin(metaclass=ABCMeta):

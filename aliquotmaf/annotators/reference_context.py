@@ -8,9 +8,10 @@ import pysam
 from .annotator import Annotator
 from aliquotmaf.converters.builder import get_builder
 
+
 class ReferenceContext(Annotator):
     def __init__(self, source, scheme, context_size=5):
-        super().__init__(name='ReferenceContext', source=source, scheme=scheme)
+        super().__init__(name="ReferenceContext", source=source, scheme=scheme)
         self.fa = None
         self.context_size = context_size
 
@@ -23,20 +24,23 @@ class ReferenceContext(Annotator):
     def annotate(self, maf_record, vcf_record, strip_chr=False):
         # Add reference context
         if strip_chr:
-            region = '{0}:{1}-{2}'.format(
-                vcf_record.chrom.replace('chr', '') if vcf_record.chrom != 'chrM' else 'MT',
+            region = "{0}:{1}-{2}".format(
+                vcf_record.chrom.replace("chr", "")
+                if vcf_record.chrom != "chrM"
+                else "MT",
                 max(1, vcf_record.pos - self.context_size),
-                vcf_record.stop + self.context_size
+                vcf_record.stop + self.context_size,
             )
         else:
-            region = '{0}:{1}-{2}'.format(
+            region = "{0}:{1}-{2}".format(
                 vcf_record.chrom,
                 max(1, vcf_record.pos - self.context_size),
-                vcf_record.stop + self.context_size
+                vcf_record.stop + self.context_size,
             )
-        maf_record['CONTEXT'] = get_builder("CONTEXT", self.scheme, value=self.fa.fetch(region=region))
+        maf_record["CONTEXT"] = get_builder(
+            "CONTEXT", self.scheme, value=self.fa.fetch(region=region)
+        )
         return maf_record
-
 
     def shutdown(self):
         self.fa.close()
