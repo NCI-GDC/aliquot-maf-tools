@@ -63,7 +63,7 @@ def extract_annotation_from_header(vcf_object, vep_key="CSQ"):
             iname = record.get("ID")
             if iname and str(iname) == vep_key:
                 vep_key = iname
-                anno_line = re.search('Format: (\S+)"$', record["Description"])
+                anno_line = re.search(r'Format: (\S+)"$', record["Description"])
                 raw_ann_cols_format = anno_line.group(1).split("|")
                 for ann in raw_ann_cols_format:
                     if ann.startswith("ExAC"):
