@@ -4,13 +4,12 @@ Builder classes assist in creating a MafColumnRecord.
 import abc
 import sys
 
-import maflib.column_types as coltypes
 from maflib.column import MafColumnRecord
 
 
 class Builder(metaclass=abc.ABCMeta):
     """
-    Specify an abstract interface for creating column builder 
+    Specify an abstract interface for creating column builder
     objects.
     """
 
@@ -68,7 +67,7 @@ class MutationStatusBuilder(Builder):
 
 class GenericColumnBuilder(Builder):
     """
-    Generic builder class that should handle the majority of the cases. 
+    Generic builder class that should handle the majority of the cases.
     """
 
     @classmethod
@@ -85,7 +84,7 @@ class GenericColumnBuilder(Builder):
 
 class GenericSequenceBuilder(Builder):
     """
-    Generic sequence builder class that should handle the majority of the cases. 
+    Generic sequence builder class that should handle the majority of the cases.
     """
 
     @classmethod

@@ -1,5 +1,5 @@
 """
-A module containing formatting utility functions needed when converting from a 
+A module containing formatting utility functions needed when converting from a
 VCF to a MAF.
 """
 

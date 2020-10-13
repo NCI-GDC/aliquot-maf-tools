@@ -600,12 +600,12 @@ class GDC_1_0_0_Aliquot(BaseRunner):
                 collection.add(column=i, value=None)
         collection.transform(self._scheme)
 
-        ## Generate maf record
+        # Generate maf record
         maf_record = init_empty_maf_record(line_number=line_number)
         for i in collection:
             maf_record += i.transformed
 
-        ## Annotations
+        # Annotations
         if self.annotators["dbsnp_priority_db"]:
             maf_record = self.annotators["dbsnp_priority_db"].annotate(maf_record)
         else:
@@ -635,7 +635,7 @@ class GDC_1_0_0_Aliquot(BaseRunner):
             maf_record, vcf_record, self.options["tumor_vcf_id"]
         )
 
-        ## Filters
+        # Filters
         gdc_filters = []
         for filt_key in self.filters:
             filt_obj = self.filters[filt_key]

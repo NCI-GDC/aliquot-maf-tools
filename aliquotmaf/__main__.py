@@ -9,6 +9,7 @@ from signal import signal, SIGPIPE, SIG_DFL
 
 from aliquotmaf.logger import Logger
 
+# FIXME: no
 from aliquotmaf.subcommands.vcf_to_aliquot.__main__ import VcfToAliquotMaf
 from aliquotmaf.subcommands.merge_aliquot.__main__ import MergeAliquotMafs
 from aliquotmaf.subcommands.mask_merged_aliquot.__main__ import MaskMergedAliquotMaf

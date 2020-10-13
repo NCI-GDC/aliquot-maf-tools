@@ -1,5 +1,5 @@
 """
-Implements the hotspots annotation. 
+Implements the hotspots annotation.
 """
 from __future__ import absolute_import
 
@@ -23,9 +23,6 @@ class Hotspot(Annotator):
             for line in fh:
                 if not head:
                     head = line.rstrip("\r\n").lower().split("\t")
-                    assert all(
-                        [i in head for i in ["hugo_symbol", "change", "type"]]
-                    ), self.logger.error("Unexpected header {0} found!".format(head))
                 else:
                     dat = dict(zip(head, line.rstrip("\r\n").split("\t")))
                     if dat["hugo_symbol"] not in hsdic:
