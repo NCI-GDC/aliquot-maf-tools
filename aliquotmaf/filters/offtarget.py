@@ -1,5 +1,5 @@
 """
-Applies the off_target filter for regions outside the provided intervals. 
+Applies the off_target filter for regions outside the provided intervals.
 """
 from __future__ import absolute_import
 

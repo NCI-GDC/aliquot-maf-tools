@@ -1,11 +1,10 @@
 """
 Implements the dbSNP validation status annotations.
 """
-from __future__ import absolute_import
 
 import sqlite3 as lite
 
-from .annotator import Annotator
+from aliquotmaf.annotators.annotator import Annotator
 
 from aliquotmaf.converters.builder import get_builder
 

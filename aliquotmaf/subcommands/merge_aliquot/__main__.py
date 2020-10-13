@@ -1,5 +1,5 @@
 """
-Subcommand for merging single caller raw aliquot MAFs to merged raw MAFs. 
+Subcommand for merging single caller raw aliquot MAFs to merged raw MAFs.
 """
 from aliquotmaf.subcommands.base import Subcommand
 from aliquotmaf.subcommands.merge_aliquot.runners import GDC_1_0_0_Aliquot_Merged

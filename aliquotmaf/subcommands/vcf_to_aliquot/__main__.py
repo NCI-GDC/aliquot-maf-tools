@@ -1,5 +1,5 @@
 """
-Subcommand for converting a VEP annotated VCF to a raw 
+Subcommand for converting a VEP annotated VCF to a raw
 aliquot MAF.
 """
 from aliquotmaf.subcommands.base import Subcommand
