@@ -1,12 +1,17 @@
-FROM python:3.5
+FROM python:3.6-alpine
 
-# Copy over source
-COPY . aliquot-maf-tools/
-WORKDIR /aliquot-maf-tools
+ENV BINARY=aliquotmaf
 
-# Installing dependencies
-RUN bash -c "./repo-install.sh" && \
-    pip install -r docker-requirements.txt
+RUN apk add make
 
-# Install bio-submitter-qc
-RUN pip install .
+COPY ./dist/ /opt
+
+WORKDIR /opt
+
+RUN make init-pip \
+  && ln -s /opt/bin/${BINARY} /bin/${BINARY} \
+  && chmod +x /bin/${BINARY}
+
+ENTRYPOINT ["/bin/aliquotmaf"]
+
+CMD ["--help"]
