@@ -1,4 +1,5 @@
 bioinf-maflib
+pysam
 mock
 pytest
 pytest-cov
