@@ -183,13 +183,13 @@ def get_pypi_suffix(branch, commit) -> str:
     if branch in ('master', 'main'):
         return ''
     elif branch == 'develop':
-        return ".dev{}".format(commit)
+        return "dev{}".format(commit)
     elif branch.startswith('hotfix'):
-        return '.post{}'.format(commit)
+        return 'post{}'.format(commit)
     elif branch.startswith('feat'):
-        return '.b{}'.format(commit)
+        return 'b{}'.format(commit)
     elif branch.startswith('release'):
-        return '.rc{}'.format(commit)
+        return 'rc{}'.format(commit)
     else:
         return 'a{}'.format(commit)
 
@@ -228,10 +228,10 @@ class Requirements(Command):
 
 setup(
     name=PYPI_REPO,
-    description = "Tools for creating and filtering aliquot-level MAFs",
+    description="Tools for creating and filtering aliquot-level MAFs",
     version=__pypi_version__,
     url=GIT_REPO_URL,
-    license = "Apache 2.0",
+    license="Apache 2.0",
     python_requires=">=3.6",
     packages=find_packages(),
     install_requires=INSTALL_REQUIRES,
