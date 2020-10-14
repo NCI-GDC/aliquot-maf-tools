@@ -1,5 +1,5 @@
-from aliquotmaf.subcommands.mask_merged_aliquot.base import BaseRunner
-from aliquotmaf.subcommands.mask_merged_aliquot.gdc_1_0_0_aliquot_merged_masked import (
+from aliquotmaf.subcommands.mask_merged_aliquot.runners.base import BaseRunner
+from aliquotmaf.subcommands.mask_merged_aliquot.runners.gdc_1_0_0_aliquot_merged_masked import (
     GDC_1_0_0_Aliquot_Merged_Masked,
 )
 
