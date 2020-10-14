@@ -5,7 +5,6 @@ Implements the dbSNP validation status annotations.
 import sqlite3 as lite
 
 from aliquotmaf.annotators.annotator import Annotator
-
 from aliquotmaf.converters.builder import get_builder
 
 

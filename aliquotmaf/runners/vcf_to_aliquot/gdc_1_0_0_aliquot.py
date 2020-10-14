@@ -1,38 +1,33 @@
 """Main vcf2maf logic for spec gdc-1.0.0-aliquot"""
-import pysam
 import urllib.parse
-
 from operator import itemgetter
 
-from maflib.header import MafHeader
-from maflib.writer import MafWriter
+import pysam
+from maflib.header import MafHeader, MafHeaderRecord
 from maflib.sort_order import BarcodesAndCoordinate
 from maflib.sorter import MafSorter
-from maflib.header import MafHeaderRecord
 from maflib.validation import ValidationStringency
+from maflib.writer import MafWriter
 
 import aliquotmaf.annotators as Annotators
 import aliquotmaf.filters as Filters
 import aliquotmaf.subcommands.vcf_to_aliquot.extractors as Extractors
-
-from aliquotmaf.subcommands.vcf_to_aliquot.runners import BaseRunner
-from aliquotmaf.converters.utils import init_empty_maf_record, get_columns_from_header
-from aliquotmaf.converters.collection import InputCollection
 from aliquotmaf.converters.builder import get_builder
-
-from aliquotmaf.subcommands.utils import (
-    extract_annotation_from_header,
-    assert_sample_in_header,
-    load_json,
-    load_enst,
-)
-
+from aliquotmaf.converters.collection import InputCollection
 from aliquotmaf.converters.formatters import (
+    format_all_effects,
     format_alleles,
     format_depths,
-    format_all_effects,
     format_vcf_columns,
 )
+from aliquotmaf.converters.utils import get_columns_from_header, init_empty_maf_record
+from aliquotmaf.subcommands.utils import (
+    assert_sample_in_header,
+    extract_annotation_from_header,
+    load_enst,
+    load_json,
+)
+from aliquotmaf.subcommands.vcf_to_aliquot.runners import BaseRunner
 
 
 class GDC_1_0_0_Aliquot(BaseRunner):
@@ -185,20 +180,20 @@ class GDC_1_0_0_Aliquot(BaseRunner):
             + "is great than this value as common_in_exac [0.001]",
         )
         filt.add_argument(
-            "--gdc_blacklist",
+            "--gdc-blacklist",
             type=str,
             default=None,
             help="The file containing the blacklist tags and tumor aliquot uuids to "
             + "apply them to.",
         )
         filt.add_argument(
-            "--min_n_depth",
+            "--min-n-depth",
             default=7,
             type=int,
             help="Flag variants where normal depth is <= INT as ndp [7].",
         )
         filt.add_argument(
-            "--gdc_pon_vcf",
+            "--gdc-pon-vcf",
             type=str,
             default=None,
             help="The tabix-indexed panel of normals VCF for applying the gdc "

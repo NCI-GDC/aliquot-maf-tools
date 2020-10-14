@@ -1,14 +1,8 @@
-"""
-Base class for all protected -> public MAF runners.
-"""
+"""Base class for all vcf2maf runners"""
 import datetime
-
 from abc import ABCMeta, abstractmethod
 
 from maflib.header import MafHeaderRecord
-
-from aliquotmaf.logger import Logger
-from aliquotmaf.metrics.metrics_collection import MafMetricsCollection
 
 
 class BaseRunner(metaclass=ABCMeta):
@@ -16,13 +10,12 @@ class BaseRunner(metaclass=ABCMeta):
         self.logger = Logger.get_logger(self.__class__.__name__)
         self.options = options
 
-        self.maf_reader = None
+        # Maf stuff
+        self.maf_header = None
         self.maf_writer = None
         self._scheme = None
         self._columns = None
         self._colset = None
-
-        self.metrics = MafMetricsCollection()
 
     @staticmethod
     def get_header_date():
@@ -70,7 +63,7 @@ class BaseRunner(metaclass=ABCMeta):
 
     @classmethod
     def add(cls, subparsers):
-        """Adds the given subcommand to the subparsers."""
+        """Adds the given subcommand to the subprsers."""
         subparser = subparsers.add_parser(
             name=cls.__tool_name__(), description=cls.__get_description__()
         )

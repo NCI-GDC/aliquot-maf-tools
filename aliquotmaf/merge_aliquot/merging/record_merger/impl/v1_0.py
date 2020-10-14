@@ -1,9 +1,8 @@
 """
 Maf recorder merger implementation v1.0
 """
-from aliquotmaf.converters.utils import init_empty_maf_record
 from aliquotmaf.converters.builder import get_builder
-
+from aliquotmaf.converters.utils import init_empty_maf_record
 from aliquotmaf.merging.record_merger.base import BaseMafRecordMerger
 from aliquotmaf.merging.record_merger.mixins import (
     MafMergingAverageColumnsMixin,
