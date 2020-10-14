@@ -1,11 +1,10 @@
 """
 Applies the GDC Blacklist filter.
 """
-from __future__ import absolute_import
 
 import gzip
 
-from .filter_base import Filter
+from aliquotmaf.filters.filter_base import Filter
 
 
 class GdcBlacklist(Filter):

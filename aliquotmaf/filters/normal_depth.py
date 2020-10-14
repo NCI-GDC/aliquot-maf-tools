@@ -1,9 +1,7 @@
 """
 Applies the normal depth filter
 """
-from __future__ import absolute_import
-
-from .filter_base import Filter
+from aliquotmaf.filters.filter_base import Filter
 
 
 class NormalDepth(Filter):

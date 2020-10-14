@@ -1,11 +1,21 @@
-from __future__ import absolute_import
-
-from .base import Extractor
-from .genotypes import VariantAlleleIndexExtractor, GenotypeAndDepthsExtractor
-from .location import LocationDataExtractor
-from .effects import EffectsExtractor, SelectOneEffectExtractor
-from .population_frequency import PopulationFrequencyExtractor
-from .variant_class import VariantClassExtractor
+from aliquotmaf.subcommands.vcf_to_aliquot.extractors.base import Extractor
+from aliquotmaf.subcommands.vcf_to_aliquot.extractors.effects import (
+    EffectsExtractor,
+    SelectOneEffectExtractor,
+)
+from aliquotmaf.subcommands.vcf_to_aliquot.extractors.genotypes import (
+    GenotypeAndDepthsExtractor,
+    VariantAlleleIndexExtractor,
+)
+from aliquotmaf.subcommands.vcf_to_aliquot.extractors.location import (
+    LocationDataExtractor,
+)
+from aliquotmaf.subcommands.vcf_to_aliquot.extractors.population_frequency import (
+    PopulationFrequencyExtractor,
+)
+from aliquotmaf.subcommands.vcf_to_aliquot.extractors.variant_class import (
+    VariantClassExtractor,
+)
 
 __all__ = [
     Extractor,
