@@ -5,10 +5,11 @@ from abc import ABCMeta, abstractmethod
 
 from aliquotmaf.logger import Logger
 
+
 class Filter(metaclass=ABCMeta):
     def __init__(self, name=None, source=None):
         self.name = None
-        self.source=source
+        self.source = source
         self.logger = Logger.get_logger(self.__class__.__name__)
         self.tags = []
 

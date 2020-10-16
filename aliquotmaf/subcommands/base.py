@@ -3,6 +3,7 @@ Abstract base class for all subcommands in aliquot-maf-tool.
 """
 from abc import ABCMeta, abstractmethod
 
+
 class Subcommand(metaclass=ABCMeta):
     @classmethod
     @abstractmethod
@@ -27,8 +28,8 @@ class Subcommand(metaclass=ABCMeta):
     def add(cls, subparsers):
         """Adds the given subcommand to the subprsers."""
         subparser = subparsers.add_parser(
-            name=cls.__tool_name__(),
-            description=cls.__get_description__())
+            name=cls.__tool_name__(), description=cls.__get_description__()
+        )
 
         cls.__add_arguments__(subparser)
         return subparser

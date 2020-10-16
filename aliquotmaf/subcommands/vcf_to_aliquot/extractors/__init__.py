@@ -15,4 +15,5 @@ __all__ = [
     EffectsExtractor,
     SelectOneEffectExtractor,
     PopulationFrequencyExtractor,
-    VariantClassExtractor]
+    VariantClassExtractor,
+]

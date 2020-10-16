@@ -9,9 +9,11 @@ from maflib.column_types import StringColumn
 
 from aliquotmaf.annotators import ReferenceContext
 
+
 @pytest.fixture
 def setup_annotator():
     created = []
+
     def _make_annotator(scheme, source, context_size=5):
         curr = ReferenceContext.setup(scheme, source, context_size=context_size)
         created.append(curr)
@@ -22,10 +24,12 @@ def setup_annotator():
     for record in created:
         record.shutdown()
 
+
 @pytest.fixture
 def test_scheme(get_test_scheme):
     coldict = OrderedDict([("CONTEXT", StringColumn)])
     return get_test_scheme(coldict)
+
 
 @pytest.fixture
 def vcf_gen(get_test_file):
@@ -45,55 +49,62 @@ def vcf_gen(get_test_file):
     for obj in created:
         obj.close()
 
+
 def test_setup_reference_context(test_scheme, setup_annotator, get_test_file):
-    fasta_path = get_test_file('fake_ref.fa')
-    annotator = setup_annotator(test_scheme, source=fasta_path) 
-    assert annotator.context_size == 5 
+    fasta_path = get_test_file("fake_ref.fa")
+    annotator = setup_annotator(test_scheme, source=fasta_path)
+    assert annotator.context_size == 5
 
-def test_reference_context_snp(test_scheme, setup_annotator, get_test_file, 
-                               get_empty_maf_record, vcf_gen):
-    fasta_path = get_test_file('fake_ref.fa')
-    annotator = setup_annotator(test_scheme, source=fasta_path) 
 
-    gen = vcf_gen('ex1.vcf.gz')
+def test_reference_context_snp(
+    test_scheme, setup_annotator, get_test_file, get_empty_maf_record, vcf_gen
+):
+    fasta_path = get_test_file("fake_ref.fa")
+    annotator = setup_annotator(test_scheme, source=fasta_path)
+
+    gen = vcf_gen("ex1.vcf.gz")
 
     # simple snp
     record = gen.snp
 
     ## default context
-    maf_record = annotator.annotate(get_empty_maf_record, record) 
-    assert maf_record['CONTEXT'].value == 'AGTGGCTCATT'
+    maf_record = annotator.annotate(get_empty_maf_record, record)
+    assert maf_record["CONTEXT"].value == "AGTGGCTCATT"
 
-    ## truncated left context 
+    ## truncated left context
     annotator.context_size = 12
-    maf_record = annotator.annotate(get_empty_maf_record, record) 
-    assert maf_record['CONTEXT'].value == 'CACTAGTGGCTCATTGTAAATG'
+    maf_record = annotator.annotate(get_empty_maf_record, record)
+    assert maf_record["CONTEXT"].value == "CACTAGTGGCTCATTGTAAATG"
 
-    ## truncated both context 
-    annotator.context_size = 1575 
-    maf_record = annotator.annotate(get_empty_maf_record, record) 
-    assert maf_record['CONTEXT'].value == annotator.fa.fetch(region=record.chrom)
+    ## truncated both context
+    annotator.context_size = 1575
+    maf_record = annotator.annotate(get_empty_maf_record, record)
+    assert maf_record["CONTEXT"].value == annotator.fa.fetch(region=record.chrom)
 
-def test_reference_context_del(test_scheme, setup_annotator, get_test_file, 
-                               get_empty_maf_record, vcf_gen):
-    fasta_path = get_test_file('fake_ref.fa')
-    annotator = setup_annotator(test_scheme, source=fasta_path) 
 
-    gen = vcf_gen('ex1.vcf.gz')
+def test_reference_context_del(
+    test_scheme, setup_annotator, get_test_file, get_empty_maf_record, vcf_gen
+):
+    fasta_path = get_test_file("fake_ref.fa")
+    annotator = setup_annotator(test_scheme, source=fasta_path)
 
-    # deletion 
+    gen = vcf_gen("ex1.vcf.gz")
+
+    # deletion
     record = gen.deletion
-    maf_record = annotator.annotate(get_empty_maf_record, record) 
-    assert maf_record['CONTEXT'].value == 'AATGAACTTCTGTA'
+    maf_record = annotator.annotate(get_empty_maf_record, record)
+    assert maf_record["CONTEXT"].value == "AATGAACTTCTGTA"
 
-def test_reference_context_ins(test_scheme, setup_annotator, get_test_file, 
-                               get_empty_maf_record, vcf_gen):
-    fasta_path = get_test_file('fake_ref.fa')
-    annotator = setup_annotator(test_scheme, source=fasta_path) 
 
-    gen = vcf_gen('ex1.vcf.gz')
+def test_reference_context_ins(
+    test_scheme, setup_annotator, get_test_file, get_empty_maf_record, vcf_gen
+):
+    fasta_path = get_test_file("fake_ref.fa")
+    annotator = setup_annotator(test_scheme, source=fasta_path)
 
-    # insertion 
+    gen = vcf_gen("ex1.vcf.gz")
+
+    # insertion
     record = gen.insertion
-    maf_record = annotator.annotate(get_empty_maf_record, record) 
-    assert maf_record['CONTEXT'].value == 'TGTAATTGAAA'
+    maf_record = annotator.annotate(get_empty_maf_record, record)
+    assert maf_record["CONTEXT"].value == "TGTAATTGAAA"
