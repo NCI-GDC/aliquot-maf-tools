@@ -1,8 +1,6 @@
-FROM python:3.6-alpine
+FROM python:3.6
 
 ENV BINARY=aliquotmaf
-
-RUN apk add make
 
 COPY ./dist/ /opt
 
