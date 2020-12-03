@@ -1,27 +1,12 @@
 """
 Main entrypoint for all aliquot-maf-tools.
 """
-import argparse
-import datetime
-import sys
-
-from signal import signal, SIGPIPE, SIG_DFL
-
-from aliquotmaf.logger import Logger
-
-# FIXME: no
-from aliquotmaf.subcommands.vcf_to_aliquot.__main__ import VcfToAliquotMaf
-from aliquotmaf.subcommands.merge_aliquot.__main__ import MergeAliquotMafs
-from aliquotmaf.subcommands.mask_merged_aliquot.__main__ import MaskMergedAliquotMaf
-
-
-signal(SIGPIPE, SIG_DFL)
 
 
 def main(args=None):
+    pass
     """
     The main method for aliquot-maf-tools.
-    """
     # Setup logger
     Logger.setup_root_logger()
 
@@ -51,7 +36,10 @@ def main(args=None):
 
     # Finish
     logger.info("Finished!")
+    """
 
 
 if __name__ == "__main__":
-    main()
+    # TODO: Update help-text or add parser
+    print('Depreciated')
+    # main()

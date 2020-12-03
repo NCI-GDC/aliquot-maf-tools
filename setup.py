@@ -15,7 +15,7 @@ PYPI_REPO = "bioinf-{}".format(PACKAGE)
 GIT_REPO_URL = "https://github.com/NCI-GDC/{}".format(GIT_REPO)
 
 INSTALL_REQUIRES = [
-    "bioinf-maflib",
+    "bioinf-maflib>=1.0.0",
     "pysam",
 ]
 
@@ -178,8 +178,7 @@ def call_subprocess(cmd: list):
 
 
 def get_pypi_suffix(branch, commit) -> str:
-    """Return PEP 440-compatible suffix based on branch type.
-    """
+    """Return PEP 440-compatible suffix based on branch type."""
     if branch in ('master', 'main'):
         return ''
     elif branch == 'develop':
@@ -242,7 +241,14 @@ setup(
         "print_version": PrintVersion,
     },
     include_package_data=True,
-    scripts=[os.path.join(os.path.dirname(__file__), 'bin', PACKAGE)],
+    # scripts=[os.path.join(os.path.dirname(__file__), 'bin', PACKAGE)],
+    entry_points={
+        "console_scripts": [
+            "vcf_to_aliquot = aliquotmaf.vcf_to_aliquot.__main__:main",
+            "merge_aliquot = aliquotmaf.merge_aliquot.__main__:main",
+            "mask_merged_aliquot = aliquotmaf.mask_merged_aliquot.__main__:main",
+        ]
+    },
 )
 
 # __END__
