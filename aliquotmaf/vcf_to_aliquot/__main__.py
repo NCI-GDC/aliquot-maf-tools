@@ -141,10 +141,22 @@ def process_argv(argv=None) -> simplenamespace:
 def run():
     # Setup annotator classes
     """
+    # Initalize aliquot class
+        # MafHeader: reference_fasta_index, tumor_only, tumor_aliquot_uuid, normal_aliquot_uuid
+        # MafSorter: reference_fasta_index
+        # MafWriter: output_maf
     for annotator in aliquot.annotators:
         annotator_instance = init_annotator(annotator)
-    """
+    with Vcf() as vcf_object:
+        for record in vcf_object:
+            do_stuff
     # Initalize GDC_1_0_0_Aliquot
+    with GDC_1_0_0_Aliquot() as aliquot, Vcf() as vcf:
+        for record in vcf:
+            extracted_data = record.extract(tumor_vcf_id, normal_vcf_id)
+            transformed_data = record.transform(extracted_data)
+            blop
+    """
     pass
 
 
