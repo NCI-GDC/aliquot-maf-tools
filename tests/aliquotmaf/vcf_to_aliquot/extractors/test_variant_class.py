@@ -3,9 +3,7 @@ Tests the extractors in aliquotmaf.subcommands.vcf_to_aliquot.extractors.variant
 """
 import pytest
 
-from aliquotmaf.subcommands.vcf_to_aliquot.extractors.variant_class import (
-    VariantClassExtractor,
-)
+from aliquotmaf.vcf_to_aliquot.extractors.variant_class import VariantClassExtractor
 
 
 @pytest.mark.parametrize(
@@ -39,7 +37,7 @@ from aliquotmaf.subcommands.vcf_to_aliquot.extractors.variant_class import (
 )
 def test_variant_class_extractor(cons, var_type, inframe, expected):
     """
-    Tests the extraction of MAF variant class. 
+    Tests the extraction of MAF variant class.
     """
     res = VariantClassExtractor.extract(cons, var_type, inframe)
     assert res == expected

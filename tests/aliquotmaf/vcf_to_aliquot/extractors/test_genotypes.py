@@ -3,9 +3,9 @@ Tests the extractors in aliquotmaf.subcommands.vcf_to_protected.extractors.genot
 """
 import pytest
 
-from aliquotmaf.subcommands.vcf_to_aliquot.extractors.genotypes import (
-    VariantAlleleIndexExtractor,
+from aliquotmaf.vcf_to_aliquot.extractors.genotypes import (
     GenotypeAndDepthsExtractor,
+    VariantAlleleIndexExtractor,
 )
 
 
@@ -78,7 +78,7 @@ def test_variant_allele_index_extractor(genotype, expected):
 )
 def test_genotype_and_depths_extractor(genotype, alleles, expected_gt, expected_dp):
     """
-    Tests the extraction of the genotype and depths data from the vcf 
+    Tests the extraction of the genotype and depths data from the vcf
     """
     idx = VariantAlleleIndexExtractor.extract(genotype)
     new_gt, depths = GenotypeAndDepthsExtractor.extract(idx, genotype, alleles)

@@ -1,45 +1,46 @@
 """
 Tests for the ``aliquotmaf.subcommands.vcf_to_aliquot`` subcommands.
 """
-import pytest
 import uuid
 
-from aliquotmaf.__main__ import main
+import pytest
+
+from aliquotmaf.vcf_to_aliquot.__main__ import main
 
 
 def test_validation_tumor_only():
     fake_uuid = str(uuid.uuid4())
     resource_commands = [
-        "--biotype_priority_file",
+        "--biotype-priority-file",
         "./fake.json",
-        "--effect_priority_file",
+        "--effect-priority-file",
         "./fake.json",
-        "--reference_fasta",
+        "--reference-fasta",
         "./fake.fa",
-        "--reference_fasta_index",
+        "--reference-fasta-index",
         "./fake.fa.fai",
     ]
 
     main_commands = [
         "VcfToAliquotMaf",
-        "--input_vcf",
+        "--input-vcf",
         "./fake.vcf.gz",
-        "--output_maf",
+        "--output-maf",
         "./fake.maf.gz",
         "gdc-1.0.0-aliquot",
-        "--caller_id",
+        "--caller-id",
         "mutect",
-        "--src_vcf_uuid",
+        "--src-vcf-uuid",
         fake_uuid,
-        "--case_uuid",
+        "--case-uuid",
         fake_uuid,
-        "--tumor_submitter_id",
+        "--tumor-submitter-id",
         "FAKE-TUMOR",
-        "--tumor_aliquot_uuid",
+        "--tumor-aliquot-uuid",
         fake_uuid,
-        "--tumor_bam_uuid",
+        "--tumor-bam-uuid",
         fake_uuid,
-        "--maf_center",
+        "--maf-center",
         "FAKE",
     ] + resource_commands
 
@@ -47,4 +48,4 @@ def test_validation_tumor_only():
         main(main_commands)
 
     with pytest.raises(FileNotFoundError):
-        main(main_commands + ["--tumor_only"])
+        main(main_commands + ["--tumor-only"])

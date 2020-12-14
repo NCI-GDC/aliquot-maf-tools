@@ -3,7 +3,7 @@ Tests the extractors in aliquotmaf.subcommands.vcf_to_aliquot.extractors.populat
 """
 import pytest
 
-from aliquotmaf.subcommands.vcf_to_aliquot.extractors.population_frequency import (
+from aliquotmaf.vcf_to_aliquot.extractors.population_frequency import (
     PopulationFrequencyExtractor,
 )
 
@@ -50,7 +50,7 @@ SUBPOPS = [
 )
 def test_population_frequency_extractor(effect, var_allele, expected):
     """
-    Tests the extraction of population frequencies. 
+    Tests the extraction of population frequencies.
     """
     raw = PopulationFrequencyExtractor.extract(effect, var_allele)
     res = {k: raw[k] for k in raw if raw[k] is not None}
