@@ -108,6 +108,8 @@ def load_enst(fpath):
 
     :returns set: a set of ENST identifiers
     """
+    if not fpath:
+        return None
     lst = []
     with open(fpath, "rt") as fh:
         for line in fh:
