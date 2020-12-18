@@ -13,51 +13,10 @@ DI = SimpleNamespace(pysam=pysam)
 
 class VcfRecord:
     def __init__(
-        self,
-        record,
-        tumor_index: int,
-        normal_index: Optional[int],
-        vep_key: str = "CSQ",
-        annotation_columns: Optional[List[str]] = None,
-        index: int = None,
+        self, record, index: int = None,
     ):
         self.record = record
         self.index = index
-        self.normal_index = normal_index
-        self.tumor_index = tumor_index
-        self.annotation_columns = annotation_columns
-        self.vep_key = vep_key
-
-        self._extracted_data: extract.ExtractedDataNT = None
-        self._transformed_data: MafRecord = None
-
-    def extract(
-        self,
-        tumor_sample_id,
-        normal_sample_id,
-        annotation_columns,
-        vep_key,
-        is_tumor_only,
-        _extract=extract,
-    ) -> dict:
-        if not self._extracted_data:
-            self._extracted_data = _extract.extract(
-                tumor_sample_id,
-                normal_sample_id,
-                self.tumor_idx,
-                self.normal_idx,
-                ann_cols,
-                vep_key,
-                is_tumor_only,
-            )
-        return self._extracted_data
-
-    def transform(self, is_tumor_only, _transform=transform) -> MafRecord:
-        if not self._transformed_data:
-            self._transformed_data = _transform.transform(
-                self.record, self._extracted_data, is_tumor_only, self.index
-            )
-        return self._transformed_data
 
 
 class VcfFile:
@@ -76,33 +35,12 @@ class VcfFile:
 
         self.pysam_file = None
 
-        self._tumor_idx = None
-        self._normal_idx = None
-        self._annotation_columns = None
+        self.tumor_idx = self.assert_sample_id_in_header(tumor_vcf_id)
+        self.normal_idx = self.assert_sample_id_in_header(normal_vcf_id)
+        self.annotation_columns = self.extract_annotation_from_header()
 
         self.vep_key = "CSQ"
         self.di = di
-
-    def tumor_idx(self) -> int:
-        if not self._tumor_idx:
-            self._tumor_idx = self.assert_sample_in_header(
-                self.pysam_file, self.tumor_vcf_id
-            )
-        return self._tumor_idx
-
-    def normal_idx(self) -> int:
-        if not self._normal_idx and not self.is_tumor_only:
-            self._normal_idx = self.assert_sample_in_header(
-                self.pysam_file, self.normal_vcf_id
-            )
-        return self._normal_idx
-
-    def annotation_columns(self):
-        if self._annotation_columns is None:
-            self._annotation_columns = self.extract_annotation_from_header(
-                self.pysam_file
-            )
-        return self._annotation_columns
 
     def __enter__(self):
         self.pysam_file = self.di.pysam.VariantFile(self.variant_file)
@@ -116,15 +54,10 @@ class VcfFile:
         for record in self.pysam_file.fetch():
             counter += 1
             yield VcfRecord(
-                record=record,
-                vep_key=self.vep_key,
-                tumor_index=self.tumor_idx(),
-                normal_index=self.normal_idx(),
-                annotation_columns=self.annotation_columns(),
-                index=counter,
+                record=record, index=counter,
             )
 
-    def assert_sample_id_in_header(self, vcf_id) -> int:
+    def assert_sample_id_in_header(self, vcf_id) -> Optional[int]:
         """
         Asserts that a given sample is in the VCF header and returns the index.
 
@@ -156,8 +89,8 @@ class VcfFile:
         for record in self.pysam_file.header.records:
             if record.type == "INFO":
                 iname = record.get("ID")
-                if iname and str(iname) == vep_key:
-                    vep_key = iname
+                if iname and str(iname) == vep_key:  # This could be a problem
+                    vep_key = iname  # following records tested against previous
                     anno_line = re.search(r'Format: (\S+)"$', record["Description"])
                     raw_ann_cols_format = anno_line.group(1).split("|")
                     for ann in raw_ann_cols_format:
@@ -166,13 +99,6 @@ class VcfFile:
                         else:
                             ann_cols_format.append(ann)
 
-        # This assert will never raise
-        assert (
-            vep_key is not None
-        ), "Malformed header, unable to find VEP annotation key"
-        assert (
-            ann_cols_format
-        ), "Malformed header, unable to find VEP annotation column info"
         return ann_cols_format
 
     def fix_exac(self, ann):
