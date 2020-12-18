@@ -12,12 +12,13 @@ class Hotspot(Annotator):
         self.data = data
 
     @classmethod
-    def setup(cls, scheme, source):
+    def setup(cls, scheme, args):
         # load the hotspots
 
         hsdic = {}
         head = []
         count = 0
+        source = args.hotspot_tsv
         with open(source, "rt") as fh:
             for line in fh:
                 if not head:
@@ -46,8 +47,8 @@ class Hotspot(Annotator):
                 hgvsp = hgvsp[: idx - 1] + "fs"
             if hgvsp and hgvsp in self.data[gene]:
                 mval = "Y"
-        maf_record["hotspot"] = get_builder("hotspot", self.scheme, value=mval)
-        return maf_record
+        hotspot_record = get_builder("hotspot", self.scheme, value=mval)
+        return hotspot_record
 
     def shutdown(self):
         pass

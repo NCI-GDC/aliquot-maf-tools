@@ -22,17 +22,17 @@ class MutationStatus(Annotator):
         }
 
     @classmethod
-    def setup(cls, scheme, caller):
-        curr = cls(scheme, caller)
+    def setup(cls, scheme, args):
+        curr = cls(scheme, args.caller)
         return curr
 
     def annotate(self, maf_record, vcf_record, tumor_sample):
-        maf_record["Mutation_Status"] = get_builder(
+        mutation_status_record = get_builder(
             "Mutation_Status",
             self.scheme,
             value=self.mapper[self.caller](vcf_record, tumor_sample),
         )
-        return maf_record
+        return mutation_status_record
 
     def _mutect2(self, record, tumor_sample):
         """Always somatic for MuTect2"""

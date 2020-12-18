@@ -20,6 +20,7 @@ class NonTcgaExac(Annotator):
         return curr
 
     def annotate(self, maf_record, vcf_record, var_allele_idx=1):
+        all_records = {}
         region = "{0}:{1}-{2}".format(vcf_record.chrom, vcf_record.pos, vcf_record.stop)
         alt = vcf_record.alleles[var_allele_idx]
         res = {}
@@ -52,19 +53,19 @@ class NonTcgaExac(Annotator):
                 break
 
         # Overall
-        maf_record["nontcga_ExAC_AF"] = get_builder(
+        all_records["nontcga_ExAC_AF"] = get_builder(
             "nontcga_ExAC_AF", self.scheme, value=raw_af
         )
-        maf_record["nontcga_ExAC_AF_Adj"] = get_builder(
+        all_records["nontcga_ExAC_AF_Adj"] = get_builder(
             "nontcga_ExAC_AF_Adj", self.scheme, value=adj_af
         )
 
         # pops
         for p in self.popkeys:
             key = "nontcga_ExAC_AF_{0}".format(p)
-            maf_record[key] = get_builder(key, self.scheme, value=res.get(p))
+            all_records[key] = get_builder(key, self.scheme, value=res.get(p))
 
-        return maf_record
+        return all_records
 
     def shutdown(self):
         self.f.close()

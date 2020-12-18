@@ -2,7 +2,7 @@
 Implements the dbSNP validation status annotations.
 """
 
-import sqlite3 as lite
+import sqlite3
 
 from aliquotmaf.annotators.annotator import Annotator
 from aliquotmaf.converters.builder import get_builder
@@ -11,15 +11,12 @@ from aliquotmaf.converters.builder import get_builder
 class DbSnpValidation(Annotator):
     def __init__(self, scheme, source):
         super().__init__(name="DbSnpValidation", source=source, scheme=scheme)
-        self.conn = None
-        self.cur = None
+        self.conn = sqlite3.connect(source)
+        self.cur = self.conn.cursor()
 
     @classmethod
-    def setup(cls, scheme, source):
-        curr = cls(scheme, source)
-        curr.logger.info("Connecting to dbsnp priority DB")
-        curr.conn = lite.connect(source)
-        curr.cur = curr.conn.cursor()
+    def setup(cls, scheme, args):
+        curr = cls(scheme, args.dbsnp_priority_db)
         return curr
 
     def annotate(self, maf_record):
@@ -35,10 +32,10 @@ class DbSnpValidation(Annotator):
                     results.append(row)
             if results:
                 validation = ";".join([i[0] for i in sorted(list(set(results)))])
-        maf_record["dbSNP_Val_Status"] = get_builder(
+        dbsnp_val_status_record = get_builder(
             "dbSNP_Val_Status", self.scheme, value=validation
         )
-        return maf_record
+        return dbsnp_val_status_record
 
     def shutdown(self):
         self.conn.close()

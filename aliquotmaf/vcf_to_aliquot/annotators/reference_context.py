@@ -14,8 +14,12 @@ class ReferenceContext(Annotator):
         self.context_size = context_size
 
     @classmethod
-    def setup(cls, scheme, source, context_size=5):
-        curr = cls(source, scheme, context_size)
+    def setup(cls, scheme, args, default_context=5):
+        curr = cls(
+            args.reference_context,
+            scheme,
+            getattr(args, "context_size", default_context),
+        )
         curr.fa = pysam.FastaFile(curr.source)
         return curr
 
@@ -35,10 +39,10 @@ class ReferenceContext(Annotator):
                 max(1, vcf_record.pos - self.context_size),
                 vcf_record.stop + self.context_size,
             )
-        maf_record["CONTEXT"] = get_builder(
+        context_record = get_builder(
             "CONTEXT", self.scheme, value=self.fa.fetch(region=region)
         )
-        return maf_record
+        return context_record
 
     def shutdown(self):
         self.fa.close()
