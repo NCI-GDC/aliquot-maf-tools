@@ -15,8 +15,9 @@ class GdcBlacklist(Filter):
         self.logger.info("Using GDC Blacklist {0}".format(source))
 
     @classmethod
-    def setup(cls, source):
+    def setup(cls, args):
         # Load blacklist
+        source = args.gdc_blacklist
         data = {}
         head = []
         reader = gzip.open if source.endswith(".gz") else open

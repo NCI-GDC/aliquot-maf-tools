@@ -14,7 +14,10 @@ class GdcPon(Filter):
         self.logger.info("Using panel of normal VCF {0}".format(source))
 
     @classmethod
-    def setup(cls, source):
+    def setup(cls, args):
+        source = args.gdc_pon_vcf
+        if not source:
+            return
         curr = cls(source)
         curr.f = VariantFile(curr.source)
         return curr

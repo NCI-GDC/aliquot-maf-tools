@@ -14,7 +14,10 @@ class NonExonic(Filter):
         self.logger.info("Using genode exon interval file {0}".format(source))
 
     @classmethod
-    def setup(cls, source):
+    def setup(cls, args):
+        source = args.nonexonic_intervals
+        if not source:
+            return None
         curr = cls(source)
         curr.f = TabixFile(curr.source, parser=asBed())
         return curr

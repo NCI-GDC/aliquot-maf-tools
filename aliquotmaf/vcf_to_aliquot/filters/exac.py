@@ -24,8 +24,8 @@ class ExAC(Filter):
         self.logger.info("Using ExAC frequency cutoff of {0}".format(cutoff))
 
     @classmethod
-    def setup(cls, cutoff):
-        curr = cls(cutoff)
+    def setup(cls, args):
+        curr = cls(args.exac_freq_cutoff)
         return curr
 
     def filter(self, maf_record):

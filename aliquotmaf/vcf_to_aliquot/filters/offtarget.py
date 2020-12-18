@@ -15,7 +15,10 @@ class OffTarget(Filter):
         self.logger.info("Using interval files {0}".format(", ".join(source)))
 
     @classmethod
-    def setup(cls, source):
+    def setup(cls, args):
+        source = args.target_intervals
+        if not source:
+            return None
         curr = cls(source)
         curr.fs = [TabixFile(i, parser=asBed()) for i in curr.source]
         return curr
