@@ -1,4 +1,24 @@
-def transform(self, vcf_record, data, is_tumor_only, line_number=None):
+#!/usr/bin/env python3
+
+from operator import itemgetter
+
+from maflib.record import MafRecord
+from maflib.validation import ValidationStringency
+
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.converters.collection import InputCollection
+from aliquotmaf.vcf_to_aliquot.converters.formatters import (
+    format_all_effects,
+    format_alleles,
+    format_depths,
+    format_vcf_columns,
+)
+from aliquotmaf.vcf_to_aliquot.vcf import VcfRecord
+
+
+def transform(vcf_record: VcfRecord, data: dict, aliquot: Aliquot, line_number: int):
+
+    # is_tumor_only, line_number=None, colset, maf_center, tumor_submitter_id, sequencer, tumor_aliquot_uuid, normal_aliquot_uuid, scheme, annotators):
     """
     Transform into maf record.
     """
@@ -14,7 +34,7 @@ def transform(self, vcf_record, data, is_tumor_only, line_number=None):
     collection.add(
         column="Entrez_Gene_Id", value=data["selected_effect"]["Entrez_Gene_Id"]
     )
-    collection.add(column="Center", value=self.options["maf_center"])
+    collection.add(column="Center", value=aliquot.maf_center)
     collection.add(column="NCBI_Build", value="GRCh38")
     collection.add(column="Chromosome", value=vcf_record.chrom)
     collection.add(column="Start_Position", value=data["location_data"]["start"])
@@ -37,7 +57,7 @@ def transform(self, vcf_record, data, is_tumor_only, line_number=None):
     ):
         collection.add(column=k, value=v)
 
-    if not is_tumor_only:
+    if not aliquot.is_tumor_only:
         for k, v in zip(
             ["Match_Norm_Seq_Allele1", "Match_Norm_Seq_Allele2"],
             format_alleles(
@@ -56,19 +76,17 @@ def transform(self, vcf_record, data, is_tumor_only, line_number=None):
 
     collection.add(column="dbSNP_RS", value=data["selected_effect"]["dbSNP_RS"])
 
-    collection.add(
-        column="Tumor_Sample_Barcode", value=self.options["tumor_submitter_id"]
-    )
+    collection.add(column="Tumor_Sample_Barcode", value=aliquot.tumor_submitter_id)
     collection.add(
         column="Matched_Norm_Sample_Barcode",
-        value=self.options["normal_submitter_id"],
+        value=aliquot.normal_submitter_id,
         default="",
     )
-    collection.add(column="Sequencer", value=self.options["sequencer"], default="")
-    collection.add(column="Tumor_Sample_UUID", value=self.options["tumor_aliquot_uuid"])
+    collection.add(column="Sequencer", value=aliquot.sequencer, default="")
+    collection.add(column="Tumor_Sample_UUID", value=aliquot.tumor_aliquot_uuid)
     collection.add(
         column="Matched_Norm_Sample_UUID",
-        value=self.options["normal_aliquot_uuid"],
+        value=aliquot.normal_aliquot_uuid,
         default="",
     )
     collection.add(column="all_effects", value=";".join(data["effects"]))
@@ -84,7 +102,7 @@ def transform(self, vcf_record, data, is_tumor_only, line_number=None):
     ):
         collection.add(column=k, value=v)
 
-    if not is_tumor_only:
+    if not aliquot.is_tumor_only:
         for k, v in zip(
             ["n_depth", "n_ref_count", "n_alt_count"],
             format_depths(
@@ -99,14 +117,14 @@ def transform(self, vcf_record, data, is_tumor_only, line_number=None):
             collection.add(column=k, value=None)
 
     for k in data["selected_effect"]:
-        if k in self._colset and k not in collection._colset:
+        if k in aliquot.colset and k not in collection._colset:
             collection.add(column=k, value=data["selected_effect"][k])
 
     # Set other uuids
-    collection.add(column="src_vcf_id", value=self.options["src_vcf_uuid"])
-    collection.add(column="tumor_bam_uuid", value=self.options["tumor_bam_uuid"])
-    collection.add(column="normal_bam_uuid", value=self.options["normal_bam_uuid"])
-    collection.add(column="case_id", value=self.options["case_uuid"])
+    collection.add(column="src_vcf_id", value=aliquot.src_vcf_uuid)
+    collection.add(column="tumor_bam_uuid", value=aliquot.tumor_bam_uuid)
+    collection.add(column="normal_bam_uuid", value=aliquot.normal_bam_uuid)
+    collection.add(column="case_id", value=aliquot.case_uuid)
 
     # VCF columns
     collection.add(column="FILTER", value=";".join(sorted(list(vcf_record.filter))))
@@ -124,56 +142,63 @@ def transform(self, vcf_record, data, is_tumor_only, line_number=None):
     collection.add(column="Sequencing_Phase", value="")
 
     anno_set = ("dbSNP_Val_Status", "COSMIC", "CONTEXT", "Mutation_Status")
-    for i in self._colset - set(collection.columns()):
+    for i in aliquot.colset - set(collection.columns()):
         if i not in anno_set:
             collection.add(column=i, value=None)
-    collection.transform(self._scheme)
+    collection.transform(aliquot.scheme)
 
-    # Generate maf record
-    maf_record = init_empty_maf_record(line_number=line_number)
+    maf_record = MafRecord(
+        line_number=line_number, stringency=ValidationStringency.Strict
+    )
     for i in collection:
         maf_record += i.transformed
 
-    # Annotations
-    # Use new object properties
-    # Do not update maf_records in place anymore
-    # maf_record['key'] = self.key.annotate()
-    if self.annotators["dbsnp_priority_db"]:
-        maf_record = self.annotators["dbsnp_priority_db"].annotate(maf_record)
-    else:
-        maf_record["dbSNP_Val_Status"] = get_builder(
-            "dbSNP_Val_Status", self._scheme, value=None
-        )
+    # TODO: Look into using MafRecord.add(MafColumnRecord) for adding columns
+    # DbSnp Validation
+    dbsnp_val_status_record = aliquot.annotators["DbSnpValidation"].annotate(maf_record)
+    maf_record["dbSNP_Val_Status"] = dbsnp_val_status_record
 
-    if self.annotators["cosmic_id"]:
-        maf_record = self.annotators["cosmic_id"].annotate(maf_record, vcf_record)
+    # Cosmic
+    if aliquot.annotators["cosmicId"]:
+        cosmic_return = aliquot.annotators["cosmicId"].annotate(maf_record, vcf_record)
+        maf_record["COSMIC"] = cosmic_return.cosmic
+        if cosmic_return.dbsnp is not None:
+            maf_record["dbSNP_RS"] = cosmic_return.dbsnp
     else:
-        maf_record["COSMIC"] = get_builder("COSMIC", self._scheme, value=None)
+        maf_record["COSMIC"] = get_builder("COSMIC", aliquot.scheme, value=None)
 
-    if self.annotators["non_tcga_exac"]:
-        maf_record = self.annotators["non_tcga_exac"].annotate(
+    # Non-TCGA Exac
+    if aliquot.annotators["NonTcgaExac"]:
+        non_tcga_exac_records = aliquot.annotators["NonTcgaExac"].annotate(
             maf_record, vcf_record, var_allele_idx=data["var_allele_idx"]
         )
+        for pop, val in non_tcga_exac_records.items():
+            maf_record[pop] = val
 
-    if self.annotators["hotspots"]:
-        maf_record = self.annotators["hotspots"].annotate(maf_record)
+    # Hotspots
+    if aliquot.annotators["hotspots"]:
+        hotspot_record = aliquot.annotators["hotspots"].annotate(maf_record)
     else:
-        maf_record["hotspot"] = get_builder("hotspot", self._scheme, value=None)
+        hotspot_record = get_builder("hotspot", aliquot.scheme, value=None)
+    maf_record['hotspot'] = hotspot_record
 
-    maf_record = self.annotators["reference_context"].annotate(maf_record, vcf_record)
-    maf_record = self.annotators["mutation_status"].annotate(
-        maf_record, vcf_record, self.options["tumor_vcf_id"]
+    # Reference context
+    context_record = aliquot.annotators["reference_context"].annotate(
+        maf_record, vcf_record
     )
+    maf_record["CONTEXT"] = context_record
+
+    # Mutation Status
+    mutation_status_record = aliquot.annotators["mutation_status"].annotate(
+        maf_record, vcf_record, aliquot.tumor_sample_id
+    )
+    maf_record['mutation_status'] = mutation_status_record
 
     # Filters
-    gdc_filters = []
-    for filt_key in self.filters:
-        filt_obj = self.filters[filt_key]
-        if filt_obj and filt_obj.filter(maf_record):
-            gdc_filters.extend(filt_obj.tags)
-
-    maf_record["GDC_FILTER"] = get_builder(
-        "GDC_FILTER", self._scheme, value=";".join(sorted(gdc_filters))
-    )
+    gdc_filter_record = filter.filter(maf_record, aliquot)
+    maf_record["GDC_FILTER"] = gdc_filter_record
 
     return maf_record
+
+
+# __END__
