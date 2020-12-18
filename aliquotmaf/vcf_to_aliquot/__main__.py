@@ -8,7 +8,14 @@ import logging
 import sys
 from collections import simplenamespace
 
+from maflib.record import MafRecord
+
+from aliquotmaf.runners.vcf_to_aliquot.gdc_1_0_0_aliquot import Aliquot
 from aliquotmaf.subcommands.vcf_to_aliquot.runners import GDC_1_0_0_Aliquot
+from aliquotmaf.vcf_to_aliquot.converters.utils import get_columns_from_header
+from aliquotmaf.vcf_to_aliquot.extract import ExtractedDataNT, extract
+from aliquotmaf.vcf_to_aliquot.transform import transform
+from aliquotmaf.vcf_to_aliquot.vcf import VcfFile
 
 logger = logging.getLogger(__name__)
 
@@ -138,26 +145,47 @@ def process_argv(argv=None) -> simplenamespace:
     pass
 
 
-def run():
+def run(
+    args: simplenamespace,
+    _aliquot: Aliquot = GDC_1_0_0_Aliquot,
+    _vcf=VcfFile,
+    _extract=extract,
+    _transform=transform,
+):
     # Setup annotator classes
-    """
-    # Initalize aliquot class
-        # MafHeader: reference_fasta_index, tumor_only, tumor_aliquot_uuid, normal_aliquot_uuid
-        # MafSorter: reference_fasta_index
-        # MafWriter: output_maf
-    for annotator in aliquot.annotators:
-        annotator_instance = init_annotator(annotator)
-    with Vcf() as vcf_object:
-        for record in vcf_object:
-            do_stuff
-    # Initalize GDC_1_0_0_Aliquot
-    with GDC_1_0_0_Aliquot() as aliquot, Vcf() as vcf:
+    with _aliquot(
+        args.tumor_sample_id,
+        args.tumor_aliquot_uuid,
+        args.reference_fasta_index,
+        args.normal_sample_id,
+        args.normal_aliquot_uuid,
+        args.is_tumor_only,
+        args.maf_center,
+        args.tumor_submitter_id,
+        args.sequencer,
+        args.normal_submitter_id,
+    ) as aliquot, _vcf(args.vcf_file) as vcf:
+        header = aliquot.header
+        sorter = aliquot.sorter
+        writer = aliquot.writer
+
         for record in vcf:
-            extracted_data = record.extract(tumor_vcf_id, normal_vcf_id)
-            transformed_data = record.transform(extracted_data)
-            blop
-    """
-    pass
+            extracted_data: ExtractedDataNT = _extract(
+                record.record,
+                args.tumor_sample_id,
+                args.normal_sample_id,
+                vcf.tumor_idx,
+                vcf.normal_idx,
+                vcf.annotation_columns,
+                vcf.vep_key,
+                args.is_tumor_only,
+            )
+            transformed_data: MafRecord = _transform(
+                record, extracted_data, aliquot,
+            )
+            sorter += transformed_data
+        for record in sorter:
+            writer += record
 
 
 def main(argv=None) -> int:
