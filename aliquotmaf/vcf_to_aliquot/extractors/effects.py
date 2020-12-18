@@ -5,8 +5,14 @@ some input source, mostly engineered for VEP annotated VCF files.
 * SelectOneEffectExtractor Select a single transcript effect based on priorities
 """
 import re
+from typing import List, NamedTuple
 
 from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
+
+
+class EffectsNT(NamedTuple):
+    all_effects: List[str]
+    selected_effect: str
 
 
 class EffectsExtractor(Extractor):
@@ -184,7 +190,9 @@ class SelectOneEffectExtractor(Extractor):
     """
 
     @classmethod
-    def extract(cls, all_effects, effect_priority, biotype_priority, custom_enst=None):
+    def extract(
+        cls, all_effects, effect_priority, biotype_priority, custom_enst=None
+    ) -> EffectsNT:
 
         maf_effect = None
 
@@ -256,4 +264,4 @@ class SelectOneEffectExtractor(Extractor):
             if not maf_effect:
                 maf_effect = all_effects[0]
 
-        return all_effects, maf_effect
+        return EffectsNT(all_effects=all_effects, selected_effect=maf_effect)

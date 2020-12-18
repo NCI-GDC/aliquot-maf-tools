@@ -1,7 +1,19 @@
 """
 Extractor class for genomic region data.
 """
+from typing import List, NamedTuple
+
 from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
+
+
+class LocationNT(NamedTuple):
+    alleles: List[str]
+    var_allele: str
+    ref_allele: str
+    start: int
+    stop: int
+    var_type: str
+    inframe: bool
 
 
 class LocationDataExtractor(Extractor):
@@ -13,7 +25,7 @@ class LocationDataExtractor(Extractor):
     NP_TYPE = {1: "SNP", 2: "DNP", 3: "TNP"}
 
     @classmethod
-    def extract(cls, ref_allele, var_allele, position, alleles):
+    def extract(cls, ref_allele, var_allele, position, alleles) -> LocationNT:
         ref_length, var_length = len(ref_allele), len(var_allele)
 
         # Remove any prefixed reference bps from all alleles, using "=" for simple indels
@@ -62,4 +74,4 @@ class LocationDataExtractor(Extractor):
             "var_type": var_type,
             "inframe": inframe,
         }
-        return rdic
+        return LocationNT(**rdic)

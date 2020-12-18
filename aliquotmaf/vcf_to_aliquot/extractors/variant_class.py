@@ -12,7 +12,7 @@ class VariantClassExtractor(Extractor):
     """
 
     @classmethod
-    def extract(cls, cons, var_type, inframe):
+    def extract(cls, cons, var_type, inframe) -> str:
 
         # Splice_Site
         if re.search(

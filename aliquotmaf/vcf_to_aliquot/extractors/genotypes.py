@@ -1,18 +1,31 @@
+#!/usr/bin/env python3
+
 """A module for extracting allele information. All the classes present
 here are subclasses of `~maf_converter_lib.extractor.Extractor` objects.
 
 * ExtractVariantAlleleIndexParser   extracts the variant allele index
 * ExtractGenotypeAndDepthsParser    extracts the genotype and depths
 """
+from typing import List, NamedTuple
+
 from aliquotmaf.logger import Logger
 from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
+
+
+class VariantAlleleIndexNT(NamedTuple):
+    var_allele_idx: int
+
+
+class GenotypeDepthNT(NamedTuple):
+    genotype: str
+    depths: List[int]
 
 
 class VariantAlleleIndexExtractor(Extractor):
     """Extractor class for extracting the variant allele index"""
 
     @classmethod
-    def extract(cls, tumor_genotype):
+    def extract(cls, tumor_genotype) -> VariantAlleleIndexNT:
         """
         Extracts the variant allele index from the tumor sample
 
@@ -30,7 +43,7 @@ class VariantAlleleIndexExtractor(Extractor):
                 var_allele_idx = [i for i in curr_gt if i is not None and i != 0][0]
             except IndexError:
                 var_allele_idx = 1
-        return var_allele_idx
+        return VariantAlleleIndexNT(var_allele_idx=var_allele_idx)
 
 
 class GenotypeAndDepthsExtractor(Extractor):
@@ -41,7 +54,7 @@ class GenotypeAndDepthsExtractor(Extractor):
     logger = Logger.get_logger("GenotypeAndDepthsExtractor")
 
     @classmethod
-    def extract(cls, var_allele_idx, genotype, alleles):
+    def extract(cls, var_allele_idx, genotype, alleles) -> GenotypeDepthNT:
         """
         Extracts the information for the variant alleles based on the
         variant allele index. Creates a new, updated genotype record
@@ -128,4 +141,7 @@ class GenotypeAndDepthsExtractor(Extractor):
         new_gt["AD"] = tuple([i if i != "" and i is not None else "." for i in depths])
         new_gt["GT"] = genotype["GT"]
         depths = [i if i != "." and i is not None else 0 for i in new_gt["AD"]]
-        return new_gt, depths
+        return GenotypeDepthNT(genotype=new_gt, depths=depths)
+
+
+# __END__
