@@ -1,13 +1,49 @@
+#!/usr/bin/env python3
+
+import urllib
+from typing import List, NamedTuple, Optional
+
+from aliquotmaf.utils.utils import load_enst, load_json
+from aliquotmaf.vcf_to_aliquot.converters.formatters import (
+    format_all_effects,
+    format_vcf_columns,
+)
+from aliquotmaf.vcf_to_aliquot.extractors import (
+    EffectsExtractor,
+    GenotypeAndDepthsExtractor,
+    LocationDataExtractor,
+    PopulationFrequencyExtractor,
+    SelectOneEffectExtractor,
+    VariantAlleleIndexExtractor,
+    VariantClassExtractor,
+)
+
+
+class ExtractedDataNT(NamedTuple):
+    var_allele_idx: int
+    tumor_gt: str
+    tumor_depths: List[int]
+    normal_gt: str
+    normal_depths: List[int]
+    location_data: dict
+    effects: List[str]
+    selected_effect: str
+    variant_class: str
+
+
 def extract(
-    tumor_sample_id,
-    normal_sample_id,
-    tumor_idx,
-    normal_idx,
-    ann_cols,
-    vep_key,
     record,
-    is_tumor_only,
-):
+    tumor_sample_id: str,
+    tumor_idx: int,
+    biotype_priority_file: str,
+    effect_priority_file: str,
+    annotation_columns: List[str],
+    normal_sample_id: Optional[str] = None,
+    normal_idx: Optional[int] = None,
+    custom_enst: Optional[str] = None,
+    is_tumor_only: bool = False,
+    vep_key: str = "CSQ",
+) -> ExtractedDataNT:
     """
     Extract the VCF information needed to transform into MAF.
     """
@@ -24,17 +60,20 @@ def extract(
     }
 
     # Genotypes
-    var_allele_idx = Extractors.VariantAlleleIndexExtractor.extract(
+    # TODO: Combine
+    var_allele_idx = VariantAlleleIndexExtractor.extract(
         tumor_genotype=record.samples[tumor_sample_id]
     )
-    tumor_gt, tumor_depths = Extractors.GenotypeAndDepthsExtractor.extract(
+    # TODO: Improve returns
+    tumor_gt, tumor_depths = GenotypeAndDepthsExtractor.extract(
         var_allele_idx=var_allele_idx,
         genotype=record.samples[tumor_sample_id],
         alleles=record.alleles,
     )
 
     if not is_tumor_only:
-        normal_gt, normal_depths = Extractors.GenotypeAndDepthsExtractor.extract(
+        # TODO: Improve returns
+        normal_gt, normal_depths = GenotypeAndDepthsExtractor.extract(
             var_allele_idx=var_allele_idx,
             genotype=record.samples[normal_sample_id],
             alleles=record.alleles,
@@ -43,35 +82,40 @@ def extract(
         normal_gt, normal_depths = None, None
 
     # Locations
-    location_data = Extractors.LocationDataExtractor.extract(
+    location_data = LocationDataExtractor.extract(
         ref_allele=record.ref,
         var_allele=record.alleles[var_allele_idx],
         position=record.pos,
         alleles=record.alleles,
     )
+    location_data = location_data._as_dict()
 
+    effect_priority = load_json(effect_priority_file)
+    biotype_priority = load_json(biotype_priority_file)
     # Handle effects
-    effects = Extractors.EffectsExtractor.extract(
-        effect_priority=self.effect_priority,
-        biotype_priority=self.biotype_priority,
-        effect_keys=ann_cols,
+    effects = EffectsExtractor.extract(
+        effect_priority=effect_priority,
+        biotype_priority=biotype_priority,
+        effect_keys=annotation_columns,
         effect_list=[urllib.parse.unquote(i).split("|") for i in record.info[vep_key]],
         var_idx=var_allele_idx,
     )
 
-    effects, selected_effect = Extractors.SelectOneEffectExtractor.extract(
+    # Combine next two
+    # TODO: Improve returns
+    effects, selected_effect = SelectOneEffectExtractor.extract(
         all_effects=effects,
-        effect_priority=self.effect_priority,
-        biotype_priority=self.biotype_priority,
-        custom_enst=self.custom_enst,
+        effect_priority=effect_priority,
+        biotype_priority=biotype_priority,
+        custom_enst=load_enst(custom_enst),
     )
 
-    selected_effect = Extractors.PopulationFrequencyExtractor.extract(
+    selected_effect = PopulationFrequencyExtractor.extract(
         effect=selected_effect, var_allele=location_data["var_allele"]
     )
 
     # Handle variant class
-    variant_class = Extractors.VariantClassExtractor.extract(
+    variant_class = VariantClassExtractor.extract(
         cons=selected_effect["One_Consequence"],
         var_type=location_data["var_type"],
         inframe=location_data["inframe"],
@@ -84,10 +128,10 @@ def extract(
     dic["normal_gt"] = normal_gt
     dic["normal_depths"] = normal_depths
     dic["location_data"] = location_data
-    dic["effects"] = format_all_effects(effects)
+    dic["effects"] = format_all_effects(effects)  # FIXME: Call elsewhere
     dic["selected_effect"] = selected_effect
     dic["variant_class"] = variant_class
     dic["vcf_columns"] = format_vcf_columns(
         vcf_record=record, vep_key=vep_key, tumor_idx=tumor_idx, normal_idx=normal_idx,
-    )
+    )  # FIXME: Call elsewhere
     return dic
