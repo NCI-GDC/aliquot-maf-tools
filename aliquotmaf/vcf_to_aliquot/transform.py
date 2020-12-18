@@ -13,7 +13,10 @@ from aliquotmaf.vcf_to_aliquot.converters.formatters import (
     format_depths,
     format_vcf_columns,
 )
+from aliquotmaf.vcf_to_aliquot.filter import filter
 from aliquotmaf.vcf_to_aliquot.vcf import VcfRecord
+
+# TODO: Build input collection in own module
 
 
 def transform(vcf_record: VcfRecord, data: dict, aliquot: Aliquot, line_number: int):
@@ -195,7 +198,7 @@ def transform(vcf_record: VcfRecord, data: dict, aliquot: Aliquot, line_number: 
     maf_record['mutation_status'] = mutation_status_record
 
     # Filters
-    gdc_filter_record = filter.filter(maf_record, aliquot)
+    gdc_filter_record = filter(maf_record, aliquot)
     maf_record["GDC_FILTER"] = gdc_filter_record
 
     return maf_record
