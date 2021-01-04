@@ -3,10 +3,7 @@ Tests the extractors in aliquotmaf.subcommands.vcf_to_protected.extractors.genot
 """
 import pytest
 
-from aliquotmaf.vcf_to_aliquot.extractors.genotypes import (
-    GenotypeAndDepthsExtractor,
-    VariantAlleleIndexExtractor,
-)
+from aliquotmaf.vcf_to_aliquot.extractors import genotypes as MOD
 
 
 @pytest.mark.parametrize(
@@ -24,8 +21,8 @@ def test_variant_allele_index_extractor(genotype, expected):
     """
     Tests the extraction of the variant allele index from the vcf
     """
-    idx = VariantAlleleIndexExtractor.extract(genotype)
-    assert idx == expected
+    idx_nt = MOD.VariantAlleleIndexExtractor.extract(genotype)
+    assert idx_nt.var_allele_idx == expected
 
 
 @pytest.mark.parametrize(
@@ -80,7 +77,9 @@ def test_genotype_and_depths_extractor(genotype, alleles, expected_gt, expected_
     """
     Tests the extraction of the genotype and depths data from the vcf
     """
-    idx = VariantAlleleIndexExtractor.extract(genotype)
-    new_gt, depths = GenotypeAndDepthsExtractor.extract(idx, genotype, alleles)
-    assert new_gt == expected_gt
-    assert depths == expected_dp
+    idx_nt = MOD.VariantAlleleIndexExtractor.extract(genotype)
+    depth_nt = MOD.GenotypeAndDepthsExtractor.extract(
+        idx_nt.var_allele_idx, genotype, alleles
+    )
+    assert depth_nt.genotype == expected_gt
+    assert depth_nt.depths == expected_dp
