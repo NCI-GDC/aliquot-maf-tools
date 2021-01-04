@@ -3,11 +3,7 @@ Tests the extractors in aliquotmaf.subcommands.vcf_to_aliquot.extractors.populat
 """
 import pytest
 
-from aliquotmaf.vcf_to_aliquot.extractors.population_frequency import (
-    PopulationFrequencyExtractor,
-)
-
-# VariantAlleleIndexExtractor -> GenotypeAndDepthsExtractor -> LocationDataExtractor -> EffectsExtractor -> SelectOneEffectExtractor -> PopulationFrequencyExtractor -> VariantClassExtractor
+from aliquotmaf.vcf_to_aliquot.extractors import population_frequency as MOD
 
 SUBPOPS = [
     "GMAF",
@@ -52,6 +48,6 @@ def test_population_frequency_extractor(effect, var_allele, expected):
     """
     Tests the extraction of population frequencies.
     """
-    raw = PopulationFrequencyExtractor.extract(effect, var_allele)
-    res = {k: raw[k] for k in raw if raw[k] is not None}
+    found = MOD.PopulationFrequencyExtractor.extract(effect, var_allele)
+    res = {k: found.effect[k] for k in found.effect if found.effect[k] is not None}
     assert res == expected
