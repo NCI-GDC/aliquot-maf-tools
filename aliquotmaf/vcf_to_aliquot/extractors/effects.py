@@ -7,12 +7,12 @@ some input source, mostly engineered for VEP annotated VCF files.
 import re
 from typing import List, NamedTuple
 
-from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
+from aliquotmaf.vcf_to_aliquot.extractors.base import Extractor
 
 
 class EffectsNT(NamedTuple):
     all_effects: List[str]
-    selected_effect: str
+    selected_effect: dict
 
 
 class EffectsExtractor(Extractor):
@@ -51,7 +51,7 @@ class EffectsExtractor(Extractor):
     @classmethod
     def extract(
         cls, effect_priority, biotype_priority, effect_keys, effect_list, var_idx
-    ):
+    ) -> List[dict]:
         """
         Entry point for parsing VEP effects.
 

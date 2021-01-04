@@ -1,12 +1,14 @@
+#!/usr/bin/env python3
 """
 Tests the extractors in aliquotmaf.subcommands.vcf_to_protected.extractors.effects
 """
+import unittest
+from types import SimpleNamespace
+from unittest import mock
+
 import pytest
 
-from aliquotmaf.vcf_to_aliquot.extractors.effects import (
-    EffectsExtractor,
-    SelectOneEffectExtractor,
-)
+from aliquotmaf.vcf_to_aliquot.extractors import effects as MOD
 
 # VariantAlleleIndexExtractor -> GenotypeAndDepthsExtractor -> LocationDataExtractor -> EffectsExtractor -> SelectOneEffectExtractor -> PopulationFrequencyExtractor -> VariantClassExtractor
 
@@ -14,6 +16,22 @@ from aliquotmaf.vcf_to_aliquot.extractors.effects import (
 ANNO_COLUMNS = "Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature|BIOTYPE|EXON|INTRON|HGVSc|HGVSp|cDNA_position|CDS_position|Protein_position|Amino_acids|Codons|Existing_variation|ALLELE_NUM|DISTANCE|STRAND|FLAGS|PICK|VARIANT_CLASS|MINIMISED|SYMBOL_SOURCE|HGNC_ID|CANONICAL|TSL|APPRIS|CCDS|ENSP|SWISSPROT|TREMBL|UNIPARC|RefSeq|GENE_PHENO|SIFT|PolyPhen|DOMAINS|HGVS_OFFSET|GMAF|AFR_MAF|AMR_MAF|EAS_MAF|EUR_MAF|SAS_MAF|AA_MAF|EA_MAF|ExAC_MAF|ExAC_Adj_MAF|ExAC_AFR_MAF|ExAC_AMR_MAF|ExAC_EAS_MAF|ExAC_FIN_MAF|ExAC_NFE_MAF|ExAC_OTH_MAF|ExAC_SAS_MAF|CLIN_SIG|SOMATIC|PHENO|PUBMED|MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE|ENTREZ|EVIDENCE".split(
     "|"
 )
+
+
+class ThisTestCase(unittest.TestCase):
+    def setUp(self) -> None:
+        pass
+
+    def tearDown(self) -> None:
+        pass
+
+
+class TestEffectsExtractor(ThisTestCase):
+    pass
+
+
+class TestSelectOneEffectExtractor(ThisTestCase):
+    pass
 
 
 def create_basic_effects(allele, allele_num):
@@ -89,10 +107,16 @@ def test_select_one_effect_extractor(
     the various nuances of the implementation.
     """
     elist = create_basic_effects("A", var_idx)
-    res = EffectsExtractor.extract(
+    res = MOD.EffectsExtractor.extract(
         effect_priority, biotype_priority, ANNO_COLUMNS, elist, var_idx
     )
-    all_effects, selected = SelectOneEffectExtractor.extract(
+    found = MOD.SelectOneEffectExtractor.extract(
         res, effect_priority, biotype_priority, custom_enst=enst
     )
-    assert (selected["Consequence"], selected["BIOTYPE"]) == expected
+    assert (
+        found.selected_effect["Consequence"],
+        found.selected_effect["BIOTYPE"],
+    ) == expected
+
+
+# __END__
