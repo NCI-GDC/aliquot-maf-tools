@@ -80,8 +80,9 @@ def test_location_data_extractor_nps(
     Tests the normalization of alleles and postions into the MAF format and
     the detection of variant types for SNP/MNPs
     """
-    res = LocationDataExtractor.extract(ref_allele, var_allele, position, alleles)
-    assert res == expected
+    found = LocationDataExtractor.extract(ref_allele, var_allele, position, alleles)
+    for k, v in expected.items():
+        assert getattr(found, k) == v
 
 
 @pytest.mark.parametrize(
@@ -126,8 +127,9 @@ def test_location_data_extractor_ins(
     Tests the normalization of alleles and postions into the MAF format and
     the detection of variant types for insertions
     """
-    res = LocationDataExtractor.extract(ref_allele, var_allele, position, alleles)
-    assert res == expected
+    found = LocationDataExtractor.extract(ref_allele, var_allele, position, alleles)
+    for k, v in expected.items():
+        assert getattr(found, k) == v
 
 
 @pytest.mark.parametrize(
@@ -187,8 +189,9 @@ def test_location_data_extractor_del(
     Tests the normalization of alleles and postions into the MAF format and
     the detection of variant types for deletions
     """
-    res = LocationDataExtractor.extract(ref_allele, var_allele, position, alleles)
-    assert res == expected
+    found = LocationDataExtractor.extract(ref_allele, var_allele, position, alleles)
+    for k, v in expected.items():
+        assert getattr(found, k) == v
 
 
 @pytest.mark.parametrize(
@@ -233,5 +236,6 @@ def test_location_data_extractor_indel(
     Tests the normalization of alleles and postions into the MAF format and
     the detection of variant types for indels.
     """
-    res = LocationDataExtractor.extract(ref_allele, var_allele, position, alleles)
-    assert res == expected
+    found = LocationDataExtractor.extract(ref_allele, var_allele, position, alleles)
+    for k, v in expected.items():
+        assert getattr(found, k) == v
