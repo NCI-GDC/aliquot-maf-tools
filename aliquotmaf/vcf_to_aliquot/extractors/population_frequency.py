@@ -4,7 +4,7 @@ Extractor class for population frequency.
 import re
 from typing import NamedTuple, Optional
 
-from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
+from aliquotmaf.vcf_to_aliquot.extractors.base import Extractor
 
 
 class PopulationFrequencyNT(NamedTuple):

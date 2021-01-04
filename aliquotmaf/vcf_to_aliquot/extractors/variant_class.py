@@ -3,7 +3,7 @@ Extractor class for variant classification.
 """
 import re
 
-from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
+from aliquotmaf.vcf_to_aliquot.extractors.base import Extractor
 
 
 class VariantClassExtractor(Extractor):

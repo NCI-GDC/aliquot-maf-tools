@@ -8,8 +8,7 @@ here are subclasses of `~maf_converter_lib.extractor.Extractor` objects.
 """
 from typing import List, NamedTuple
 
-from aliquotmaf.logger import Logger
-from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
+from aliquotmaf.vcf_to_aliquot.extractors.base import Extractor
 
 
 class VariantAlleleIndexNT(NamedTuple):
@@ -51,7 +50,7 @@ class GenotypeAndDepthsExtractor(Extractor):
     variant allele index.
     """
 
-    logger = Logger.get_logger("GenotypeAndDepthsExtractor")
+    # logger = Logger.get_logger("GenotypeAndDepthsExtractor")
 
     @classmethod
     def extract(cls, var_allele_idx, genotype, alleles) -> GenotypeDepthNT:
@@ -100,7 +99,7 @@ class GenotypeAndDepthsExtractor(Extractor):
 
         # If N depths not equal to N alleles, blank out the depths
         elif depths and len(depths) != len(alleles):
-            cls.logger.warning("The length of DP array != length of allele array")
+            # cls.logger.warning("The length of DP array != length of allele array")
             depths = [None for i in alleles]
 
         # Sanity check that REF/ALT allele depths are lower than total depth
@@ -120,7 +119,7 @@ class GenotypeAndDepthsExtractor(Extractor):
                 )
             )
         ):
-            cls.logger.warning("REF/ALT allele depths are lower than total depth!!")
+            # cls.logger.warning("REF/ALT allele depths are lower than total depth!!")
             new_gt["DP"] = 0
             for i in depths:
                 if i and i != ".":

@@ -3,7 +3,7 @@ Extractor class for genomic region data.
 """
 from typing import List, NamedTuple
 
-from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
+from aliquotmaf.vcf_to_aliquot.extractors.base import Extractor
 
 
 class LocationNT(NamedTuple):
