@@ -68,8 +68,10 @@ class GenotypeAndDepthsExtractor(Extractor):
         """
         depths = []
         new_gt = {}
+
+        # Short circuit without genotype
         if not genotype["GT"]:
-            return new_gt, depths
+            return GenotypeDepthNT(genotype=new_gt, depths=depths)
 
         # If DP is defined, set it in new_gt
         if "DP" in genotype and genotype["DP"] is not None:
