@@ -2,18 +2,13 @@
 Annotates the COSMIC ID and mutates the dbSNP_RS if necessary.
 """
 
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 
 import pysam
 from maflib.column import MafColumnRecord
 
-from aliquotmaf.annotators.annotator import Annotator
-from aliquotmaf.converters.builder import get_builder
-
-
-class CosmicIdNT(NamedTuple):
-    cosmic: MafColumnRecord
-    dbsnp: Optional[MafColumnRecord]
+from aliquotmaf.vcf_to_aliquot.annotators.annotator import Annotator
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
 
 
 class CosmicId(Annotator):
@@ -27,7 +22,7 @@ class CosmicId(Annotator):
         curr.f = pysam.VariantFile(curr.source)
         return curr
 
-    def annotate(self, maf_record, vcf_record, var_allele_idx=1) -> CosmicIdNT:
+    def annotate(self, maf_record, vcf_record, var_allele_idx=1) -> MafColumnRecord:
         region = "{0}:{1}-{2}".format(
             vcf_record.chrom, vcf_record.pos, vcf_record.pos + 1
         )
@@ -45,19 +40,15 @@ class CosmicId(Annotator):
                 # Weirdly formatted COSMIC variants
                 pass
 
+        # NOTE: Overwrite `dbSNP_rs` if cosmic IDs found and dbSNP reports `novel`
         if cosmic_ids:
-            # TODO: Fixme
-            if maf_record["dbSNP_RS"].value == ["novel"]:
-                dbsnp_record = get_builder("dbSNP_RS", self.scheme, value=None)
-            else:
-                dbsnp_record = None
             cosmic_record = get_builder(
                 "COSMIC", self.scheme, value=";".join(sorted(list(set(cosmic_ids))))
             )
         else:
             cosmic_record = get_builder("COSMIC", self.scheme, value=None)
 
-        return CosmicIdNT(cosmic=cosmic_record, dbsnp=dbsnp_record)
+        return cosmic_record
 
     def shutdown(self):
         self.f.close()

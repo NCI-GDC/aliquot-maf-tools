@@ -1,23 +1,24 @@
 """
 Tests for the ``aliquotmaf.annotators.Cosmic`` class.
 """
+from collections import OrderedDict, namedtuple
+from types import SimpleNamespace
+
 import pysam
 import pytest
-from collections import OrderedDict, namedtuple
-
-from maflib.record import MafColumnRecord
 from maflib.column_types import SequenceOfStrings
+from maflib.record import MafColumnRecord
 
-from aliquotmaf.annotators import CosmicID
-from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.annotators import cosmic as MOD
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
 
 
 @pytest.fixture
 def setup_annotator():
     created = []
 
-    def _make_annotator(scheme, source):
-        curr = CosmicID.setup(scheme, source)
+    def _make_annotator(scheme, args):
+        curr = MOD.CosmicId.setup(scheme, args)
         created.append(curr)
         return curr
 
@@ -58,8 +59,10 @@ def vcf_gen(get_test_file):
 
 def test_setup_cosmic(test_scheme, setup_annotator, get_test_file):
     vcf_path = get_test_file("ex2.vcf.gz")
-    annotator = setup_annotator(test_scheme, source=vcf_path)
-    assert isinstance(annotator, CosmicID)
+    # Mimic CLI arg namespace
+    args = SimpleNamespace(cosmic_vcf=vcf_path)
+    annotator = setup_annotator(test_scheme, args)
+    assert isinstance(annotator, MOD.CosmicId)
 
 
 def test_cosmic_snp(
@@ -71,7 +74,8 @@ def test_cosmic_snp(
     get_test_vcf_record,
 ):
     vcf_path = get_test_file("ex2.vcf.gz")
-    annotator = setup_annotator(test_scheme, source=vcf_path)
+    args = SimpleNamespace(cosmic_vcf=vcf_path)
+    annotator = setup_annotator(test_scheme, args)
 
     gen = vcf_gen("ex2.vcf.gz")
 
@@ -87,18 +91,18 @@ def test_cosmic_snp(
         alts=record.alts,
     )
     maf_record = get_empty_maf_record
-    maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="novel")
-    maf_record = annotator.annotate(maf_record, vcf_record, var_allele_idx=1)
+    # maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="novel")
+    found = annotator.annotate(maf_record, vcf_record, var_allele_idx=1)
 
-    assert maf_record["COSMIC"].value == ["COSM0000"]
-    assert maf_record["dbSNP_RS"].value == []
+    assert found.value == ["COSM0000"]
+    # assert return_nt.dbsnp.value == []
 
     maf_record = get_empty_maf_record
-    maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value=None)
-    maf_record = annotator.annotate(maf_record, vcf_record, var_allele_idx=1)
+    # maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value=None)
+    found = annotator.annotate(maf_record, vcf_record, var_allele_idx=1)
 
-    assert maf_record["COSMIC"].value == ["COSM0000"]
-    assert maf_record["dbSNP_RS"].value == []
+    assert found.value == ["COSM0000"]
+    # assert return_nt.dbsnp.value == []
 
     record = gen.snp2
 
@@ -111,11 +115,12 @@ def test_cosmic_snp(
         alts=record.alts,
     )
     maf_record = get_empty_maf_record
-    maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="novel")
-    maf_record = annotator.annotate(maf_record, vcf_record, var_allele_idx=1)
+    # maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="novel")
+    found = annotator.annotate(maf_record, vcf_record, var_allele_idx=1)
 
-    assert maf_record["COSMIC"].value == ["COSM0003"]
-    assert maf_record["dbSNP_RS"].value == []
+    # Do overwrite dnSNP_RS with cosmic IDs
+    assert found.value == ["COSM0003"]
+    # assert return_nt.dbsnp.value == []
 
     ## setup no overlap alleles
     vcf_record = get_test_vcf_record(
@@ -126,11 +131,12 @@ def test_cosmic_snp(
         alts=tuple("G"),
     )
     maf_record["COSMIC"] = get_builder("COSMIC", test_scheme, value=None)
-    maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="novel")
-    maf_record = annotator.annotate(maf_record, vcf_record, var_allele_idx=1)
+    # maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="novel")
+    found = annotator.annotate(maf_record, vcf_record, var_allele_idx=1)
 
-    assert maf_record["COSMIC"].value == []
-    assert maf_record["dbSNP_RS"].value == ["novel"]
+    # No new dbSNP_RS column without cosmic IDs
+    assert found.value == []
+    # assert return_nt.dbsnp == None
 
     ## setup no overlap pos
     vcf_record = get_test_vcf_record(
@@ -141,11 +147,12 @@ def test_cosmic_snp(
         alts=tuple("G"),
     )
     maf_record["COSMIC"] = get_builder("COSMIC", test_scheme, value=None)
-    maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="novel")
-    maf_record = annotator.annotate(maf_record, vcf_record, var_allele_idx=1)
+    # maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="novel")
+    found = annotator.annotate(maf_record, vcf_record, var_allele_idx=1)
 
-    assert maf_record["COSMIC"].value == []
-    assert maf_record["dbSNP_RS"].value == ["novel"]
+    # No new dbSNP_RS column without cosmic IDs
+    assert found.value == []
+    # assert return_nt.dbsnp == None
 
 
 def test_cosmic_del(
@@ -157,7 +164,8 @@ def test_cosmic_del(
     get_test_vcf_record,
 ):
     vcf_path = get_test_file("ex2.vcf.gz")
-    annotator = setup_annotator(test_scheme, source=vcf_path)
+    args = SimpleNamespace(cosmic_vcf=vcf_path)
+    annotator = setup_annotator(test_scheme, args)
 
     gen = vcf_gen("ex2.vcf.gz")
 
@@ -173,11 +181,11 @@ def test_cosmic_del(
         alts=record.alts,
     )
     maf_record = get_empty_maf_record
-    maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="novel")
-    maf_record = annotator.annotate(maf_record, vcf_record, var_allele_idx=1)
+    # maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="novel")
+    found = annotator.annotate(maf_record, vcf_record, var_allele_idx=1)
 
-    assert maf_record["COSMIC"].value == ["COSM0001"]
-    assert maf_record["dbSNP_RS"].value == []
+    assert found.value == ["COSM0001"]
+    # assert maf_record["dbSNP_RS"].value == []
 
 
 def test_cosmic_ins(
@@ -189,7 +197,8 @@ def test_cosmic_ins(
     get_test_vcf_record,
 ):
     vcf_path = get_test_file("ex2.vcf.gz")
-    annotator = setup_annotator(test_scheme, source=vcf_path)
+    args = SimpleNamespace(cosmic_vcf=vcf_path)
+    annotator = setup_annotator(test_scheme, args)
 
     gen = vcf_gen("ex2.vcf.gz")
 
@@ -205,8 +214,11 @@ def test_cosmic_ins(
         alts=record.alts,
     )
     maf_record = get_empty_maf_record
-    maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="novel")
-    maf_record = annotator.annotate(maf_record, vcf_record, var_allele_idx=1)
+    # maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="novel")
+    found = annotator.annotate(maf_record, vcf_record, var_allele_idx=1)
 
-    assert maf_record["COSMIC"].value == ["COSM0002"]
-    assert maf_record["dbSNP_RS"].value == []
+    assert found.value == ["COSM0002"]
+    # assert maf_record["dbSNP_RS"].value == []
+
+
+# __END__
