@@ -1,22 +1,24 @@
+#!/usr/bin/env python3
 """
 Tests for the ``aliquotmaf.annotators.Hotpot`` class.
 """
 from collections import OrderedDict
+from types import SimpleNamespace
 
 import pytest
 from maflib.column_types import NullableStringColumn, NullableYOrN, StringColumn
 from maflib.record import MafColumnRecord
 
-from aliquotmaf.annotators import Hotspot
-from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.annotators import hotspot as MOD
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
 
 
 @pytest.fixture
 def setup_annotator():
     created = []
 
-    def _make_annotator(scheme, source):
-        curr = Hotspot.setup(scheme, source)
+    def _make_annotator(scheme, args):
+        curr = MOD.Hotspot.setup(scheme, args)
         created.append(curr)
         return curr
 
@@ -40,8 +42,9 @@ def test_scheme(get_test_scheme):
 
 def test_setup_hotspot(test_scheme, setup_annotator, get_test_file):
     tsv_path = get_test_file("fake_hotspot.tsv")
-    annotator = setup_annotator(test_scheme, source=tsv_path)
-    assert isinstance(annotator, Hotspot)
+    args = SimpleNamespace(hotspot_tsv=tsv_path)
+    annotator = setup_annotator(test_scheme, args)
+    assert isinstance(annotator, MOD.Hotspot)
 
 
 def test_hotspot_annotator_no_overlap_1(
@@ -51,15 +54,16 @@ def test_hotspot_annotator_no_overlap_1(
     Not a hotspot 
     """
     tsv_path = get_test_file("fake_hotspot.tsv")
-    annotator = setup_annotator(test_scheme, source=tsv_path)
+    args = SimpleNamespace(hotspot_tsv=tsv_path)
+    annotator = setup_annotator(test_scheme, args)
 
     maf_record = get_empty_maf_record
     maf_record["Hugo_Symbol"] = get_builder("Hugo_Symbol", test_scheme, value="Unknown")
     maf_record["HGVSp_Short"] = get_builder("HGVSp_Short", test_scheme, value=None)
 
-    maf_record = annotator.annotate(maf_record)
+    found = annotator.annotate(maf_record)
 
-    assert maf_record["hotspot"].value.value == "N"
+    assert found.value.value == "N"
 
 
 def test_hotspot_annotator_no_overlap_2(
@@ -69,7 +73,8 @@ def test_hotspot_annotator_no_overlap_2(
     Not a hotspot 
     """
     tsv_path = get_test_file("fake_hotspot.tsv")
-    annotator = setup_annotator(test_scheme, source=tsv_path)
+    args = SimpleNamespace(hotspot_tsv=tsv_path)
+    annotator = setup_annotator(test_scheme, args)
 
     maf_record = get_empty_maf_record
     maf_record["Hugo_Symbol"] = get_builder("Hugo_Symbol", test_scheme, value="ASXL1")
@@ -77,9 +82,9 @@ def test_hotspot_annotator_no_overlap_2(
         "HGVSp_Short", test_scheme, value="p.R547fs"
     )
 
-    maf_record = annotator.annotate(maf_record)
+    found = annotator.annotate(maf_record)
 
-    assert maf_record["hotspot"].value.value == "N"
+    assert found.value.value == "N"
 
 
 def test_hotspot_annotator_overlap(
@@ -89,7 +94,8 @@ def test_hotspot_annotator_overlap(
     Is a hotspot 
     """
     tsv_path = get_test_file("fake_hotspot.tsv")
-    annotator = setup_annotator(test_scheme, source=tsv_path)
+    args = SimpleNamespace(hotspot_tsv=tsv_path)
+    annotator = setup_annotator(test_scheme, args)
 
     maf_record = get_empty_maf_record
     maf_record["Hugo_Symbol"] = get_builder("Hugo_Symbol", test_scheme, value="ASXL1")
@@ -97,6 +103,9 @@ def test_hotspot_annotator_overlap(
         "HGVSp_Short", test_scheme, value="p.R548fs"
     )
 
-    maf_record = annotator.annotate(maf_record)
+    found = annotator.annotate(maf_record)
 
-    assert maf_record["hotspot"].value.value == "Y"
+    assert found.value.value == "Y"
+
+
+# __END__
