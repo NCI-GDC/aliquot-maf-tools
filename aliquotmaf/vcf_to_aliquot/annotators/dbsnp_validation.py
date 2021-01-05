@@ -4,19 +4,19 @@ Implements the dbSNP validation status annotations.
 
 import sqlite3
 
-from aliquotmaf.annotators.annotator import Annotator
-from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.annotators.annotator import Annotator
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
 
 
 class DbSnpValidation(Annotator):
-    def __init__(self, scheme, source):
+    def __init__(self, scheme, source, _sqlite3=sqlite3):
         super().__init__(name="DbSnpValidation", source=source, scheme=scheme)
-        self.conn = sqlite3.connect(source)
+        self.conn = _sqlite3.connect(source)
         self.cur = self.conn.cursor()
 
     @classmethod
-    def setup(cls, scheme, args):
-        curr = cls(scheme, args.dbsnp_priority_db)
+    def setup(cls, scheme, args, _sqlite3=sqlite3):
+        curr = cls(scheme, args.dbsnp_priority_db, _sqlite3=_sqlite3)
         return curr
 
     def annotate(self, maf_record):

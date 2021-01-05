@@ -2,22 +2,23 @@
 Tests for the ``aliquotmaf.annotators.DbSnpValidation`` class.
 """
 from collections import OrderedDict
+from types import SimpleNamespace
 
 import pysam
 import pytest
 from maflib.column_types import SequenceOfStrings
 from maflib.record import MafColumnRecord
 
-from aliquotmaf.annotators import DbSnpValidation
-from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.annotators import dbsnp_validation as MOD
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
 
 
 @pytest.fixture
 def setup_annotator():
     created = []
 
-    def _make_annotator(scheme, source):
-        curr = DbSnpValidation.setup(scheme, source)
+    def _make_annotator(scheme, args):
+        curr = MOD.DbSnpValidation.setup(scheme, args)
         created.append(curr)
         return curr
 
@@ -37,37 +38,42 @@ def test_scheme(get_test_scheme):
 
 def test_setup_dbsnp(test_scheme, setup_annotator, get_test_file):
     db_path = get_test_file("dbsnp_valstatus.db")
-    annotator = setup_annotator(test_scheme, source=db_path)
-    assert isinstance(annotator, DbSnpValidation)
+    args = SimpleNamespace(dbsnp_priority_db=db_path)
+    annotator = setup_annotator(test_scheme, args)
+    assert isinstance(annotator, MOD.DbSnpValidation)
 
 
 def test_annotate_dbsnp(
     test_scheme, setup_annotator, get_test_file, get_empty_maf_record
 ):
     db_path = get_test_file("dbsnp_valstatus.db")
-    annotator = setup_annotator(test_scheme, source=db_path)
+    args = SimpleNamespace(dbsnp_priority_db=db_path)
+    annotator = setup_annotator(test_scheme, args)
 
     ## should match
     maf_record = get_empty_maf_record
     maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="rs540")
-    maf_record = annotator.annotate(maf_record)
+    found = annotator.annotate(maf_record)
 
-    assert maf_record["dbSNP_Val_Status"].value == ["byOtherPop"]
+    assert found.value == ["byOtherPop"]
 
     ## novel should return empty list
     maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="novel")
     maf_record["dbSNP_Val_Status"] = get_builder(
         "dbSNP_Val_Status", test_scheme, value=None
     )
-    maf_record = annotator.annotate(maf_record)
+    found = annotator.annotate(maf_record)
 
-    assert maf_record["dbSNP_Val_Status"].value == []
+    assert found.value == []
 
     ## empty should return empty list
     maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value=None)
     maf_record["dbSNP_Val_Status"] = get_builder(
         "dbSNP_Val_Status", test_scheme, value=None
     )
-    maf_record = annotator.annotate(maf_record)
+    found = annotator.annotate(maf_record)
 
-    assert maf_record["dbSNP_Val_Status"].value == []
+    assert found.value == []
+
+
+# __END__
