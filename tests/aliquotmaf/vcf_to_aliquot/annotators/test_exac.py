@@ -1,11 +1,11 @@
 """
 Tests for the ``aliquotmaf.annotators.NonTcgaExac`` class.
 """
-import pytest
 from collections import OrderedDict
 
-from maflib.record import MafColumnRecord
+import pytest
 from maflib.column_types import NullableFloatColumn
+from maflib.record import MafColumnRecord
 
 from aliquotmaf.annotators import NonTcgaExac
 from aliquotmaf.converters.builder import get_builder
