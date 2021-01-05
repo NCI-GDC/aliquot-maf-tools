@@ -1,10 +1,9 @@
 """
 MutationStatus annotator. Sets the Germline/Somatic/LOH/Unknown etc status for MAFs.
 """
-import pysam
 
-from aliquotmaf.annotators.annotator import Annotator
-from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.annotators.annotator import Annotator
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
 
 
 class MutationStatus(Annotator):
@@ -26,7 +25,7 @@ class MutationStatus(Annotator):
         curr = cls(scheme, args.caller)
         return curr
 
-    def annotate(self, maf_record, vcf_record, tumor_sample):
+    def annotate(self, vcf_record, tumor_sample):
         mutation_status_record = get_builder(
             "Mutation_Status",
             self.scheme,

@@ -1,21 +1,23 @@
+#!/usr/bin/env python3
 """
 Tests for the ``aliquotmaf.annotators.MutationStatus`` class.
 """
 from collections import OrderedDict
+from types import SimpleNamespace
 
 import pytest
 from maflib.column_types import MutationStatus
 from maflib.column_values import MutationStatusEnum
 
-from aliquotmaf.annotators import MutationStatus as MutationStatusAnnotator
+from aliquotmaf.vcf_to_aliquot.annotators import mutation_status as MOD
 
 
 @pytest.fixture
 def setup_mutation_status():
     created = []
 
-    def _make_mutation_status(scheme, caller):
-        curr = MutationStatusAnnotator.setup(scheme, caller)
+    def _make_mutation_status(scheme, args):
+        curr = MOD.MutationStatus.setup(scheme, args)
         created.append(curr)
         return curr
 
@@ -33,8 +35,10 @@ def test_scheme(get_test_scheme):
 
 def test_setup_mutation_status(test_scheme, setup_mutation_status):
     """Test setting up mutation status annotator class"""
-    annotator = setup_mutation_status(test_scheme, "MuTect2")
-    assert annotator.caller == "MuTect2"
+    caller = 'MuTect2'
+    args = SimpleNamespace(caller=caller)
+    annotator = setup_mutation_status(test_scheme, args)
+    assert annotator.caller == caller
 
 
 @pytest.mark.parametrize(
@@ -70,7 +74,11 @@ def test_mutation_status_annotator(
     info,
     expected,
 ):
-    annotator = setup_mutation_status(test_scheme, caller)
+    args = SimpleNamespace(caller=caller)
+    annotator = setup_mutation_status(test_scheme, args)
     record = get_test_vcf_record(samples=sample, info=info)
-    maf_record = annotator.annotate(get_empty_maf_record, record, "TUMOR")
-    assert maf_record["Mutation_Status"].value == expected
+    found = annotator.annotate(record, "TUMOR")
+    assert found.value == expected
+
+
+# __END__
