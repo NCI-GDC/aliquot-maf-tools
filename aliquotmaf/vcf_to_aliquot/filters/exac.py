@@ -2,7 +2,7 @@
 Applies the common in non-tcga ExAC filter.
 """
 
-from aliquotmaf.filters.filter_base import Filter
+from aliquotmaf.vcf_to_aliquot.filters.filter_base import Filter
 
 
 class ExAC(Filter):
@@ -21,7 +21,6 @@ class ExAC(Filter):
             "nontcga_ExAC_AF_OTH",
             "nontcga_ExAC_AF_SAS",
         ]
-        self.logger.info("Using ExAC frequency cutoff of {0}".format(cutoff))
 
     @classmethod
     def setup(cls, args):

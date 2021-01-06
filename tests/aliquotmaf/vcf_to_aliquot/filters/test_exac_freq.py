@@ -1,13 +1,15 @@
+#!/usr/bin/env python3
 """
 Tests for the ``aliquotmaf.filters.ExAC`` class.
 """
 from collections import OrderedDict
+from types import SimpleNamespace
 
 import pytest
 from maflib.column_types import NullableFloatColumn
 
-from aliquotmaf.converters.builder import get_builder
-from aliquotmaf.filters import ExAC
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.filters import exac as MOD
 
 subpops = [
     "nontcga_ExAC_AF_Adj",
@@ -26,8 +28,8 @@ subpops = [
 def setup_filter():
     created = []
 
-    def _make_filter(cutoff):
-        curr = ExAC.setup(cutoff)
+    def _make_filter(args):
+        curr = MOD.ExAC.setup(args)
         created.append(curr)
         return curr
 
@@ -49,8 +51,9 @@ def test_scheme(get_test_scheme):
 
 def test_setup_exac(setup_filter):
     cutoff = 0.0004
-    filterer = setup_filter(cutoff)
-    assert isinstance(filterer, ExAC)
+    args = SimpleNamespace(exac_freq_cutoff=cutoff)
+    filterer = setup_filter(args)
+    assert isinstance(filterer, MOD.ExAC)
 
 
 def test_exac_filter_1(test_scheme, setup_filter, get_empty_maf_record):
@@ -58,7 +61,8 @@ def test_exac_filter_1(test_scheme, setup_filter, get_empty_maf_record):
     Test exac filter when all freqs are None
     """
     cutoff = 0.0004
-    filterer = setup_filter(cutoff)
+    args = SimpleNamespace(exac_freq_cutoff=cutoff)
+    filterer = setup_filter(args)
     maf_record = get_empty_maf_record
     for key in subpops:
         maf_record[key] = get_builder(key, test_scheme, value=None)
@@ -71,7 +75,8 @@ def test_exac_filter_2(test_scheme, setup_filter, get_empty_maf_record):
     Test exac filter when all freqs are below cutoff 
     """
     cutoff = 0.0004
-    filterer = setup_filter(cutoff)
+    args = SimpleNamespace(exac_freq_cutoff=cutoff)
+    filterer = setup_filter(args)
     maf_record = get_empty_maf_record
     for key in subpops:
         maf_record[key] = get_builder(key, test_scheme, value=0.0003)
@@ -84,7 +89,8 @@ def test_exac_filter_3(test_scheme, setup_filter, get_empty_maf_record):
     Test exac filter when all freqs are exactly cutoff 
     """
     cutoff = 0.0004
-    filterer = setup_filter(cutoff)
+    args = SimpleNamespace(exac_freq_cutoff=cutoff)
+    filterer = setup_filter(args)
     maf_record = get_empty_maf_record
     for key in subpops:
         maf_record[key] = get_builder(key, test_scheme, value=0.0004)
@@ -97,7 +103,8 @@ def test_exac_filter_4(test_scheme, setup_filter, get_empty_maf_record):
     Test exac filter when all but 1 freqs is above cutoff 
     """
     cutoff = 0.0004
-    filterer = setup_filter(cutoff)
+    args = SimpleNamespace(exac_freq_cutoff=cutoff)
+    filterer = setup_filter(args)
     maf_record = get_empty_maf_record
     for key in subpops:
         maf_record[key] = get_builder(key, test_scheme, value=0.0004)
@@ -106,3 +113,6 @@ def test_exac_filter_4(test_scheme, setup_filter, get_empty_maf_record):
     )
     result = filterer.filter(maf_record)
     assert result is True
+
+
+# __END__
