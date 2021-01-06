@@ -1,13 +1,13 @@
 """
 Tests for the ``aliquotmaf.filters.ExAC`` class.
 """
-import pytest
 from collections import OrderedDict
 
+import pytest
 from maflib.column_types import NullableFloatColumn
 
-from aliquotmaf.filters import ExAC
 from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.filters import ExAC
 
 subpops = [
     "nontcga_ExAC_AF_Adj",

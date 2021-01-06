@@ -1,13 +1,13 @@
 """
-Tests for the ``aliquotmaf.filters.NonExonic`` class.
+Tests for the ``aliquotmaf.filters.OffTarget`` class.
 """
-import pytest
 from collections import OrderedDict
 
-from maflib.column_types import StringColumn, OneBasedIntegerColumn
+import pytest
+from maflib.column_types import OneBasedIntegerColumn, StringColumn
 
-from aliquotmaf.filters import NonExonic
 from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.filters import OffTarget
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def setup_filter():
     created = []
 
     def _make_filter(source):
-        curr = NonExonic.setup(source)
+        curr = OffTarget.setup(source)
         created.append(curr)
         return curr
 
@@ -33,10 +33,10 @@ def test_scheme(get_test_scheme):
     return get_test_scheme(coldict)
 
 
-def test_setup_nonexonic(setup_filter, get_test_file):
+def test_setup_offtarget(setup_filter, get_test_file):
     bed_file = get_test_file("fake_regions.bed.gz")
-    filterer = setup_filter(bed_file)
-    assert isinstance(filterer, NonExonic)
+    filterer = setup_filter([bed_file])
+    assert isinstance(filterer, OffTarget)
 
 
 @pytest.mark.parametrize(
@@ -47,9 +47,11 @@ def test_setup_nonexonic(setup_filter, get_test_file):
         ("chr1:11800:.:.:.", 11869, False),
         ("chr1:12227:.:.:.", 12228, False),
         ("chr2:11800:.:.:.", 11869, True),
+        ("chr1:939039:.:.:.", 939040, False),
+        ("chr10:945517:.:.:.", 945520, False),
     ],
 )
-def test_nonexonic_filter(
+def test_offtarget_filter(
     test_scheme,
     setup_filter,
     get_test_file,
@@ -59,9 +61,12 @@ def test_nonexonic_filter(
     expected,
 ):
     """
-    Test nonexonic filter 
+    Test offtarget filter 
     """
-    bed_file = get_test_file("fake_regions.bed.gz")
+    bed_file = [
+        get_test_file("fake_regions.bed.gz"),
+        get_test_file("fake_regions_2.bed.gz"),
+    ]
     filterer = setup_filter(bed_file)
     maf_record = get_empty_maf_record
     maf_record["vcf_region"] = get_builder("vcf_region", test_scheme, value=vcf_region)
