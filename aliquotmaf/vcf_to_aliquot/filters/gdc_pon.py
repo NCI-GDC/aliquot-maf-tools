@@ -3,7 +3,7 @@ Applies the GDC PON filter. We don't care about alleles, just positions.
 """
 from pysam import VariantFile
 
-from aliquotmaf.filters.filter_base import Filter
+from aliquotmaf.vcf_to_aliquot.filters.filter_base import Filter
 
 
 class GdcPon(Filter):
@@ -11,7 +11,6 @@ class GdcPon(Filter):
         super().__init__(name="GDCPON", source=source)
         self.tags = ["gdc_pon"]
         self.f = None
-        self.logger.info("Using panel of normal VCF {0}".format(source))
 
     @classmethod
     def setup(cls, args):
