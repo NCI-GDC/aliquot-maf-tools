@@ -1,21 +1,23 @@
+#!/usr/bin/env python3
 """
 Tests for the ``aliquotmaf.filters.NonExonic`` class.
 """
 from collections import OrderedDict
+from types import SimpleNamespace
 
 import pytest
 from maflib.column_types import OneBasedIntegerColumn, StringColumn
 
-from aliquotmaf.converters.builder import get_builder
-from aliquotmaf.filters import NonExonic
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.filters import nonexonic as MOD
 
 
 @pytest.fixture
 def setup_filter():
     created = []
 
-    def _make_filter(source):
-        curr = NonExonic.setup(source)
+    def _make_filter(args):
+        curr = MOD.NonExonic.setup(args)
         created.append(curr)
         return curr
 
@@ -35,8 +37,9 @@ def test_scheme(get_test_scheme):
 
 def test_setup_nonexonic(setup_filter, get_test_file):
     bed_file = get_test_file("fake_regions.bed.gz")
-    filterer = setup_filter(bed_file)
-    assert isinstance(filterer, NonExonic)
+    args = SimpleNamespace(nonexonic_intervals=bed_file)
+    filterer = setup_filter(args)
+    assert isinstance(filterer, MOD.NonExonic)
 
 
 @pytest.mark.parametrize(
@@ -59,10 +62,11 @@ def test_nonexonic_filter(
     expected,
 ):
     """
-    Test nonexonic filter 
+    Test nonexonic filter
     """
     bed_file = get_test_file("fake_regions.bed.gz")
-    filterer = setup_filter(bed_file)
+    args = SimpleNamespace(nonexonic_intervals=bed_file)
+    filterer = setup_filter(args)
     maf_record = get_empty_maf_record
     maf_record["vcf_region"] = get_builder("vcf_region", test_scheme, value=vcf_region)
     maf_record["End_Position"] = get_builder(
@@ -70,3 +74,6 @@ def test_nonexonic_filter(
     )
     result = filterer.filter(maf_record)
     assert result is expected
+
+
+# __END__

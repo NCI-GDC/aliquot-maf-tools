@@ -3,7 +3,7 @@ Applies the NonExonic filter for regions outside the gencode intervals provided.
 """
 from pysam import TabixFile, asBed
 
-from aliquotmaf.filters.filter_base import Filter
+from aliquotmaf.vcf_to_aliquot.filters.filter_base import Filter
 
 
 class NonExonic(Filter):
@@ -11,7 +11,6 @@ class NonExonic(Filter):
         super().__init__(name="NonExonic", source=source)
         self.tags = ["NonExonic"]
         self.f = None
-        self.logger.info("Using genode exon interval file {0}".format(source))
 
     @classmethod
     def setup(cls, args):
