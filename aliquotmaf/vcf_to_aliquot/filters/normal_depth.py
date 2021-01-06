@@ -1,7 +1,7 @@
 """
 Applies the normal depth filter
 """
-from aliquotmaf.filters.filter_base import Filter
+from aliquotmaf.vcf_to_aliquot.filters.filter_base import Filter
 
 
 class NormalDepth(Filter):
@@ -9,7 +9,6 @@ class NormalDepth(Filter):
         super().__init__(name="NormalDepth")
         self.tags = ["ndp"] if not is_tumor_only else []
         self.cutoff = cutoff
-        self.logger.info("Using normal depth cutoff of {0}".format(cutoff))
 
     @classmethod
     def setup(cls, args):
