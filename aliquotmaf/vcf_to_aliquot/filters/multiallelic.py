@@ -1,15 +1,15 @@
+#!/usr/bin/env python3
 """
 Applies the multiallelic filter.
 """
 
-from aliquotmaf.filters.filter_base import Filter
+from aliquotmaf.vcf_to_aliquot.filters.filter_base import Filter
 
 
 class Multiallelic(Filter):
     def __init__(self):
         super().__init__(name="Multiallelic")
         self.tags = ["multiallelic"]
-        self.logger.info("Loading Multialellic filter")
 
     @classmethod
     def setup(cls):
@@ -23,3 +23,6 @@ class Multiallelic(Filter):
 
     def shutdown(self):
         pass
+
+
+# __END__

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Tests for the ``aliquotmaf.filters.Multiallelic`` class.
 """
@@ -6,8 +7,8 @@ from collections import OrderedDict
 import pytest
 from maflib.column_types import StringColumn
 
-from aliquotmaf.converters.builder import get_builder
-from aliquotmaf.filters import Multiallelic
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.filters import multiallelic as MOD
 
 
 @pytest.fixture
@@ -15,7 +16,7 @@ def setup_filter():
     created = []
 
     def _make_filter():
-        curr = Multiallelic.setup()
+        curr = MOD.Multiallelic.setup()
         created.append(curr)
         return curr
 
@@ -35,7 +36,7 @@ def test_scheme(get_test_scheme):
 
 def test_setup_multiallelic(setup_filter):
     filterer = setup_filter()
-    assert isinstance(filterer, Multiallelic)
+    assert isinstance(filterer, MOD.Multiallelic)
 
 
 @pytest.mark.parametrize(
@@ -52,10 +53,13 @@ def test_multiallelic_filter(
     test_scheme, setup_filter, get_empty_maf_record, vcf_region, expected
 ):
     """
-    Test multiallelic filter 
+    Test multiallelic filter
     """
     filterer = setup_filter()
     maf_record = get_empty_maf_record
     maf_record["vcf_region"] = get_builder("vcf_region", test_scheme, value=vcf_region)
     result = filterer.filter(maf_record)
     assert result is expected
+
+
+# __END__
