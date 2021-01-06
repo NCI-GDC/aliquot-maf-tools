@@ -1,10 +1,11 @@
+#!/usr/bin/env python3
 """
 Applies the GDC Blacklist filter.
 """
 
 import gzip
 
-from aliquotmaf.filters.filter_base import Filter
+from aliquotmaf.vcf_to_aliquot.filters.filter_base import Filter
 
 
 class GdcBlacklist(Filter):
@@ -12,7 +13,6 @@ class GdcBlacklist(Filter):
         super().__init__(name="GDCBlacklist", source=source)
         self.tags = []
         self.data = data
-        self.logger.info("Using GDC Blacklist {0}".format(source))
 
     @classmethod
     def setup(cls, args):
@@ -54,3 +54,6 @@ class GdcBlacklist(Filter):
 
     def shutdown(self):
         pass
+
+
+# __END__

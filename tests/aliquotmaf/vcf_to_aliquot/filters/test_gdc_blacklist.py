@@ -1,21 +1,23 @@
+#!/usr/bin/env python3
 """
 Tests for the ``aliquotmaf.filters.GdcBlacklist`` class.
 """
 from collections import OrderedDict
+from types import SimpleNamespace
 
 import pytest
 from maflib.column_types import UUIDColumn
 
-from aliquotmaf.converters.builder import get_builder
-from aliquotmaf.filters import GdcBlacklist
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.filters import gdc_blacklist as MOD
 
 
 @pytest.fixture
 def setup_filter():
     created = []
 
-    def _make_filter(source):
-        curr = GdcBlacklist.setup(source)
+    def _make_filter(args):
+        curr = MOD.GdcBlacklist.setup(args)
         created.append(curr)
         return curr
 
@@ -35,8 +37,9 @@ def test_scheme(get_test_scheme):
 
 def test_setup_blacklist(setup_filter, get_test_file):
     tsv_path = get_test_file("fake_blacklist.tsv")
-    filterer = setup_filter(tsv_path)
-    assert isinstance(filterer, GdcBlacklist)
+    args = SimpleNamespace(gdc_blacklist=tsv_path)
+    filterer = setup_filter(args)
+    assert isinstance(filterer, MOD.GdcBlacklist)
 
 
 @pytest.mark.parametrize(
@@ -60,7 +63,8 @@ def test_blacklist_filter(
     Test blacklist filter
     """
     tsv_path = get_test_file("fake_blacklist.tsv")
-    filterer = setup_filter(tsv_path)
+    args = SimpleNamespace(gdc_blacklist=tsv_path)
+    filterer = setup_filter(args)
     maf_record = get_empty_maf_record
     maf_record["Tumor_Sample_UUID"] = get_builder(
         "Tumor_Sample_UUID", test_scheme, value=tumor_uuid
@@ -68,3 +72,6 @@ def test_blacklist_filter(
     result = filterer.filter(maf_record)
     assert result is expected_bool
     assert filterer.tags == expected_tags
+
+
+# __END__
