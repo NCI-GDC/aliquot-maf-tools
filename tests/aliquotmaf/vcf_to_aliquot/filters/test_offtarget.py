@@ -1,21 +1,23 @@
+#!/usr/bin/env python3
 """
 Tests for the ``aliquotmaf.filters.OffTarget`` class.
 """
 from collections import OrderedDict
+from types import SimpleNamespace
 
 import pytest
 from maflib.column_types import OneBasedIntegerColumn, StringColumn
 
-from aliquotmaf.converters.builder import get_builder
-from aliquotmaf.filters import OffTarget
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.filters import offtarget as MOD
 
 
 @pytest.fixture
 def setup_filter():
     created = []
 
-    def _make_filter(source):
-        curr = OffTarget.setup(source)
+    def _make_filter(args):
+        curr = MOD.OffTarget.setup(args)
         created.append(curr)
         return curr
 
@@ -35,8 +37,9 @@ def test_scheme(get_test_scheme):
 
 def test_setup_offtarget(setup_filter, get_test_file):
     bed_file = get_test_file("fake_regions.bed.gz")
-    filterer = setup_filter([bed_file])
-    assert isinstance(filterer, OffTarget)
+    args = SimpleNamespace(target_intervals=[bed_file])
+    filterer = setup_filter(args)
+    assert isinstance(filterer, MOD.OffTarget)
 
 
 @pytest.mark.parametrize(
@@ -61,13 +64,14 @@ def test_offtarget_filter(
     expected,
 ):
     """
-    Test offtarget filter 
+    Test offtarget filter
     """
     bed_file = [
         get_test_file("fake_regions.bed.gz"),
         get_test_file("fake_regions_2.bed.gz"),
     ]
-    filterer = setup_filter(bed_file)
+    args = SimpleNamespace(target_intervals=bed_file)
+    filterer = setup_filter(args)
     maf_record = get_empty_maf_record
     maf_record["vcf_region"] = get_builder("vcf_region", test_scheme, value=vcf_region)
     maf_record["End_Position"] = get_builder(
@@ -75,3 +79,6 @@ def test_offtarget_filter(
     )
     result = filterer.filter(maf_record)
     assert result is expected
+
+
+# __END__

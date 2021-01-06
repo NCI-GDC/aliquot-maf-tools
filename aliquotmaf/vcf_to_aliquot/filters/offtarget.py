@@ -4,7 +4,7 @@ Applies the off_target filter for regions outside the provided intervals.
 
 from pysam import TabixFile, asBed
 
-from aliquotmaf.filters.filter_base import Filter
+from aliquotmaf.vcf_to_aliquot.filters.filter_base import Filter
 
 
 class OffTarget(Filter):
@@ -12,7 +12,6 @@ class OffTarget(Filter):
         super().__init__(name="OffTarget", source=source)
         self.tags = ["off_target"]
         self.fs = []
-        self.logger.info("Using interval files {0}".format(", ".join(source)))
 
     @classmethod
     def setup(cls, args):
