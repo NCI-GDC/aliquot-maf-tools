@@ -2,11 +2,11 @@
 
 from maflib.record import MafColumnRecord, MafRecord
 
-from aliquotmaf.runners.vcf_to_aliquot.gdc_1_0_0_aliquot import Aliquot
+from aliquotmaf.vcf_to_aliquot.aliquot.base import Aliquot
 from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
 
 
-def filter(maf_record: MafRecord, aliquot: Aliquot) -> MafColumnRecord:
+def filter_maf(maf_record: MafRecord, aliquot: Aliquot) -> MafColumnRecord:
     gdc_filters = []
     for filt_obj in aliquot.filters.values():
         if filt_obj and filt_obj.filter(maf_record):
