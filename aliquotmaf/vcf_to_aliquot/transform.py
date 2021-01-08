@@ -1,34 +1,23 @@
 #!/usr/bin/env python3
 
-from operator import itemgetter
+from typing import Callable
 
 from maflib.record import MafRecord
 from maflib.validation import ValidationStringency
 
-from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.aliquot import Aliquot
+from aliquotmaf.vcf_to_aliquot.annotate import annotate
 from aliquotmaf.vcf_to_aliquot.converters.collection import InputCollection
 from aliquotmaf.vcf_to_aliquot.converters.formatters import (
-    format_all_effects,
     format_alleles,
     format_depths,
-    format_vcf_columns,
 )
-from aliquotmaf.vcf_to_aliquot.filter import filter
+from aliquotmaf.vcf_to_aliquot.filter_maf import filter_maf
 from aliquotmaf.vcf_to_aliquot.vcf import VcfRecord
 
-# TODO: Build input collection in own module
 
-
-def transform(vcf_record: VcfRecord, data: dict, aliquot: Aliquot, line_number: int):
-
-    # is_tumor_only, line_number=None, colset, maf_center, tumor_submitter_id, sequencer, tumor_aliquot_uuid, normal_aliquot_uuid, scheme, annotators):
-    """
-    Transform into maf record.
-    """
-
-    # Generic data
+def initalize_collection(vcf_record, data, aliquot):
     collection = InputCollection()
-    keys = itemgetter("selected_effect", itemgetter("Hugo_Symbol"))
     collection.add(
         column="Hugo_Symbol",
         value=data["selected_effect"].get("Hugo_Symbol"),
@@ -130,7 +119,9 @@ def transform(vcf_record: VcfRecord, data: dict, aliquot: Aliquot, line_number: 
     collection.add(column="case_id", value=aliquot.case_uuid)
 
     # VCF columns
-    collection.add(column="FILTER", value=";".join(sorted(list(vcf_record.filter))))
+    collection.add(
+        column="FILTER", value=";".join(sorted(list(vcf_record.record.filter)))
+    )
     collection.add(column="vcf_region", value=data["vcf_columns"]["vcf_region"])
     collection.add(column="vcf_info", value=data["vcf_columns"]["vcf_info"])
     collection.add(column="vcf_format", value=data["vcf_columns"]["vcf_format"])
@@ -148,6 +139,26 @@ def transform(vcf_record: VcfRecord, data: dict, aliquot: Aliquot, line_number: 
     for i in aliquot.colset - set(collection.columns()):
         if i not in anno_set:
             collection.add(column=i, value=None)
+
+    return collection
+
+
+def transform(
+    vcf_record: VcfRecord,
+    data: dict,
+    aliquot: Aliquot,
+    line_number: int,
+    _annotate: Callable = annotate,
+    _filter_maf: Callable = filter_maf,
+    _initalize_collection: Callable = initalize_collection,
+) -> MafRecord:
+    """
+    Converts VCF Record to MAF Record.
+    """
+
+    record = vcf_record.record
+    # Generic data
+    collection = _initalize_collection(vcf_record, data, aliquot)
     collection.transform(aliquot.scheme)
 
     maf_record = MafRecord(
@@ -156,49 +167,17 @@ def transform(vcf_record: VcfRecord, data: dict, aliquot: Aliquot, line_number: 
     for i in collection:
         maf_record += i.transformed
 
-    # TODO: Look into using MafRecord.add(MafColumnRecord) for adding columns
-    # DbSnp Validation
-    dbsnp_val_status_record = aliquot.annotators["DbSnpValidation"].annotate(maf_record)
-    maf_record["dbSNP_Val_Status"] = dbsnp_val_status_record
-
-    # Cosmic
-    if aliquot.annotators["cosmicId"]:
-        cosmic_return = aliquot.annotators["cosmicId"].annotate(maf_record, vcf_record)
-        maf_record["COSMIC"] = cosmic_return.cosmic
-        if cosmic_return.dbsnp is not None:
-            maf_record["dbSNP_RS"] = cosmic_return.dbsnp
-    else:
-        maf_record["COSMIC"] = get_builder("COSMIC", aliquot.scheme, value=None)
-
-    # Non-TCGA Exac
-    if aliquot.annotators["NonTcgaExac"]:
-        non_tcga_exac_records = aliquot.annotators["NonTcgaExac"].annotate(
-            maf_record, vcf_record, var_allele_idx=data["var_allele_idx"]
-        )
-        for pop, val in non_tcga_exac_records.items():
-            maf_record[pop] = val
-
-    # Hotspots
-    if aliquot.annotators["hotspots"]:
-        hotspot_record = aliquot.annotators["hotspots"].annotate(maf_record)
-    else:
-        hotspot_record = get_builder("hotspot", aliquot.scheme, value=None)
-    maf_record['hotspot'] = hotspot_record
-
-    # Reference context
-    context_record = aliquot.annotators["reference_context"].annotate(
-        maf_record, vcf_record
-    )
-    maf_record["CONTEXT"] = context_record
-
-    # Mutation Status
-    mutation_status_record = aliquot.annotators["mutation_status"].annotate(
-        maf_record, vcf_record, aliquot.tumor_sample_id
-    )
-    maf_record['mutation_status'] = mutation_status_record
+    # Annotate
+    # TODO: Following
+    """
+    annotation_columns = _annotate()
+    for col in annotation_columns:
+        maf_record.add(col)
+    """
+    maf_record = _annotate(aliquot, data, maf_record, vcf_record=record)
 
     # Filters
-    gdc_filter_record = filter(maf_record, aliquot)
+    gdc_filter_record = _filter_maf(maf_record, aliquot)
     maf_record["GDC_FILTER"] = gdc_filter_record
 
     return maf_record
