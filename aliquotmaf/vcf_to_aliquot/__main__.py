@@ -10,9 +10,8 @@ from collections import simplenamespace
 
 from maflib.record import MafRecord
 
-from aliquotmaf.runners.vcf_to_aliquot.gdc_1_0_0_aliquot import Aliquot
-from aliquotmaf.subcommands.vcf_to_aliquot.runners import GDC_1_0_0_Aliquot
-from aliquotmaf.vcf_to_aliquot.converters.utils import get_columns_from_header
+from aliquotmaf.vcf_to_aliquot.aliquot import Aliquot
+from aliquotmaf.vcf_to_aliquot.aliquot.gdc_1_0_0_aliquot import GDC_1_0_0_Aliquot
 from aliquotmaf.vcf_to_aliquot.extract import ExtractedDataNT, extract
 from aliquotmaf.vcf_to_aliquot.transform import transform
 from aliquotmaf.vcf_to_aliquot.vcf import VcfFile
@@ -152,6 +151,11 @@ def run(
     _extract=extract,
     _transform=transform,
 ):
+    # File path validation
+    # input vcf
+    # output directory
+    # biotype_priority file
+    # effects priority file
     # Setup annotator classes
     with _aliquot(
         args.tumor_sample_id,
@@ -165,23 +169,29 @@ def run(
         args.sequencer,
         args.normal_submitter_id,
     ) as aliquot, _vcf(args.vcf_file) as vcf:
-        header = aliquot.header
         sorter = aliquot.sorter
         writer = aliquot.writer
 
-        for record in vcf:
+        aliquot.setup_annotators(args)
+        aliquot.setup_filters(args)
+
+        for idx, record in enumerate(vcf):
             extracted_data: ExtractedDataNT = _extract(
-                record.record,
-                args.tumor_sample_id,
-                args.normal_sample_id,
+                record,
+                aliquot,
                 vcf.tumor_idx,
                 vcf.normal_idx,
                 vcf.annotation_columns,
+                args.biotype_priority_file,
+                args.effects_priority_file,
                 vcf.vep_key,
-                args.is_tumor_only,
+                args.custom_enst,
             )
             transformed_data: MafRecord = _transform(
-                record, extracted_data, aliquot,
+                vcf_record=record,
+                data=extracted_data,
+                aliquot=aliquot,
+                line_number=idx,
             )
             sorter += transformed_data
         for record in sorter:
