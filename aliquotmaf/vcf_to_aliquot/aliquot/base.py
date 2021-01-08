@@ -1,4 +1,15 @@
 #!/usr/bin/env python3
+"""Base Aliquot MAF class.
+
+Children classes should represent a single MAF spec, each requiring annotators
+    and filters be specified.
+
+Example:
+    >>> with aliquot(*args, **kwargs) as aliquot_object:
+    >>>     aliquot_object.setup_annotators(args)
+    >>>     aliquot_object.setup_filters(args)
+
+"""
 
 import datetime
 from typing import Optional
@@ -13,8 +24,20 @@ from aliquotmaf.vcf_to_aliquot.converters.utils import get_columns_from_header
 
 
 class Aliquot:
-    VERSION = None
+    """Base Aliquot MAF class.
+    Children classes should represent a single MAF spec, each requiring annotators
+        and filters be specified.
+
+    Properties:
+        ANNOTATION (list): MAF annotation
+        VERSION (list): MAF version
+    """
+
     ANNOTATION = None
+    VERSION = None
+
+    ANNOTATORS = None
+    FILTERS = None
 
     @classmethod
     def __tool_name__(cls):
@@ -36,16 +59,16 @@ class Aliquot:
         normal_aliquot_uuid: Optional[str] = None,
         normal_submitter_id: Optional[str] = None,
         is_tumor_only: bool = False,
+        _maf_header=MafHeader,
+        _maf_sorter=MafSorter,
+        _maf_writer=MafWriter,
     ):
 
-        self.input_vcf = input_vcf
         self.tumor_sample_id = tumor_sample_id
         self.tumor_aliquot_uuid = tumor_aliquot_uuid
         self.normal_sample_id = normal_sample_id
         self.normal_aliquot_uuid = normal_aliquot_uuid
         self.is_tumor_only = is_tumor_only
-        self.reference_fasta_index = reference_fasta_index
-        self.output_maf = output_maf
         self.tumor_submitter_id = tumor_submitter_id
         self.maf_center = maf_center
         self.sequencer = sequencer
@@ -53,18 +76,30 @@ class Aliquot:
         self.src_vcf_uuid = src_vcf_uuid
         self.case_uuid = case_uuid
 
+        # Files
+        self.input_vcf = input_vcf
+        self.reference_fasta_index = reference_fasta_index
+        self.output_maf = output_maf
+
+        # Mocks
+        self._maf_header = _maf_header
+        self._maf_sorter = _maf_sorter
+        self._maf_writer = _maf_writer
+
+        # Properties
         self._header: MafHeader = None
         self._sorter: MafSorter = None
         self._writer: MafWriter = None
 
+        # MafHeader information
         self._scheme = None
         self._columns = None
         self._colset = None
 
+        # To be set by children classes
         self.annotators = None
         self.filters = None
 
-        # Finally
         self.validate_tumor_only()
 
     @property
@@ -73,7 +108,7 @@ class Aliquot:
         Sets up the maf header.
         """
         if not self._header:
-            header = MafHeader.from_defaults(
+            header = self._maf_header.from_defaults(
                 version=self.VERSION,
                 annotation=self.ANNOTATION,
                 sort_order=BarcodesAndCoordinate(),
@@ -103,7 +138,7 @@ class Aliquot:
     @property
     def sorter(self) -> MafSorter:
         if not self._sorter:
-            self._sorter = MafSorter(
+            self._sorter = self._maf_sorter(
                 max_objects_in_ram=100000,
                 sort_order_name=BarcodesAndCoordinate.name(),
                 scheme=self.header.scheme(),
@@ -114,7 +149,7 @@ class Aliquot:
     @property
     def writer(self) -> MafWriter:
         if not self._writer:
-            self._writer = MafWriter.from_path(
+            self._writer = self._maf_writer.from_path(
                 path=self.output_maf,
                 header=self.header,
                 validation_stringency=ValidationStringency.Strict,
@@ -142,11 +177,18 @@ class Aliquot:
     def __enter__(self):
         return self
 
-    def __exit__(self, x, y, z):
+    def __exit__(self, *_):
         self.sorter.close()
         self.writer.close()
-        for anno in self.annotators.values():
-            anno.shutdown()
+        if self.annotators:
+            for anno in self.annotators.values():
+                anno.shutdown()
+
+    def setup_annotators(self):
+        raise NotImplementedError()
+
+    def setup_filters(self):
+        raise NotImplementedError()
 
     def validate_tumor_only(self):
         """Asserts no normal information given while tumor-only, and vice versa."""
