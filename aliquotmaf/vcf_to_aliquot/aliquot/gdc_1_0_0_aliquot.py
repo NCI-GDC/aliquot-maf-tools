@@ -1,29 +1,21 @@
 #!/usr/bin/env python3
-"""Main vcf2maf logic for spec gdc-1.0.0-aliquot"""
+"""gdc-1.0.0-aliquot"""
 
-import pysam
 from maflib.column_types import MutationStatus
 
-from aliquotmaf.utils.utils import (
-    assert_sample_in_header,
-    extract_annotation_from_header,
-)
 from aliquotmaf.vcf_to_aliquot.aliquot import Aliquot
 from aliquotmaf.vcf_to_aliquot.annotators.cosmic import CosmicId
 from aliquotmaf.vcf_to_aliquot.annotators.dbsnp_validation import DbSnpValidation
 from aliquotmaf.vcf_to_aliquot.annotators.hotspot import Hotspot
 from aliquotmaf.vcf_to_aliquot.annotators.nontcga_exac import NonTcgaExac
 from aliquotmaf.vcf_to_aliquot.annotators.reference_context import ReferenceContext
-from aliquotmaf.vcf_to_aliquot.converters.utils import get_columns_from_header
-from aliquotmaf.vcf_to_aliquot.filters import (
-    ExAC,
-    GdcBlacklist,
-    GdcPon,
-    Multiallelic,
-    NonExonic,
-    NormalDepth,
-    OffTarget,
-)
+from aliquotmaf.vcf_to_aliquot.filters.exac import ExAC
+from aliquotmaf.vcf_to_aliquot.filters.gdc_blacklist import GdcBlacklist
+from aliquotmaf.vcf_to_aliquot.filters.gdc_pon import GdcPon
+from aliquotmaf.vcf_to_aliquot.filters.multiallelic import Multiallelic
+from aliquotmaf.vcf_to_aliquot.filters.nonexonic import NonExonic
+from aliquotmaf.vcf_to_aliquot.filters.normal_depth import NormalDepth
+from aliquotmaf.vcf_to_aliquot.filters.offtarget import OffTarget
 
 
 class GDC_1_0_0_Aliquot(Aliquot):
@@ -56,6 +48,7 @@ class GDC_1_0_0_Aliquot(Aliquot):
         """
         Sets up all annotator classes.
         """
+        assert self.ANNOTATORS is not None, "Annotator classes must be defined"
         if not self.annotators:
             self.annotators = {}
             for Annotator in self.ANNOTATORS:
@@ -65,12 +58,13 @@ class GDC_1_0_0_Aliquot(Aliquot):
         """
         Sets up all filter classes.
         """
+        assert self.FILTERS is not None, "Filter classes must be defined"
         if not self.filters:
             self.filters = {}
             for Filter in self.FILTERS:
-                filt = Filter.setup(args)
-                if filt:
-                    self.filters[Filter.__name__] = filt
+                filt_obj = Filter.setup(args)
+                if filt_obj:
+                    self.filters[Filter.__name__] = filt_obj
 
 
 # __END__
