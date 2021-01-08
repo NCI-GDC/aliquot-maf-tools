@@ -3,20 +3,14 @@
 import urllib
 from typing import List, NamedTuple, Optional
 
+from aliquotmaf.runners.vcf_to_aliquot.gdc_1_0_0_aliquot import Aliquot
 from aliquotmaf.utils.utils import load_enst, load_json
+from aliquotmaf.vcf_to_aliquot import extractors
 from aliquotmaf.vcf_to_aliquot.converters.formatters import (
     format_all_effects,
     format_vcf_columns,
 )
-from aliquotmaf.vcf_to_aliquot.extractors import (
-    EffectsExtractor,
-    GenotypeAndDepthsExtractor,
-    LocationDataExtractor,
-    PopulationFrequencyExtractor,
-    SelectOneEffectExtractor,
-    VariantAlleleIndexExtractor,
-    VariantClassExtractor,
-)
+from aliquotmaf.vcf_to_aliquot.vcf import VcfRecord
 
 
 class ExtractedDataNT(NamedTuple):
@@ -32,17 +26,16 @@ class ExtractedDataNT(NamedTuple):
 
 
 def extract(
-    record,
-    tumor_sample_id: str,
+    vcf_record: VcfRecord,
+    aliquot: Aliquot,
     tumor_idx: int,
     biotype_priority_file: str,
     effect_priority_file: str,
     annotation_columns: List[str],
-    normal_sample_id: Optional[str] = None,
     normal_idx: Optional[int] = None,
     custom_enst: Optional[str] = None,
-    is_tumor_only: bool = False,
     vep_key: str = "CSQ",
+    _extractors=extractors,
 ) -> ExtractedDataNT:
     """
     Extract the VCF information needed to transform into MAF.
@@ -58,14 +51,18 @@ def extract(
         "selected_effect": None,
         "variant_class": None,
     }
+    record = vcf_record.record
+    tumor_sample_id = aliquot.tumor_sample_id
+    normal_sample_id = aliquot.normal_sample_id
+    is_tumor_only = aliquot.is_tumor_only
 
     # Genotypes
     # TODO: Combine
-    var_allele_idx = VariantAlleleIndexExtractor.extract(
+    var_allele_idx = _extractors.VariantAlleleIndexExtractor.extract(
         tumor_genotype=record.samples[tumor_sample_id]
     )
     # TODO: Improve returns
-    tumor_gt, tumor_depths = GenotypeAndDepthsExtractor.extract(
+    tumor_gt, tumor_depths = _extractors.GenotypeAndDepthsExtractor.extract(
         var_allele_idx=var_allele_idx,
         genotype=record.samples[tumor_sample_id],
         alleles=record.alleles,
@@ -73,7 +70,7 @@ def extract(
 
     if not is_tumor_only:
         # TODO: Improve returns
-        normal_gt, normal_depths = GenotypeAndDepthsExtractor.extract(
+        normal_gt, normal_depths = _extractors.GenotypeAndDepthsExtractor.extract(
             var_allele_idx=var_allele_idx,
             genotype=record.samples[normal_sample_id],
             alleles=record.alleles,
@@ -82,7 +79,7 @@ def extract(
         normal_gt, normal_depths = None, None
 
     # Locations
-    location_data = LocationDataExtractor.extract(
+    location_data = _extractors.LocationDataExtractor.extract(
         ref_allele=record.ref,
         var_allele=record.alleles[var_allele_idx],
         position=record.pos,
@@ -93,7 +90,7 @@ def extract(
     effect_priority = load_json(effect_priority_file)
     biotype_priority = load_json(biotype_priority_file)
     # Handle effects
-    effects = EffectsExtractor.extract(
+    effects = _extractors.EffectsExtractor.extract(
         effect_priority=effect_priority,
         biotype_priority=biotype_priority,
         effect_keys=annotation_columns,
@@ -103,19 +100,19 @@ def extract(
 
     # Combine next two
     # TODO: Improve returns
-    effects, selected_effect = SelectOneEffectExtractor.extract(
+    effects, selected_effect = _extractors.SelectOneEffectExtractor.extract(
         all_effects=effects,
         effect_priority=effect_priority,
         biotype_priority=biotype_priority,
         custom_enst=load_enst(custom_enst),
     )
 
-    selected_effect = PopulationFrequencyExtractor.extract(
+    selected_effect = _extractors.PopulationFrequencyExtractor.extract(
         effect=selected_effect, var_allele=location_data["var_allele"]
     )
 
     # Handle variant class
-    variant_class = VariantClassExtractor.extract(
+    variant_class = _extractors.VariantClassExtractor.extract(
         cons=selected_effect["One_Consequence"],
         var_type=location_data["var_type"],
         inframe=location_data["inframe"],
