@@ -1,8 +1,38 @@
+#!/usr/bin/env python3
 """
 A simple container class for storing a collection of builders you want to convert to
 MAF columns.
 """
-from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.enums import InputDataState
+
+
+class InputData:
+    """Contains individual column mapping and transformation functions."""
+
+    def __init__(self, value, column, default=None):
+        self.value = value
+        self.column = column
+        self.default = default
+        self.transformed = None
+        self.state = InputDataState.UNTRANSFORMED
+
+    def __hash__(self):
+        return self.column
+
+    def __str__(self):
+        return "{0.state}: <FROM({0.value})> -> <TO({0.column} -> {0.transformed})>".format(
+            self
+        )
+
+    def __repr__(self):
+        return str(self)
+
+    def __build__(self, scheme):
+        self.transformed = get_builder(
+            self.column, scheme, value=self.value, default=self.default
+        )
+        self.state = InputDataState.TRANSFORMED
 
 
 class InputCollection:
@@ -18,7 +48,7 @@ class InputCollection:
     def columns(self):
         return [i.column for i in self._from_data]
 
-    def add(self, value=None, column=None, default=None, data=None):
+    def add(self, value=None, column=None, default=None, data: InputData = None):
         if data is not None:
             assert (
                 data.column not in self._colset
@@ -41,29 +71,4 @@ class InputCollection:
             yield i
 
 
-class InputData:
-    """Contains individual column mapping and transformation functions."""
-
-    def __init__(self, value, column, default=None):
-        self.value = value
-        self.column = column
-        self.default = default
-        self.transformed = None
-        self.state = "UNTRANSFORMED"
-
-    def __hash__(self):
-        return self.column
-
-    def __str__(self):
-        return "{0.state}: <FROM({0.value})> -> <TO({0.column} -> {0.transformed})>".format(
-            self
-        )
-
-    def __repr__(self):
-        return str(self)
-
-    def __build__(self, scheme):
-        self.transformed = get_builder(
-            self.column, scheme, value=self.value, default=self.default
-        )
-        self.state = "TRANSFORMED"
+# __END__
