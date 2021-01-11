@@ -1,10 +1,11 @@
+#!/usr/bin/env python3
 """
 Implements the reference context annotation.
 """
 import pysam
 
-from aliquotmaf.annotators.annotator import Annotator
-from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.annotators.annotator import Annotator
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
 
 
 class ReferenceContext(Annotator):
@@ -46,3 +47,6 @@ class ReferenceContext(Annotator):
 
     def shutdown(self):
         self.fa.close()
+
+
+# __END__
