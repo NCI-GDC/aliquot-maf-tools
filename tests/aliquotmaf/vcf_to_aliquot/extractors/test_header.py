@@ -3,7 +3,10 @@ Tests for functions parsing the VCF headers.
 """
 import pytest
 
-from aliquotmaf.utils import assert_sample_in_header, extract_annotation_from_header
+from aliquotmaf.utils.utils import (
+    assert_sample_in_header,
+    extract_annotation_from_header,
+)
 
 
 def test_sample_in_header(get_test_vcf_header):
