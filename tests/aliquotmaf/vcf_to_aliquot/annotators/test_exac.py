@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Tests for the ``aliquotmaf.annotators.NonTcgaExac`` class.
 """
@@ -5,10 +6,8 @@ from collections import OrderedDict
 
 import pytest
 from maflib.column_types import NullableFloatColumn
-from maflib.record import MafColumnRecord
 
-from aliquotmaf.annotators import NonTcgaExac
-from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.annotators import nontcga_exac as MOD
 
 popkeys = ["AFR", "AMR", "EAS", "FIN", "NFE", "OTH", "SAS"]
 
@@ -18,7 +17,7 @@ def setup_annotator():
     created = []
 
     def _make_annotator(scheme, source):
-        curr = NonTcgaExac.setup(scheme, source)
+        curr = MOD.NonTcgaExac.setup(scheme, source)
         created.append(curr)
         return curr
 
@@ -44,7 +43,7 @@ def test_scheme(get_test_scheme):
 def test_setup_exac(test_scheme, setup_annotator, get_test_file):
     vcf_path = get_test_file("fake_exac.vcf.gz")
     annotator = setup_annotator(test_scheme, source=vcf_path)
-    assert isinstance(annotator, NonTcgaExac)
+    assert isinstance(annotator, MOD.NonTcgaExac)
 
 
 def test_exac_annotator_1(
@@ -152,7 +151,7 @@ def test_exac_annotator_4(
     get_empty_maf_record,
 ):
     """
-    SNP should not match due to alleles 
+    SNP should not match due to alleles
     """
     vcf_path = get_test_file("fake_exac.vcf.gz")
     annotator = setup_annotator(test_scheme, source=vcf_path)
@@ -175,3 +174,6 @@ def test_exac_annotator_4(
 
     for k in expected:
         assert maf_record[k].value == expected[k]
+
+
+# __END__

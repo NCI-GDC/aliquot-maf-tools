@@ -1,10 +1,11 @@
+#!/usr/bin/env python3
 """
 Annotates the population frequency from the non-TCGA ExAC file.
 """
 import pysam
 
-from aliquotmaf.annotators.annotator import Annotator
-from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.vcf_to_aliquot.annotators.annotator import Annotator
+from aliquotmaf.vcf_to_aliquot.converters.builder import get_builder
 
 
 class NonTcgaExac(Annotator):
@@ -69,3 +70,6 @@ class NonTcgaExac(Annotator):
 
     def shutdown(self):
         self.f.close()
+
+
+# __END__
