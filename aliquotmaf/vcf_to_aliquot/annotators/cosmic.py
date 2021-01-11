@@ -2,7 +2,6 @@
 Annotates the COSMIC ID and mutates the dbSNP_RS if necessary.
 """
 
-from typing import NamedTuple, Optional
 
 import pysam
 from maflib.column import MafColumnRecord
