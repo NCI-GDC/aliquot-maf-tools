@@ -6,7 +6,7 @@ aliquot MAF.
 import argparse
 import logging
 import sys
-from collections import simplenamespace
+from types import SimpleNamespace
 
 from maflib.record import MafRecord
 
@@ -140,12 +140,12 @@ def setup_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def process_argv(argv=None) -> simplenamespace:
+def process_argv(argv=None) -> SimpleNamespace:
     pass
 
 
 def run(
-    args: simplenamespace,
+    args: SimpleNamespace,
     _aliquot: Aliquot = GDC_1_0_0_Aliquot,
     _vcf=VcfFile,
     _extract=extract,

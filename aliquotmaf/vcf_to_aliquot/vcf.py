@@ -4,9 +4,6 @@ from types import SimpleNamespace
 from typing import Generator, List, Optional
 
 import pysam
-from maflib.record import MafRecord
-
-from aliquotmaf.vcf_to_aliquot import extract, transform
 
 DI = SimpleNamespace(pysam=pysam)
 

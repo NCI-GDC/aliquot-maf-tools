@@ -3,9 +3,9 @@
 import urllib
 from typing import List, NamedTuple, Optional
 
-from aliquotmaf.runners.vcf_to_aliquot.gdc_1_0_0_aliquot import Aliquot
 from aliquotmaf.utils.utils import load_enst, load_json
 from aliquotmaf.vcf_to_aliquot import extractors
+from aliquotmaf.vcf_to_aliquot.aliquot.base import Aliquot
 from aliquotmaf.vcf_to_aliquot.converters.formatters import (
     format_all_effects,
     format_vcf_columns,
