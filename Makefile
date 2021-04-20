@@ -4,18 +4,19 @@ REPO = aliquot-maf-tools
 # UPDATE ME
 MODULE = aliquotmaf
 
-BRANCH_NAME?=unknown
 GIT_SHORT_HASH:=$(shell git rev-parse --short HEAD)
 
 PYPI_VERSION:=$(shell python3 setup.py -q print_version --pypi)
+DOCKER_VERSION:=$(shell python3 setup.py -q print_version --docker)
 COMMIT_HASH:=$(shell python3 setup.py -q print_version --hash)
 
 DOCKER_REPO := quay.io/ncigdc
-DOCKER_IMAGE := ${DOCKER_REPO}/${REPO}:${LONG_VERSION}
+DOCKER_IMAGE := ${DOCKER_REPO}/${REPO}:${DOCKER_VERSION}
 DOCKER_IMAGE_COMMIT := ${DOCKER_REPO}/${REPO}:${COMMIT_HASH}
 DOCKER_IMAGE_LATEST := ${DOCKER_REPO}/${REPO}:latest
 
 TWINE_REPOSITORY_URL?=""
+PIP_EXTRA_INDEX_URL?=
 
 .PHONY: version version-* print-*
 version:
@@ -40,6 +41,7 @@ init-pip:
 	@echo -- Installing pip packages --
 	pip3 install \
 		--no-cache-dir \
+		-r dev-requirements.txt \
 		-r requirements.txt
 	python3 setup.py develop
 
@@ -67,11 +69,14 @@ lint:
 run:
 	bin/run
 
-# Include next line if publishing to Jenkins
-# --extra-index-url ${TWINE_REPOSITORY_URL}
-requirements: init-venv
+requirements: init-venv requirements-prod requirements-dev
+
+requirements-dev:
 	python3 setup.py -q capture_requirements --dev
-	pip-compile -o requirements.txt requirements.in
+	pip-compile -o dev-requirements.txt dev-requirements.in
+
+requirements-prod:
+	pip-compile -o requirements.txt
 
 .PHONY: build build-*
 
@@ -84,7 +89,7 @@ build-docker:
 	mkdir -p dist
 	cp -r build/lib/* dist/
 	cp -r bin/ dist/
-	cp -f Makefile requirements.txt README.md setup.py dist/
+	cp -f Makefile requirements.txt dev-requirements.txt README.md setup.py dist/
 	docker build . \
 		--file ./Dockerfile \
 		--build-arg http_proxy=${PROXY} \
