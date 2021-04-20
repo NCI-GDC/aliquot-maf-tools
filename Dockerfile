@@ -1,12 +1,15 @@
-FROM python:3.5
+FROM quay.io/ncigdc/bio-python:3.6
 
-# Copy over source
-COPY . aliquot-maf-tools/
-WORKDIR /aliquot-maf-tools
+ENV BINARY=maflib
 
-# Installing dependencies
-RUN bash -c "./repo-install.sh" && \
-    pip install -r docker-requirements.txt
+COPY ./dist/ /opt
 
-# Install bio-submitter-qc
-RUN pip install .
+WORKDIR /opt
+
+RUN make init-pip \
+  && ln -s /opt/bin/${BINARY} /bin/${BINARY} \
+  && chmod +x /bin/${BINARY}
+
+ENTRYPOINT ["/bin/aliquotmaf"]
+
+CMD ["--help"]
