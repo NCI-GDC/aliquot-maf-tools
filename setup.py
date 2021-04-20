@@ -16,19 +16,22 @@ PACKAGE = "aliquotmaf"
 PYPI_REPO = "bioinf-{}".format(PACKAGE)
 GIT_REPO_URL = "https://github.com/NCI-GDC/{}".format(GIT_REPO)
 
-INSTALL_REQUIRES = []
+INSTALL_REQUIRES = [
+    "bioinf-maflib",
+    "pysam",
+]
 
-TESTS_REQUIRES = [
-    'mock',
-    'pytest',
-    'pytest-cov',
+TESTS_REQUIRE = [
+    "mock",
+    "pytest",
+    "pytest-cov",
 ]
 
 DEV_REQUIRES = [
-    'detect-secrets==0.13.1',
-    'isort',
-    'flake8',
-    'pre-commit',
+    "detect-secrets==0.13.1",
+    "isort",
+    "flake8",
+    "pre-commit",
 ]
 
 
@@ -40,27 +43,26 @@ GIT_COMMANDS = SimpleNamespace(
 )
 
 
-
 try:
     # Set versions if version file exists
     mod = importlib.import_module("{}".format(PACKAGE))
     __pypi_version__ = mod.__version__
 except Exception:
     # Set defaults otherwise
-    __pypi_version__ = '0.0.0'
+    __pypi_version__ = "0.0.0"
 
 
 class PrintVersion(Command):
     description = "Print out specified version, default long version."
     user_options = [
         ("pypi", None, "Print package version."),
-        ("short", None, "Print semantic version."),
+        ("docker", None, "Print Docker-friendly package version."),
         ("hash", None, "Print commit hash."),
     ]
 
     def initialize_options(self):
         self.pypi = False
-        self.short = False
+        self.docker = False
         self.hash = False
 
     def finalize_options(self):
@@ -69,19 +71,17 @@ class PrintVersion(Command):
     def run(self):
         if self.pypi:
             print(__pypi_version__)
-        elif self.short:
-            print(__short_version__)
+        elif self.docker:
+            print(__pypi_version__.replace("+", "."))
         elif self.hash:
             try:
                 commit_hash = call_subprocess(GIT_COMMANDS.hash)
             except Exception:
-                print('')
+                print("")
             else:
                 print(commit_hash)
         else:
-            print(__long_version__)
-
-
+            print(__pypi_version__)
 
 
 def call_subprocess(cmd: list):
@@ -92,29 +92,24 @@ def call_subprocess(cmd: list):
 
 
 class Requirements(Command):
-    description = "foobar"
+    description = "Write out dev-requirements.in file."
     user_options = [
-        ("install", None, "Bundles only install requirements"),
-        ("test", None, "Bundles only install requirements"),
         ("dev", None, "Bundles all requirements"),
     ]
 
     def initialize_options(self):
-        self.install = False
-        self.test = False
         self.dev = False
 
     def finalize_options(self):
-        assert self.install + self.test + self.dev == 1, "Provide only one arg"
+        pass
 
     def run(self):
-        path = os.path.join(".", "requirements.in")
+        REQUIREMENT = ["-c requirements.txt"]
         if self.dev:
-            reqs = INSTALL_REQUIRES + TESTS_REQUIRES + DEV_REQUIRES
-        elif self.test:
-            reqs = INSTALL_REQUIRES + TESTS_REQUIRES
-        elif self.install:
-            reqs = INSTALL_REQUIRES
+            reqs = REQUIREMENT + DEV_REQUIRES + TESTS_REQUIRE
+            path = "dev-requirements.in"
+        else:
+            raise ValueError("Choose one of install, test, or dev")
         self.write_requirements(path, reqs)
         return
 
@@ -125,29 +120,24 @@ class Requirements(Command):
 
 setup(
     name=PYPI_REPO,
-    description="Mutation Annotation Format (MAF) library",
+    description="Tools for creating and filtering aliquot-level MAFs",
     version=__pypi_version__,
     url=GIT_REPO_URL,
     python_requires=">=3.6",
-    setup_requires=['setuptools_scm'],
+    setup_requires=["setuptools_scm"],
     use_scm_version={
         "write_to": os.path.join(f"{PACKAGE}", "_version.py"),
         "fallback_version": __pypi_version__,
     },
     packages=find_packages(),
-    package_data={'maflib': ['schemas/*.json']},
     install_requires=INSTALL_REQUIRES,
-    tests_require=TESTS_REQUIRES,
+    tests_require=TESTS_REQUIRE,
     cmdclass={
         "capture_requirements": Requirements,
         "print_version": PrintVersion,
     },
     include_package_data=True,
-    entry_points= {
-        'console_scripts': [
-            'aliquot-maf-tools = aliquotmaf.__main__:main'
-        ]
-    }
+    entry_points={"console_scripts": ["aliquot-maf-tools = aliquotmaf.__main__:main"]},
 )
 
 # __END__
