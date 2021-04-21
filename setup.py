@@ -1,7 +1,3 @@
-from setuptools import setup, find_packages
-
-#!/usr/bin/env python
-
 import importlib
 import os
 import subprocess
@@ -9,6 +5,9 @@ from textwrap import dedent
 from types import SimpleNamespace
 
 from setuptools import Command, find_packages, setup
+
+#!/usr/bin/env python
+
 
 GIT_REPO = "aliquot-maf-tools"
 PACKAGE = "aliquotmaf"
@@ -132,10 +131,7 @@ setup(
     packages=find_packages(),
     install_requires=INSTALL_REQUIRES,
     tests_require=TESTS_REQUIRE,
-    cmdclass={
-        "capture_requirements": Requirements,
-        "print_version": PrintVersion,
-    },
+    cmdclass={"capture_requirements": Requirements, "print_version": PrintVersion},
     include_package_data=True,
     entry_points={"console_scripts": ["aliquot-maf-tools = aliquotmaf.__main__:main"]},
 )
