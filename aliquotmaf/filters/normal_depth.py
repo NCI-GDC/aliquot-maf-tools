@@ -1,5 +1,5 @@
 """
-Applies the normal depth filter 
+Applies the normal depth filter
 """
 from __future__ import absolute_import
 

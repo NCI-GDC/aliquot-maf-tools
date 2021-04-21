@@ -1,5 +1,5 @@
 """
-Applies the GDC Blacklist filter. 
+Applies the GDC Blacklist filter.
 """
 from __future__ import absolute_import
 
@@ -29,12 +29,12 @@ class GdcBlacklist(Filter):
                 assert (
                     "tumor_aliquot_id" in head
                 ), 'Required column "tumor_aliquot_id" missing from blacklist file {0}'.format(
-                    self.source
+                    cls.source
                 )
                 assert (
                     "tag" in head
                 ), 'Required column "tag" missing from blacklist file {0}'.format(
-                    self.source
+                    cls.source
                 )
             else:
                 # Parse row into dict

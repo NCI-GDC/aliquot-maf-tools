@@ -35,7 +35,7 @@ class VariantAlleleIndexExtractor(Extractor):
 
 class GenotypeAndDepthsExtractor(Extractor):
     """Extractor class for extracting the genotype and depths based on the
-       variant allele index.
+    variant allele index.
     """
 
     logger = Logger.get_logger("GenotypeAndDepthsExtractor")
@@ -43,14 +43,14 @@ class GenotypeAndDepthsExtractor(Extractor):
     @classmethod
     def extract(cls, var_allele_idx, genotype, alleles):
         """
-        Extracts the information for the variant alleles based on the 
+        Extracts the information for the variant alleles based on the
         variant allele index. Creates a new, updated genotype record
         and depths list.
- 
+
         :param var_allele_idx: the variant allele index
         :param genotype: a dictionary or dictionary-like object containing
                          various possible keys like AD, DP, etc.
-        :param alleles: an ordered list or tuple of the possible alleles 
+        :param alleles: an ordered list or tuple of the possible alleles
                         at the locus
         :returns: an updated genotype record and depths list
         """
@@ -113,18 +113,18 @@ class GenotypeAndDepthsExtractor(Extractor):
                 if i and i != ".":
                     new_gt["DP"] += i
 
-        ## If depths is empty, just set to 0, 0
+        # If depths is empty, just set to 0, 0
         if not depths:
             depths = [0, 0]
 
-        ## If we have REF/ALT allele depths but not DP, then set DP equal to sum of all ADs
+        # If we have REF/ALT allele depths but not DP, then set DP equal to sum of all ADs
         if (depths[0] is not None and depths[var_allele_idx] is not None) and (
             "DP" not in genotype or genotype["DP"] is None or genotype["DP"] == "."
         ):
             # cls.logger.warn('Missing DP field. setting DP equal to sum of ADs!!')
             new_gt["DP"] = sum([i for i in depths if i and i != "."])
 
-        ## Set the formatted AD and alleles
+        # Set the formatted AD and alleles
         new_gt["AD"] = tuple([i if i != "" and i is not None else "." for i in depths])
         new_gt["GT"] = genotype["GT"]
         depths = [i if i != "." and i is not None else 0 for i in new_gt["AD"]]

@@ -8,7 +8,7 @@ class OverlapSet:
         """
         Container for the results of an iteration of the overlap iterator. The
         results are converted to a dictionary where the caller is the key and the
-        overlaps for that caller are the values. 
+        overlaps for that caller are the values.
 
         :param result: result from an iteration of `maflib.overlap_iter.LocatableOverlapIterator`
         :param maf_keys: list of callers in same order as results
@@ -116,7 +116,7 @@ class OverlapSet:
     @property
     def caller_type_map(self):
         """
-        Dictionary where the keys are a ``tuple`` of caller and variant types 
+        Dictionary where the keys are a ``tuple`` of caller and variant types
         mapped using self._type_dic and values are a list of records.
         """
         if self._caller_type_map is None:

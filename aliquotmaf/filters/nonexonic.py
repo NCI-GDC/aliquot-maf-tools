@@ -1,5 +1,5 @@
 """
-Applies the NonExonic filter for regions outside the gencode intervals provided. 
+Applies the NonExonic filter for regions outside the gencode intervals provided.
 """
 from __future__ import absolute_import
 

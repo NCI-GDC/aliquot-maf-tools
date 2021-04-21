@@ -1,6 +1,5 @@
 """
-Subcommand for converting a VEP annotated VCF to a raw 
-aliquot MAF.
+Subcommand for converting a VEP annotated VCF to a raw aliquot MAF.
 """
 from aliquotmaf.subcommands.base import Subcommand
 from aliquotmaf.subcommands.vcf_to_aliquot.runners import GDC_1_0_0_Aliquot

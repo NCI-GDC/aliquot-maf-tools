@@ -11,7 +11,7 @@ class BaseMafRecordMerger(metaclass=ABCMeta):
     def __init__(self, scheme):
         """
         Initialize the MAF record merging object which has the main `merge_records`
-        function to take an `aliquotmaf.merging.overlap_set.OverlapSet` 
+        function to take an `aliquotmaf.merging.overlap_set.OverlapSet`
         instance and performs merging.
         """
 
@@ -31,12 +31,12 @@ class BaseMafRecordMerger(metaclass=ABCMeta):
     def caller_type_order(self):
         """
         :return: a ``list`` of ``tuples`` of the format (caller, variant type)
-        in their order of priority. 
+        in their order of priority.
         """
 
     def allele_columns(self):
         """
-        :return: a ``tuple`` of column names that contain allele information 
+        :return: a ``tuple`` of column names that contain allele information
         """
         return (
             "Tumor_Seq_Allele1",
@@ -48,7 +48,7 @@ class BaseMafRecordMerger(metaclass=ABCMeta):
     @abstractmethod
     def merge_records(self, results, tumor_only=False):
         """
-        The main function for merging a MAF recrods from an 
+        The main function for merging a MAF recrods from an
         `aliquotmaf.merging.overlap_set.OverlapSet` instance. The idea is to
         create a dictionary of column names as keys and the merged values as the
         values and then convert this dictionary to a `maflib.maf_record.MafRecord`
@@ -95,12 +95,12 @@ class BaseMafRecordMerger(metaclass=ABCMeta):
     def fix_depths(self, maf_dic, tumor_only=False):
         """
         Sets the total depths of tumor/normal to be the sum of the ref and alt
-        count columns if the sum of the ref and alt count columns is less than 
+        count columns if the sum of the ref and alt count columns is less than
         the dp.
 
         :param maf_dic: ``dict`` of the maf record to format
         :param tumor_only: ``True`` if there is no matched normal else ``False``
-        :return: updated maf_dic with formatted depths 
+        :return: updated maf_dic with formatted depths
         """
         # fix depths
         tsum = maf_dic["t_ref_count"].value + maf_dic["t_alt_count"].value

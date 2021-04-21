@@ -1,5 +1,5 @@
 """
-Subcommand for masking/filtering a merged aliquot MAF. 
+Subcommand for masking/filtering a merged aliquot MAF.
 """
 from aliquotmaf.subcommands.base import Subcommand
 from aliquotmaf.subcommands.mask_merged_aliquot.runners import (

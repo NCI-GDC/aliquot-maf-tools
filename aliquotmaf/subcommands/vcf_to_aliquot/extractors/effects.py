@@ -69,7 +69,7 @@ class EffectsExtractor(Extractor):
                         effect[v] = edat[i].replace("&", ";")
                     else:
                         effect[v] = None
-                except:
+                except Exception:
                     effect[v] = None
 
             # Skip effects on other ALT alleles. If ALLELE_NUM is undefined (e.g.
