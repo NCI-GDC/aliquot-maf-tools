@@ -62,9 +62,7 @@ clean:
 lint:
 	@echo
 	@echo -- Lint --
-	python3 -m flake8 \
-		--ignore=E501,F401,E302,E502,E126,E731,W503,W605,F841,C901 \
-		${MODULE}/
+	python3 -m flake8 ${MODULE}/
 
 run:
 	bin/run
