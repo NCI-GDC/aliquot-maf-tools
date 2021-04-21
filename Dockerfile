@@ -1,6 +1,6 @@
 FROM quay.io/ncigdc/bio-python:3.6
 
-ENV BINARY=maflib
+ENV BINARY=aliquotmaf
 
 COPY ./dist/ /opt
 
