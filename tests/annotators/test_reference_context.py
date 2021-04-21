@@ -1,10 +1,10 @@
 """
 Tests for the ``aliquotmaf.annotators.ReferenceContext`` class.
 """
-import pysam
-import pytest
 from collections import OrderedDict, namedtuple
 
+import pysam
+import pytest
 from maflib.column_types import StringColumn
 
 from aliquotmaf.annotators import ReferenceContext

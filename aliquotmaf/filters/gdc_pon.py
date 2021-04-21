@@ -3,9 +3,9 @@ Applies the GDC PON filter. We don't care about alleles, just positions.
 """
 from __future__ import absolute_import
 
-from .filter_base import Filter
-
 from pysam import VariantFile
+
+from .filter_base import Filter
 
 
 class GdcPon(Filter):

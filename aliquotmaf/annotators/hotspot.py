@@ -3,8 +3,9 @@ Implements the hotspots annotation.
 """
 from __future__ import absolute_import
 
-from .annotator import Annotator
 from aliquotmaf.converters.builder import get_builder
+
+from .annotator import Annotator
 
 
 class Hotspot(Annotator):

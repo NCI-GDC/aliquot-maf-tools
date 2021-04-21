@@ -1,13 +1,13 @@
 """
 Tests for the ``aliquotmaf.filters.GdcPon`` class.
 """
-import pytest
 from collections import OrderedDict
 
+import pytest
 from maflib.column_types import StringColumn
 
-from aliquotmaf.filters import GdcPon
 from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.filters import GdcPon
 
 
 @pytest.fixture

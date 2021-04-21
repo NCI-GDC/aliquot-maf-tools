@@ -5,9 +5,9 @@ from __future__ import absolute_import
 
 import pysam
 
-from .annotator import Annotator
-
 from aliquotmaf.converters.builder import get_builder
+
+from .annotator import Annotator
 
 
 class NonTcgaExac(Annotator):

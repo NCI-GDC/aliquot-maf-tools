@@ -1,9 +1,9 @@
 from __future__ import absolute_import
 
 from .base import Extractor
-from .genotypes import VariantAlleleIndexExtractor, GenotypeAndDepthsExtractor
-from .location import LocationDataExtractor
 from .effects import EffectsExtractor, SelectOneEffectExtractor
+from .genotypes import GenotypeAndDepthsExtractor, VariantAlleleIndexExtractor
+from .location import LocationDataExtractor
 from .population_frequency import PopulationFrequencyExtractor
 from .variant_class import VariantClassExtractor
 

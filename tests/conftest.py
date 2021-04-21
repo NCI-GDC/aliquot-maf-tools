@@ -1,12 +1,12 @@
 import logging
-import pytest
-import pysam
 import os
 from collections import OrderedDict, namedtuple
 
+import pysam
+import pytest
+from maflib.record import MafRecord
 from maflib.schemes import MafScheme
 from maflib.validation import ValidationStringency
-from maflib.record import MafRecord
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)

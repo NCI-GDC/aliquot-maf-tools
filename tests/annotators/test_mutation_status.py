@@ -1,11 +1,12 @@
 """
 Tests for the ``aliquotmaf.annotators.MutationStatus`` class.
 """
-import pytest
 from collections import OrderedDict
 
-from maflib.column_values import MutationStatusEnum
+import pytest
 from maflib.column_types import MutationStatus
+from maflib.column_values import MutationStatusEnum
+
 from aliquotmaf.annotators import MutationStatus as MutationStatusAnnotator
 
 

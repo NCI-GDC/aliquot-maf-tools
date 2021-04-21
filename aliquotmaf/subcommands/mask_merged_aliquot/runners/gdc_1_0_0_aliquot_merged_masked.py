@@ -4,15 +4,15 @@ gdc-1.0.0-aliquot-merged-masked.
 """
 import json
 
-from maflib.reader import MafReader
 from maflib.header import MafHeader
-from maflib.writer import MafWriter
+from maflib.reader import MafReader
 from maflib.sort_order import BarcodesAndCoordinate
 from maflib.validation import ValidationStringency
+from maflib.writer import MafWriter
 
-from aliquotmaf.subcommands.mask_merged_aliquot.runners import BaseRunner
-from aliquotmaf.converters.utils import init_empty_maf_record, get_columns_from_header
 from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.converters.utils import get_columns_from_header, init_empty_maf_record
+from aliquotmaf.subcommands.mask_merged_aliquot.runners import BaseRunner
 
 
 class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
