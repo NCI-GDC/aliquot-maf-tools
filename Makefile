@@ -118,7 +118,7 @@ test-docker:
 	docker run --rm ${DOCKER_IMAGE_LATEST} test
 
 .PHONY: publish publish-*
-publish: docker-login
+publish:
 	docker push ${DOCKER_IMAGE_COMMIT}
 	docker push ${DOCKER_IMAGE}
 
