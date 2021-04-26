@@ -31,7 +31,7 @@ docker-login:
 	docker login -u="${QUAY_USERNAME}" -p="${QUAY_PASSWORD}" quay.io
 
 
-.PHONY: build build-* clean init init-* lint requirements run version
+.PHONY: build build-* clean clean-* init init-* lint requirements run version
 init: init-pip init-hooks
 
 # Include next line if publishing to Jenkins
@@ -58,6 +58,10 @@ clean:
 	rm -rf ./build/
 	rm -rf ./dist/
 	rm -rf ./*.egg-info/
+
+clean-docker:
+	@echo "Removing latest image: ${DOCKER_IMAGE_LATEST}"
+	docker rmi -f ${DOCKER_IMAGE_LATEST}
 
 lint:
 	@echo
