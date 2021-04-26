@@ -6,16 +6,17 @@ MODULE = aliquotmaf
 
 GIT_SHORT_HASH:=$(shell git rev-parse --short HEAD)
 
-PYPI_VERSION:=$(shell python3 setup.py -q print_version --pypi)
-DOCKER_VERSION:=$(shell python3 setup.py -q print_version --docker)
-COMMIT_HASH:=$(shell python3 setup.py -q print_version --hash)
+# PYPI_VERSION:=$(shell python3 setup.py -q print_version --pypi)
+# DOCKER_VERSION:=$(shell python3 setup.py -q print_version --docker)
+# COMMIT_HASH:=$(shell python3 setup.py -q print_version --hash)
+COMMIT_HASH:=$(shell git rev-parse HEAD)
 
 DOCKER_REPO := quay.io/ncigdc
-DOCKER_IMAGE := ${DOCKER_REPO}/${REPO}:${DOCKER_VERSION}
+# DOCKER_IMAGE := ${DOCKER_REPO}/${REPO}:${DOCKER_VERSION}
 DOCKER_IMAGE_COMMIT := ${DOCKER_REPO}/${REPO}:${COMMIT_HASH}
 DOCKER_IMAGE_LATEST := ${DOCKER_REPO}/${REPO}:latest
 
-TWINE_REPOSITORY_URL?=""
+TWINE_REPOSITORY_URL?=
 PIP_EXTRA_INDEX_URL?=
 
 .PHONY: version version-* print-*
@@ -97,7 +98,6 @@ build-docker:
 		--build-arg http_proxy=${PROXY} \
 		--build-arg https_proxy=${PROXY} \
 		-t "${DOCKER_IMAGE_COMMIT}" \
-		-t "${DOCKER_IMAGE}" \
 		-t "${DOCKER_IMAGE_LATEST}"
 
 build-pypi:

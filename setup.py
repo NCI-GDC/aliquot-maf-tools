@@ -15,7 +15,7 @@ PYPI_REPO = "bioinf-{}".format(PACKAGE)
 GIT_REPO_URL = "https://github.com/NCI-GDC/{}".format(GIT_REPO)
 
 INSTALL_REQUIRES = [
-    "bioinf-maflib>=1.1.0",
+    "bioinf-maflib",
     "pysam",
 ]
 

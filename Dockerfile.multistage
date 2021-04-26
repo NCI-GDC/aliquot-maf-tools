@@ -1,5 +1,7 @@
 FROM quay.io/ncigdc/bio-python:3.6 as builder
 
+ARG PIP_EXTRA_INDEX_URL
+
 COPY ./ /opt
 
 WORKDIR /opt
@@ -19,7 +21,8 @@ ENV BINARY=aliquotmaf
 
 WORKDIR /opt
 
-RUN make init-pip \
+RUN python3 -m pip install -r requirements.txt -r dev-requirements.txt \
+	&& python3 setup.py develop \
 	&& ln -s /opt/bin/${BINARY} /bin/${BINARY} \
 	&& chmod +x /bin/${BINARY}
 
