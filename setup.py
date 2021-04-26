@@ -125,7 +125,7 @@ setup(
     python_requires=">=3.6",
     setup_requires=["setuptools_scm"],
     use_scm_version={
-        "write_to": os.path.join(f"{PACKAGE}", "_version.py"),
+        "write_to": os.path.join(PACKAGE, "_version.py"),
         "fallback_version": __pypi_version__,
     },
     packages=find_packages(),
@@ -133,7 +133,7 @@ setup(
     tests_require=TESTS_REQUIRE,
     cmdclass={"capture_requirements": Requirements, "print_version": PrintVersion},
     include_package_data=True,
-    scripts=[os.path.join(os.path.dirname(__file__), 'bin', f"{PACKAGE}")],
+    scripts=[os.path.join(os.path.dirname(__file__), 'bin', PACKAGE)],
     entry_points={"console_scripts": ["aliquot-maf-tools = aliquotmaf.__main__:main"]},
 )
 
