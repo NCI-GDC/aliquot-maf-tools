@@ -24,8 +24,7 @@ version:
 	@echo --- VERSION: ${PYPI_VERSION} ---
 
 version-docker:
-	@echo ${DOCKER_IMAGE}
-	@echo ${DOCKER_IMAGE_COMMIT}
+	@docker run --rm ${DOCKER_IMAGE_LATEST} --version
 
 .PHONY: docker-login
 docker-login:
@@ -88,11 +87,6 @@ build: build-docker
 build-docker:
 	@echo
 	@echo -- Building docker --
-	# python3 setup.py build
-	# mkdir -p dist
-	# cp -r build/lib/* dist/
-	# cp -r bin/ dist/
-	# cp -f Makefile requirements.txt dev-requirements.txt README.md setup.py dist/
 	docker build . \
 		--file ./Dockerfile.multistage \
 		--build-arg http_proxy=${PROXY} \
@@ -121,8 +115,9 @@ test-docker:
 	@echo -- Running Docker Test --
 	docker run --rm ${DOCKER_IMAGE_LATEST} test
 
-.PHONY: publish publish-*
-publish:
+.PHONY: publish-*
+publish-docker:
+	docker tag ${DOCKER_IMAGE_COMMIT} ${DOCKER_IMAGE}
 	docker push ${DOCKER_IMAGE_COMMIT}
 	docker push ${DOCKER_IMAGE}
 

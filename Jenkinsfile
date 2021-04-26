@@ -36,27 +36,9 @@ pipeline {
         sh 'make test-docker'
       }
     }
-    stage('Docker Publish Staging') {
-      when {
-        anyOf {
-	  branch 'feat*'
-	  branch 'develop'
-	  branch 'hotfix/*'
-	  branch 'release/*'
-	}
-      }
+    stage('Docker Publish') {
       steps {
-        sh 'make publish-staging'
-      }
-    }
-    stage('Docker Publish Release') {
-      when {
-        anyOf {
-	  branch 'main'
-	}
-      }
-      steps {
-        sh 'make publish-release'
+        sh 'make publish-docker DOCKER_IMAGE=$(make version-docker)'
       }
     }
   }
