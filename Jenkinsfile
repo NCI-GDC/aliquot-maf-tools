@@ -17,6 +17,8 @@ pipeline {
 	TWINE_PASSWORD = credentials('twine_password')
 	QUAY_USERNAME = credentials('QUAY_USERNAME')
 	QUAY_PASSWORD = credentials('QUAY_PASSWORD')
+	http_proxy = "$PROXY"
+	https_proxy = "$PROXY"
   }
   options {
     disableConcurrentBuilds()
