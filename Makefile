@@ -87,13 +87,13 @@ build: build-docker
 build-docker:
 	@echo
 	@echo -- Building docker --
-	python3 setup.py build
-	mkdir -p dist
-	cp -r build/lib/* dist/
-	cp -r bin/ dist/
-	cp -f Makefile requirements.txt dev-requirements.txt README.md setup.py dist/
+	# python3 setup.py build
+	# mkdir -p dist
+	# cp -r build/lib/* dist/
+	# cp -r bin/ dist/
+	# cp -f Makefile requirements.txt dev-requirements.txt README.md setup.py dist/
 	docker build . \
-		--file ./Dockerfile \
+		--file ./Dockerfile.multistage \
 		--build-arg http_proxy=${PROXY} \
 		--build-arg https_proxy=${PROXY} \
 		-t "${DOCKER_IMAGE_COMMIT}" \

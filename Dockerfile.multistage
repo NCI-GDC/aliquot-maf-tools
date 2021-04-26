@@ -1,0 +1,28 @@
+FROM quay.io/ncigdc/bio-python:3.6 as builder
+
+COPY ./ /opt
+
+WORKDIR /opt
+
+RUN python3 setup.py build \
+	&& mkdir -p dist/ \
+	&& cp -r build/lib/* dist/ \
+	&& cp -r bin/ dist/ \
+	&& cp -f Makefile requirements.txt dev-requirements.txt README.md setup.py dist/ \
+	&& ls -l /opt/dist/*
+
+FROM quay.io/ncigdc/bio-python:3.6
+
+COPY --from=builder /opt /opt
+
+ENV BINARY=aliquotmaf
+
+WORKDIR /opt
+
+RUN make init-pip \
+	&& ln -s /opt/bin/${BINARY} /bin/${BINARY} \
+	&& chmod +x /bin/${BINARY}
+
+ENTRYPOINT ["/bin/aliquotmaf"]
+
+CMD ["--help"]
