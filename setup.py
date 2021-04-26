@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import importlib
 import os
 import subprocess
@@ -6,9 +8,6 @@ from types import SimpleNamespace
 
 from setuptools import Command, find_packages, setup
 
-#!/usr/bin/env python
-
-
 GIT_REPO = "aliquot-maf-tools"
 PACKAGE = "aliquotmaf"
 
@@ -16,7 +15,7 @@ PYPI_REPO = "bioinf-{}".format(PACKAGE)
 GIT_REPO_URL = "https://github.com/NCI-GDC/{}".format(GIT_REPO)
 
 INSTALL_REQUIRES = [
-    "bioinf-maflib",
+    "bioinf-maflib>=1.1.0",
     "pysam",
 ]
 
