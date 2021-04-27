@@ -2,7 +2,7 @@ REPO = aliquot-maf-tools
 
 MODULE = aliquotmaf
 
-COMMIT_HASH:=$(shell git rev-parse HEAD)
+COMMIT_HASH:=$(shell git rev-parse HEAD 2>/dev/null)
 
 DOCKER_REPO := quay.io/ncigdc
 DOCKER_IMAGE_COMMIT := ${DOCKER_REPO}/${REPO}:${COMMIT_HASH}
@@ -19,7 +19,7 @@ version-docker:
 	@python setup.py -q print_version --docker
 
 version-docker-tag:
-	@docker run --rm --entrypoint="make -C /opt" ${DOCKER_IMAGE_LATEST} version-docker
+	@docker run --rm --entrypoint="make" ${DOCKER_IMAGE_LATEST} "version-docker"
 
 .PHONY: docker-login
 docker-login:
