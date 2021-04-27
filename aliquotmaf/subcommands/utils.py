@@ -1,7 +1,7 @@
 """Utility functions for subcommands"""
 import gzip
-import re
 import json
+import re
 
 
 def get_open_function(fil):

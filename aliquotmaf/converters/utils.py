@@ -1,6 +1,6 @@
 """Utilities for converters"""
-from maflib.validation import ValidationStringency
 from maflib.record import MafRecord
+from maflib.validation import ValidationStringency
 
 
 def get_columns_from_header(header):

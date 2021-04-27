@@ -3,8 +3,8 @@ Tests the subcommand ABC.
 """
 import pytest
 
-from aliquotmaf.subcommands.base import Subcommand
 from aliquotmaf.__main__ import main
+from aliquotmaf.subcommands.base import Subcommand
 
 
 class Example(Subcommand):

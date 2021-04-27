@@ -1,12 +1,12 @@
 """
 Tests for the ``aliquotmaf.annotators.DbSnpValidation`` class.
 """
-import pysam
-import pytest
 from collections import OrderedDict
 
-from maflib.record import MafColumnRecord
+import pysam
+import pytest
 from maflib.column_types import SequenceOfStrings
+from maflib.record import MafColumnRecord
 
 from aliquotmaf.annotators import DbSnpValidation
 from aliquotmaf.converters.builder import get_builder

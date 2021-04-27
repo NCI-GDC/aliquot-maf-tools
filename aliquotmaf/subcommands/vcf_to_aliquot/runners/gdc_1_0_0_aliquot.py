@@ -1,38 +1,33 @@
 """Main vcf2maf logic for spec gdc-1.0.0-aliquot"""
-import pysam
 import urllib.parse
-
 from operator import itemgetter
 
-from maflib.header import MafHeader
-from maflib.writer import MafWriter
+import pysam
+from maflib.header import MafHeader, MafHeaderRecord
 from maflib.sort_order import BarcodesAndCoordinate
 from maflib.sorter import MafSorter
-from maflib.header import MafHeaderRecord
 from maflib.validation import ValidationStringency
+from maflib.writer import MafWriter
 
 import aliquotmaf.annotators as Annotators
 import aliquotmaf.filters as Filters
 import aliquotmaf.subcommands.vcf_to_aliquot.extractors as Extractors
-
-from aliquotmaf.subcommands.vcf_to_aliquot.runners import BaseRunner
-from aliquotmaf.converters.utils import init_empty_maf_record, get_columns_from_header
-from aliquotmaf.converters.collection import InputCollection
 from aliquotmaf.converters.builder import get_builder
-
-from aliquotmaf.subcommands.utils import (
-    extract_annotation_from_header,
-    assert_sample_in_header,
-    load_json,
-    load_enst,
-)
-
+from aliquotmaf.converters.collection import InputCollection
 from aliquotmaf.converters.formatters import (
+    format_all_effects,
     format_alleles,
     format_depths,
-    format_all_effects,
     format_vcf_columns,
 )
+from aliquotmaf.converters.utils import get_columns_from_header, init_empty_maf_record
+from aliquotmaf.subcommands.utils import (
+    assert_sample_in_header,
+    extract_annotation_from_header,
+    load_enst,
+    load_json,
+)
+from aliquotmaf.subcommands.vcf_to_aliquot.runners import BaseRunner
 
 
 class GDC_1_0_0_Aliquot(BaseRunner):
@@ -600,12 +595,12 @@ class GDC_1_0_0_Aliquot(BaseRunner):
                 collection.add(column=i, value=None)
         collection.transform(self._scheme)
 
-        ## Generate maf record
+        # Generate maf record
         maf_record = init_empty_maf_record(line_number=line_number)
         for i in collection:
             maf_record += i.transformed
 
-        ## Annotations
+        # Annotations
         if self.annotators["dbsnp_priority_db"]:
             maf_record = self.annotators["dbsnp_priority_db"].annotate(maf_record)
         else:
@@ -635,7 +630,7 @@ class GDC_1_0_0_Aliquot(BaseRunner):
             maf_record, vcf_record, self.options["tumor_vcf_id"]
         )
 
-        ## Filters
+        # Filters
         gdc_filters = []
         for filt_key in self.filters:
             filt_obj = self.filters[filt_key]

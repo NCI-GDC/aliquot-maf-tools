@@ -1,11 +1,11 @@
 """
 Tests for the ``aliquotmaf.annotators.Hotpot`` class.
 """
-import pytest
 from collections import OrderedDict
 
+import pytest
+from maflib.column_types import NullableStringColumn, NullableYOrN, StringColumn
 from maflib.record import MafColumnRecord
-from maflib.column_types import StringColumn, NullableStringColumn, NullableYOrN
 
 from aliquotmaf.annotators import Hotspot
 from aliquotmaf.converters.builder import get_builder

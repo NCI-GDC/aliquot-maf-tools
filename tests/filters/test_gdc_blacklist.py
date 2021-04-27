@@ -1,13 +1,13 @@
 """
 Tests for the ``aliquotmaf.filters.GdcBlacklist`` class.
 """
-import pytest
 from collections import OrderedDict
 
+import pytest
 from maflib.column_types import UUIDColumn
 
-from aliquotmaf.filters import GdcBlacklist
 from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.filters import GdcBlacklist
 
 
 @pytest.fixture

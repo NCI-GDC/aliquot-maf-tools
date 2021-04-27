@@ -1,8 +1,9 @@
 """
 Tests for the ``aliquotmaf.subcommands.vcf_to_aliquot`` subcommands.
 """
-import pytest
 import uuid
+
+import pytest
 
 from aliquotmaf.__main__ import main
 

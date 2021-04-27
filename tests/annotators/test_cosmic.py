@@ -1,12 +1,12 @@
 """
 Tests for the ``aliquotmaf.annotators.Cosmic`` class.
 """
-import pysam
-import pytest
 from collections import OrderedDict, namedtuple
 
-from maflib.record import MafColumnRecord
+import pysam
+import pytest
 from maflib.column_types import SequenceOfStrings
+from maflib.record import MafColumnRecord
 
 from aliquotmaf.annotators import CosmicID
 from aliquotmaf.converters.builder import get_builder
