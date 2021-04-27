@@ -1,18 +1,10 @@
-# UPDATE ME
 REPO = aliquot-maf-tools
 
-# UPDATE ME
 MODULE = aliquotmaf
 
-GIT_SHORT_HASH:=$(shell git rev-parse --short HEAD)
-
-# PYPI_VERSION:=$(shell python3 setup.py -q print_version --pypi)
-# DOCKER_VERSION:=$(shell python3 setup.py -q print_version --docker)
-# COMMIT_HASH:=$(shell python3 setup.py -q print_version --hash)
 COMMIT_HASH:=$(shell git rev-parse HEAD)
 
 DOCKER_REPO := quay.io/ncigdc
-# DOCKER_IMAGE := ${DOCKER_REPO}/${REPO}:${DOCKER_VERSION}
 DOCKER_IMAGE_COMMIT := ${DOCKER_REPO}/${REPO}:${COMMIT_HASH}
 DOCKER_IMAGE_LATEST := ${DOCKER_REPO}/${REPO}:latest
 
@@ -24,7 +16,10 @@ version:
 	@echo --- VERSION: ${PYPI_VERSION} ---
 
 version-docker:
-	@docker run --rm ${DOCKER_IMAGE_LATEST} --version
+	@python setup.py -q print_version --docker
+
+version-docker-tag:
+	@docker run --rm --entrypoint="make -C /opt" ${DOCKER_IMAGE_LATEST} version-docker
 
 .PHONY: docker-login
 docker-login:

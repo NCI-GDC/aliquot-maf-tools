@@ -1,7 +1,5 @@
 FROM quay.io/ncigdc/bio-python:3.6 as builder
 
-ARG PIP_EXTRA_INDEX_URL
-
 COPY ./ /opt
 
 WORKDIR /opt
@@ -10,12 +8,11 @@ RUN python3 setup.py build \
 	&& mkdir -p dist/ \
 	&& cp -r build/lib/* dist/ \
 	&& cp -r bin/ dist/ \
-	&& cp -f Makefile requirements.txt dev-requirements.txt README.md setup.py dist/ \
-	&& ls -l /opt/dist/*
+	&& cp -f Makefile requirements.txt dev-requirements.txt README.md setup.py dist/
 
 FROM quay.io/ncigdc/bio-python:3.6
 
-COPY --from=builder /opt /opt
+COPY --from=builder /opt/dist/ /opt
 
 ENV BINARY=aliquotmaf
 

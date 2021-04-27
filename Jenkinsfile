@@ -17,8 +17,6 @@ pipeline {
 	TWINE_PASSWORD = credentials('twine_password')
 	QUAY_USERNAME = credentials('QUAY_USERNAME')
 	QUAY_PASSWORD = credentials('QUAY_PASSWORD')
-	http_proxy = "$PROXY"
-	https_proxy = "$PROXY"
   }
   options {
     disableConcurrentBuilds()
@@ -28,7 +26,7 @@ pipeline {
   stages {
     stage('Docker Build') {
       steps {
-        vbash "make build-docker PROXY=${PROXY}"
+        vbash "make build-docker"
       }
     }
     stage('Docker Test') {
@@ -38,7 +36,8 @@ pipeline {
     }
     stage('Docker Publish') {
       steps {
-        sh 'make publish-docker DOCKER_IMAGE=$(make version-docker)'
+        DOCKER_IMAGE = sh([script: "make version-docker-tag", returnStdout: true]).trim()
+        sh 'make publish-docker DOCKER_IMAGE=${DOCKER_IMAGE}'
       }
     }
   }
