@@ -39,7 +39,7 @@ pipeline {
         script {
           DOCKER_IMAGE = sh(script: "make version-docker-tag", returnStdout: true).trim()
 	}
-        sh 'make publish-docker DOCKER_IMAGE=${DOCKER_IMAGE}'
+        sh "make publish-docker DOCKER_IMAGE=${DOCKER_IMAGE}"
       }
     }
   }
