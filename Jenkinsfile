@@ -37,9 +37,9 @@ pipeline {
     stage('Docker Publish') {
       steps {
         script {
-          DOCKER_IMAGE = sh(script: "make version-docker-tag", returnStdout: true).trim()
+          DOCKER_TAG = sh(script: "make version-docker-tag", returnStdout: true).trim()
 	}
-        sh "make publish-docker DOCKER_IMAGE=${DOCKER_IMAGE}"
+        sh "make publish-docker DOCKER_TAG=${DOCKER_TAG}"
       }
     }
   }
