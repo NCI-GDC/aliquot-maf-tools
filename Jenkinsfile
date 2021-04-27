@@ -43,6 +43,11 @@ pipeline {
       }
     }
   }
+  post {
+    always {
+      sh 'make clean'
+    }
+  }
 }
 
 def vbash(command) {
