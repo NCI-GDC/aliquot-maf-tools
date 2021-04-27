@@ -26,7 +26,7 @@ pipeline {
   stages {
     stage('Docker Build') {
       steps {
-        vbash "make build-docker"
+        vbash "make build-docker PROXY=${PROXY}"
       }
     }
     stage('Docker Test') {
