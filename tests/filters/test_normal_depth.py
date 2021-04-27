@@ -1,13 +1,13 @@
 """
 Tests for the ``aliquotmaf.filters.NormalDepth`` class.
 """
-import pytest
 from collections import OrderedDict
 
+import pytest
 from maflib.column_types import NullableZeroBasedIntegerColumn
 
-from aliquotmaf.filters import NormalDepth
 from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.filters import NormalDepth
 
 
 @pytest.fixture

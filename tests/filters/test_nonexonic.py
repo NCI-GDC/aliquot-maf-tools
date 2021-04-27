@@ -1,13 +1,13 @@
 """
 Tests for the ``aliquotmaf.filters.NonExonic`` class.
 """
-import pytest
 from collections import OrderedDict
 
-from maflib.column_types import StringColumn, OneBasedIntegerColumn
+import pytest
+from maflib.column_types import OneBasedIntegerColumn, StringColumn
 
-from aliquotmaf.filters import NonExonic
 from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.filters import NonExonic
 
 
 @pytest.fixture

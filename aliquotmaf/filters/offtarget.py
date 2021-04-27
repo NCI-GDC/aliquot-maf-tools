@@ -1,11 +1,11 @@
 """
-Applies the off_target filter for regions outside the provided intervals. 
+Applies the off_target filter for regions outside the provided intervals.
 """
 from __future__ import absolute_import
 
-from .filter_base import Filter
-
 from pysam import TabixFile, asBed
+
+from .filter_base import Filter
 
 
 class OffTarget(Filter):

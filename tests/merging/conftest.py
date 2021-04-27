@@ -1,19 +1,19 @@
-import pytest
 from collections import OrderedDict
 
-from maflib.record import MafRecord
-from maflib.validation import ValidationStringency
+import pytest
 from maflib.column_types import (
-    OneBasedIntegerColumn,
     DnaString,
     NullableDnaString,
-    VariantType,
-    ZeroBasedIntegerColumn,
+    NullableStringColumn,
     NullableZeroBasedIntegerColumn,
+    OneBasedIntegerColumn,
     SequenceOfStrings,
     StringColumn,
-    NullableStringColumn,
+    VariantType,
+    ZeroBasedIntegerColumn,
 )
+from maflib.record import MafRecord
+from maflib.validation import ValidationStringency
 
 from aliquotmaf.merging.overlap_set import OverlapSet
 

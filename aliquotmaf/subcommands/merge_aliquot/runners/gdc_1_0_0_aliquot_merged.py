@@ -3,24 +3,21 @@ Main logic for merging raw aliquot MAFs on schema gdc-1.0.0-aliquot-merged.
 """
 import json
 
-from maflib.reader import MafReader
 from maflib.header import MafHeader
-from maflib.writer import MafWriter
+from maflib.overlap_iter import LocatableOverlapIterator
+from maflib.reader import MafReader
 from maflib.sort_order import BarcodesAndCoordinate
 from maflib.sorter import MafSorter
 from maflib.validation import ValidationStringency
-from maflib.overlap_iter import LocatableOverlapIterator
+from maflib.writer import MafWriter
 
 import aliquotmaf.filters as Filters
-
+from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.converters.utils import get_columns_from_header
 from aliquotmaf.merging.filtering_iterator import FilteringPeekableIterator
 from aliquotmaf.merging.overlap_set import OverlapSet
 from aliquotmaf.merging.record_merger.impl.v1_0 import MafRecordMerger_1_0_0
-
 from aliquotmaf.subcommands.merge_aliquot.runners import BaseRunner
-
-from aliquotmaf.converters.utils import get_columns_from_header
-from aliquotmaf.converters.builder import get_builder
 
 
 class GDC_1_0_0_Aliquot_Merged(BaseRunner):

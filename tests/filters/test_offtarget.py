@@ -1,13 +1,13 @@
 """
 Tests for the ``aliquotmaf.filters.OffTarget`` class.
 """
-import pytest
 from collections import OrderedDict
 
-from maflib.column_types import StringColumn, OneBasedIntegerColumn
+import pytest
+from maflib.column_types import OneBasedIntegerColumn, StringColumn
 
-from aliquotmaf.filters import OffTarget
 from aliquotmaf.converters.builder import get_builder
+from aliquotmaf.filters import OffTarget
 
 
 @pytest.fixture

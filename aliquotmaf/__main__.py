@@ -4,17 +4,19 @@ Main entrypoint for all aliquot-maf-tools.
 import argparse
 import datetime
 import sys
-
-from signal import signal, SIGPIPE, SIG_DFL
+from signal import SIG_DFL, SIGPIPE, signal
 
 from aliquotmaf.logger import Logger
-
-from aliquotmaf.subcommands.vcf_to_aliquot.__main__ import VcfToAliquotMaf
-from aliquotmaf.subcommands.merge_aliquot.__main__ import MergeAliquotMafs
 from aliquotmaf.subcommands.mask_merged_aliquot.__main__ import MaskMergedAliquotMaf
-
+from aliquotmaf.subcommands.merge_aliquot.__main__ import MergeAliquotMafs
+from aliquotmaf.subcommands.vcf_to_aliquot.__main__ import VcfToAliquotMaf
 
 signal(SIGPIPE, SIG_DFL)
+
+try:
+    from aliquotmaf import __version__
+except ImportError:
+    __version__ = '0'
 
 
 def main(args=None):
@@ -35,6 +37,7 @@ def main(args=None):
 
     # Get args
     p = argparse.ArgumentParser("GDC Aliquot MAF Tools")
+    p.add_argument("--version", action="version", version=__version__)
     subparsers = p.add_subparsers(dest="subcommand")
     subparsers.required = True
 
