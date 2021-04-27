@@ -17,8 +17,6 @@ pipeline {
 	TWINE_PASSWORD = credentials('twine_password')
 	QUAY_USERNAME = credentials('QUAY_USERNAME')
 	QUAY_PASSWORD = credentials('QUAY_PASSWORD')
-	http_proxy = "$PROXY"
-	https_proxy = "$PROXY"
   }
   options {
     disableConcurrentBuilds()
@@ -26,20 +24,6 @@ pipeline {
   }
 
   stages {
-    stage('Init') {
-      steps {
-        vbash 'make version'
-
-	script {
-	  GIT_HASH = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-	  VERSION = sh(script: "make print-version BRANCH_NAME=${BRANCH_NAME}", returnStdout: true).trim()
-	  PYPI_VERSION = sh(script: "make print-pypi", returnStdout: true).trim()
-	  currentBuild.displayName = "#${currentBuild.number} - ${VERSION}"
-	}
-
-	echo "Version: ${VERSION}"
-      }
-    }
     stage('Docker Build') {
       steps {
         vbash "make build-docker PROXY=${PROXY}"
@@ -50,44 +34,18 @@ pipeline {
         sh 'make test-docker'
       }
     }
-    stage('Docker Publish Staging') {
-      when {
-        anyOf {
-	  branch 'feat*'
-	  branch 'develop'
-	  branch 'hotfix/*'
-	  branch 'release/*'
-	}
-      }
+    stage('Docker Publish') {
       steps {
-        sh 'make publish-staging'
+        script {
+          DOCKER_TAG = sh(script: "make version-docker-tag", returnStdout: true).trim()
+	}
+        sh "make publish-docker DOCKER_TAG=${DOCKER_TAG}"
       }
     }
-    stage('Docker Publish Release') {
-      when {
-        anyOf {
-	  branch 'main'
-	}
-      }
-      steps {
-        sh 'make publish-release'
-      }
-    }
-    stage('PyPI Publish Branch') {
-      when { 
-        anyOf {
-	  branch 'main'
-	  branch 'develop'
-	  branch 'hotfix/*'
-	  branch 'release/*'
-	}
-      }
-      steps {
-	echo "Building PyPI Version: ${PYPI_VERSION}"
-        sh "pip install --user twine wheel"
-        vbash "make build-pypi"
-        vbash "make publish-pypi"
-      }
+  }
+  post {
+    always {
+      sh 'make clean'
     }
   }
 }
