@@ -112,7 +112,7 @@ test-docker:
 
 .PHONY: publish-*
 publish-docker:
-	DOCKER_IMAGE:=${DOCKER_REPO}/${REPO}:{DOCKER_TAG}
+	DOCKER_IMAGE:=${DOCKER_REPO}/${REPO}:${DOCKER_TAG}
 	docker tag ${DOCKER_IMAGE_COMMIT} ${DOCKER_IMAGE}
 	docker push ${DOCKER_IMAGE_COMMIT}
 	docker push ${DOCKER_IMAGE}
