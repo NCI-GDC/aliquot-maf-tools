@@ -114,7 +114,7 @@ test-docker:
 publish-docker:
 	docker tag ${DOCKER_IMAGE_COMMIT} ${DOCKER_REPO}/${REPO}:${DOCKER_TAG}
 	docker push ${DOCKER_IMAGE_COMMIT}
-	docker push ${DOCKER_IMAGE}
+	docker push ${DOCKER_REPO}/${REPO}:${DOCKER_TAG}
 
 publish-pypi: dist/*.whl
 	@echo
