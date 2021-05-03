@@ -94,8 +94,11 @@ build-pypi:
 	@echo Building wheel - ${PYPI_VERSION}
 	python3 setup.py bdist_wheel -b ${MODULE}.egg-info
 
-.PHONY: test test-*
+.PHONY: test test-* tox
 test: lint test-unit
+
+tox:
+	@tox
 
 test-unit:
 	@echo
