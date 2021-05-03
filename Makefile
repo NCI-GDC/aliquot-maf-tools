@@ -119,7 +119,7 @@ publish-docker:
 	docker push ${DOCKER_IMAGE_COMMIT}
 	docker push ${DOCKER_REPO}/${REPO}:${DOCKER_TAG}
 
-publish-pypi: dist/*.whl
+publish-pypi:
 	@echo
 	@echo Publishing wheel
 	python3 -m twine upload $(shell ls -1 dist/*.whl | head -1)
