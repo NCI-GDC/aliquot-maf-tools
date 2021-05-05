@@ -1,6 +1,6 @@
 #!groovy
 
-library identifier: "jenkins-lib@feat/bio-docker-pipeline"
+library identifier: "jenkins-lib@master"
 bioScriptedLibPipeline {
   testRunner = 'tox'
 }
