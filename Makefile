@@ -94,8 +94,11 @@ build-pypi:
 	@echo Building wheel - ${PYPI_VERSION}
 	python3 setup.py bdist_wheel -b ${MODULE}.egg-info
 
-.PHONY: test test-*
+.PHONY: test test-* tox
 test: lint test-unit
+
+tox:
+	@tox
 
 test-unit:
 	@echo
@@ -116,7 +119,7 @@ publish-docker:
 	docker push ${DOCKER_IMAGE_COMMIT}
 	docker push ${DOCKER_REPO}/${REPO}:${DOCKER_TAG}
 
-publish-pypi: dist/*.whl
+publish-pypi:
 	@echo
 	@echo Publishing wheel
 	python3 -m twine upload $(shell ls -1 dist/*.whl | head -1)
