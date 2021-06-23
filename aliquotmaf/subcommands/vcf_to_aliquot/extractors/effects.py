@@ -287,7 +287,7 @@ class EffectsExtractor_102(EffectsExtractor):
                 if p_pos is not None:
                     p_pos = p_pos.group(1)
                     aa = effect["Amino_acids"]
-                    effect["HGVSp_Short"] = "p.{0}{1}{0}".format(aa, p_pos)
+                    effect["HGVSp_Short"] = "p.{0}{1}=".format(aa, p_pos)
 
             # Copy VEP data into MAF fields that don't share the same identifier
             effect["Transcript_ID"] = effect["Feature"]
