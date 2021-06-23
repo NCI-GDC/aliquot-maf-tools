@@ -394,7 +394,8 @@ class SelectOneEffectExtractor(Extractor):
                         filter(
                             lambda x: x["SYMBOL"]
                             and x["Transcript_ID"]
-                            and x["Transcript_ID"] in custom_enst
+                            and x["Transcript_ID"] in custom_enst,
+                            all_effects,
                         )
                     )[0]
                 except IndexError:
