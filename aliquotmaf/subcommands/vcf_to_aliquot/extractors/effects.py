@@ -387,6 +387,19 @@ class SelectOneEffectExtractor(Extractor):
             except IndexError:
                 maf_effect = None
 
+            # If no VEP-preferred isoform, then choose worst affected user-preferred isoform with a gene symbol
+            if not maf_effect and custom_enst:
+                try:
+                    maf_effect = list(
+                        filter(
+                            lambda x: x["SYMBOL"]
+                            and x["Transcript_ID"]
+                            and x["Transcript_ID"] in custom_enst
+                        )
+                    )[0]
+                except IndexError:
+                    maf_effect = None
+
             # If that gene has no canonical transcript tagged, choose the highest priority
             # canonical effect on any gene
             if not maf_effect:
