@@ -3,7 +3,7 @@ some input source, mostly engineered for VEP annotated VCF files.
 
 * EffectsExtractor         Extract the VEP effects into a list of dictionaries
                            based on the VEP v84 outputs.
-* EffectsExtractor102      Extract the VEP effects into a list of formatted
+* EffectsExtractor_102     Extract the VEP effects into a list of formatted
                            dictionaries based on VEP v102 outputs.
 * SelectOneEffectExtractor Select a single transcript effect based on priorities
 """
