@@ -269,12 +269,16 @@ class EffectsExtractor_102(EffectsExtractor):
                     c_pos = 1 if int(c_pos.group(1)) < 1 else int(c_pos.group(1))
                     p_pos = "{0:.0f}".format((c_pos + c_pos % 3) / 3.0)
                     effect["HGVSp_Short"] = "p.X" + p_pos + "_splice"
-                    effect["CDS_position"] = re.sub(
-                        r"^-(/\d+)$", str(c_pos) + r"\1", effect["CDS_position"]
-                    )
-                    effect["Protein_position"] = re.sub(
-                        r"^-(/\d+)$", str(p_pos) + r"\1", effect["Protein_position"]
-                    )
+
+                    if effect["CDS_position"] is not None:
+                        effect["CDS_position"] = re.sub(
+                            r"^-(/\d+)$", str(c_pos) + r"\1", effect["CDS_position"]
+                        )
+
+                    if effect["Protein_position"] is not None:
+                        effect["Protein_position"] = re.sub(
+                            r"^-(/\d+)$", str(p_pos) + r"\1", effect["Protein_position"]
+                        )
 
             # Fix HGVSp_Short for Silent mutations, so it mentions the amino-acid and position
             if "HGVSp_Short" in effect and effect["HGVSp_Short"] == "p.=":
