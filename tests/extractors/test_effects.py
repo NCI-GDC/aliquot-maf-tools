@@ -5,6 +5,7 @@ import pytest
 
 from aliquotmaf.subcommands.vcf_to_aliquot.extractors.effects import (
     EffectsExtractor,
+    EffectsExtractor_102,
     SelectOneEffectExtractor,
 )
 
@@ -92,6 +93,62 @@ def test_select_one_effect_extractor(
     res = EffectsExtractor.extract(
         effect_priority, biotype_priority, ANNO_COLUMNS, elist, var_idx
     )
+    all_effects, selected = SelectOneEffectExtractor.extract(
+        res, effect_priority, biotype_priority, custom_enst=enst
+    )
+    assert (selected["Consequence"], selected["BIOTYPE"]) == expected
+
+
+@pytest.mark.parametrize(
+    "effect_priority, biotype_priority, var_idx, enst, expected",
+    [
+        (
+            {"A": 1, "B": 2, "C": 3, "": 10},
+            {"A": 1, "B": 2, "C": 3},
+            1,
+            None,
+            ("A", "A"),
+        ),
+        (
+            {"A": 1, "B": 2, "C": 3, "": 10},
+            {"A": 2, "B": 1, "C": 3},
+            1,
+            None,
+            ("A", "B"),
+        ),
+        (
+            {"A": 1, "B": 2, "C": 3, "": 10},
+            {"A": 2, "B": 3, "C": 1},
+            1,
+            None,
+            ("A", "C"),
+        ),
+        (
+            {"A": 3, "B": 1, "C": 3, "": 10},
+            {"A": 1, "B": 2, "C": 3},
+            1,
+            None,
+            ("B", "A"),
+        ),
+        (
+            {"A": 1, "B": 1, "C": 3, "": 10},
+            {"A": 2, "B": 1, "C": 3},
+            1,
+            None,
+            ("A", "B"),
+        ),
+    ],
+)
+def test_select_one_effect_extractor_vep_102(
+    effect_priority, biotype_priority, var_idx, enst, expected
+):
+    """
+    Tests the extraction of single effect based on the priority data. This is
+    only an extremely simple test, and more work needs to be done to test all
+    the various nuances of the implementation.
+    """
+    elist = create_basic_effects("A", var_idx)
+    res = EffectsExtractor_102.extract(effect_priority, ANNO_COLUMNS, elist, var_idx)
     all_effects, selected = SelectOneEffectExtractor.extract(
         res, effect_priority, biotype_priority, custom_enst=enst
     )
