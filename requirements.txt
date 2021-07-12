@@ -9,8 +9,12 @@
 bioinf-maflib==1.4.0
     # via bioinf-aliquotmaf (setup.py)
 numpy==1.19.5
-    # via pandas
+    # via
+    #   pandas
+    #   pyarrow
 pandas==1.1.5
+    # via bioinf-aliquotmaf (setup.py)
+pyarrow==4.0.1
     # via bioinf-aliquotmaf (setup.py)
 pysam==0.16.0.1
     # via bioinf-aliquotmaf (setup.py)
