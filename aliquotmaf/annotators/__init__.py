@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from .cosmic import CosmicID
 from .dbsnp_validation import DbSnpValidation
-from .entrez import Entrez, Vcf
+from .entrez import MAF_FEATURE, MAF_SYMBOL, Entrez
 from .gnomad import GnomAD
 from .hotspot import Hotspot
 from .mutation_status import MutationStatus

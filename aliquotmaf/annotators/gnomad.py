@@ -5,6 +5,7 @@ Implements the gnomAD annotation.
 from __future__ import absolute_import
 
 import os
+from collections import OrderedDict
 from itertools import repeat
 from sys import path
 
@@ -14,39 +15,24 @@ from aliquotmaf.converters.builder import get_builder
 
 from .annotator import Annotator
 
-GNOMAD_SOURCE_COLUMNS = (
-    'AF_non_cancer_eas',
-    'AF_non_cancer_afr',
-    'AF_non_cancer_ami',
-    'AF_non_cancer_mid',
-    'AF_non_cancer_sas',
-    'AF_non_cancer_nfe',
-    'AF_non_cancer',
-    'AF_non_cancer_amr',
-    'AF_non_cancer_oth',
-    'AF_non_cancer_asj',
-    'AF_non_cancer_fin',
-    'MAX_AF_non_cancer_adj',
-    'POP_MAX_non_cancer_adj',
+CHROM_LIST = ["chr" + str(i) for i in range(1, 23)] + ["chrX", "chrY", "chrM"]
+GNOMAD_SRC_TO_MAF = OrderedDict(
+    AF_non_cancer_eas="gnomAD_non_cancer_EAS_AF",
+    AF_non_cancer_afr="gnomAD_non_cancer_AFR_AF",
+    AF_non_cancer_ami="gnomAD_non_cancer_AMI_AF",
+    AF_non_cancer_mid="gnomAD_non_cancer_MID_AF",
+    AF_non_cancer_sas="gnomAD_non_cancer_SAS_AF",
+    AF_non_cancer_nfe="gnomAD_non_cancer_NFE_AF",
+    AF_non_cancer="gnomAD_non_cancer_AF",
+    AF_non_cancer_amr="gnomAD_non_cancer_AMR_AF",
+    AF_non_cancer_oth="gnomAD_non_cancer_OTH_AF",
+    AF_non_cancer_asj="gnomAD_non_cancer_ASJ_AF",
+    AF_non_cancer_fin="gnomAD_non_cancer_FIN_AF",
+    MAX_AF_non_cancer_adj="gnomAD_non_cancer_MAX_AF_adj",
+    POP_MAX_non_cancer_adj="gnomAD_non_cancer_MAX_AF_POPS_adj",
 )
-
-GNOMAD_MAF_COLUMNS = (
-    "gnomAD_non_cancer_EAS_AF",
-    "gnomAD_non_cancer_AFR_AF",
-    "gnomAD_non_cancer_AMI_AF",
-    "gnomAD_non_cancer_MID_AF",
-    "gnomAD_non_cancer_SAS_AF",
-    "gnomAD_non_cancer_NFE_AF",
-    "gnomAD_non_cancer_AF",
-    "gnomAD_non_cancer_AMR_AF",
-    "gnomAD_non_cancer_OTH_AF",
-    "gnomAD_non_cancer_ASJ_AF",
-    "gnomAD_non_cancer_FIN_AF",
-    "gnomAD_non_cancer_MAX_AF_adj",
-    "gnomAD_non_cancer_MAX_AF_POPS_adj",
-)
-
-GNOMAD_SRC_TO_MAF = dict(zip(GNOMAD_SOURCE_COLUMNS, GNOMAD_MAF_COLUMNS))
+GNOMAD_SOURCE_COLUMNS = GNOMAD_SRC_TO_MAF.keys()
+GNOMAD_MAF_COLUMNS = GNOMAD_SRC_TO_MAF.values()
 
 
 class GnomAD(Annotator):
@@ -55,33 +41,7 @@ class GnomAD(Annotator):
         self.path = refpath
         self.file_template = refpattern
         self.chrom = None
-        self.chrom_list = {
-            'chr1',
-            'chr2',
-            'chr3',
-            'chr4',
-            'chr5',
-            'chr6',
-            'chr7',
-            'chr8',
-            'chr9',
-            'chr10',
-            'chr11',
-            'chr12',
-            'chr13',
-            'chr14',
-            'chr15',
-            'chr16',
-            'chr17',
-            'chr18',
-            'chr19',
-            'chr20',
-            'chr21',
-            'chr22',
-            'chrX',
-            'chrY',
-            'chrM',
-        }
+        self.chrom_list = CHROM_LIST
         self.df = None
 
     @classmethod
@@ -124,7 +84,6 @@ class GnomAD(Annotator):
             target = f'{ref}|{alt}'
             for idx, value in vdf['ref_alt'].iteritems():
                 if value == target:
-                    print(idx)
                     return vdf.loc[idx][list(GNOMAD_SOURCE_COLUMNS)].fillna("")
 
     def load_chrom(self, chrom):
@@ -145,8 +104,7 @@ class GnomAD(Annotator):
             vcf_record.chrom, vcf_record.pos, vcf_record.ref, vcf_record.alts[0]
         )
 
-        for source_col in list(GNOMAD_SOURCE_COLUMNS):
-            maf_col = GNOMAD_SRC_TO_MAF[source_col]
+        for source_col, maf_col in GNOMAD_SRC_TO_MAF.items():
             value = str(getattr(grec, source_col))
             default = ''
             if source_col == "POP_MAX_non_cancer_adj":
