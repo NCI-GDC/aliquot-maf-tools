@@ -66,7 +66,7 @@ def test_entrez_symbol_and_feature(
     assert maf_record['Entrez_Gene_Id'].value == 101929983
 
 
-def test_entrez_symbol(
+def test_entrez_symbol_only(
     test_scheme, setup_annotator, get_test_file, get_empty_maf_record,
 ):
 
@@ -82,3 +82,75 @@ def test_entrez_symbol(
     maf_record = annotator.annotate(init_maf_record)
 
     assert maf_record['Entrez_Gene_Id'].value == 101929983
+
+
+def test_feature_only(
+    test_scheme, setup_annotator, get_test_file, get_empty_maf_record,
+):
+
+    # setup annotator
+    json_path = get_test_file("ex_entrez.json")
+    annotator = setup_annotator(test_scheme, entrez_json_file=json_path)
+
+    init_maf_record = get_empty_maf_record
+
+    init_maf_record[MAF_FEATURE] = get_builder(
+        MAF_FEATURE, test_scheme, value='ENST00000436041', default=''
+    )
+
+    # print(test_scheme.column_class('Entrez_Gene_Id').__name__)
+    maf_record = annotator.annotate(init_maf_record)
+
+    assert maf_record['Entrez_Gene_Id'].value == 101929983
+
+
+def test_neither_id_present_in_query(
+    test_scheme, setup_annotator, get_test_file, get_empty_maf_record,
+):
+
+    # setup annotator
+    json_path = get_test_file("ex_entrez.json")
+    annotator = setup_annotator(test_scheme, entrez_json_file=json_path)
+
+    init_maf_record = get_empty_maf_record
+
+    # print(test_scheme.column_class('Entrez_Gene_Id').__name__)
+    maf_record = annotator.annotate(init_maf_record)
+
+    assert maf_record['Entrez_Gene_Id'].value is None
+
+
+def test_symbol_not_present_in_database(
+    test_scheme, setup_annotator, get_test_file, get_empty_maf_record,
+):
+    # setup annotator
+    json_path = get_test_file("ex_entrez.json")
+    annotator = setup_annotator(test_scheme, entrez_json_file=json_path)
+
+    init_maf_record = get_empty_maf_record
+    init_maf_record[MAF_SYMBOL] = get_builder(
+        MAF_SYMBOL, test_scheme, value='NOTAGENE', default=''
+    )
+
+    # print(test_scheme.column_class('Entrez_Gene_Id').__name__)
+    maf_record = annotator.annotate(init_maf_record)
+
+    assert maf_record['Entrez_Gene_Id'].value is None
+
+
+def test_gencode_id_not_present_in_database(
+    test_scheme, setup_annotator, get_test_file, get_empty_maf_record,
+):
+    # setup annotator
+    json_path = get_test_file("ex_entrez.json")
+    annotator = setup_annotator(test_scheme, entrez_json_file=json_path)
+
+    init_maf_record = get_empty_maf_record
+    init_maf_record[MAF_FEATURE] = get_builder(
+        MAF_FEATURE, test_scheme, value='ENST99999999999', default=''
+    )
+
+    # print(test_scheme.column_class('Entrez_Gene_Id').__name__)
+    maf_record = annotator.annotate(init_maf_record)
+
+    assert maf_record['Entrez_Gene_Id'].value is None

@@ -46,15 +46,15 @@ class Entrez(Annotator):
         # try to find match based on HGNC Symbol first
         if MAF_SYMBOL in maf_record:
             ncbi = maf_record[MAF_SYMBOL].value
-            entrez_id = self.ncbi.get(ncbi)
+            entrez_id = self.ncbi.get(ncbi, [0])
         # otherwise try to find match based on Ensembl Transcript ID
         elif MAF_FEATURE in maf_record:
             gencode = maf_record[MAF_FEATURE].value
-            entrez_id = self.gencode.get(gencode)
+            entrez_id = self.gencode.get(gencode, [0])
         # Replicating old VEP entrez filter behavior, if multiple entrez IDs
         # are available just select the first one in the list
         maf_record["Entrez_Gene_Id"] = get_builder(
-            "Entrez_Gene_Id", self.scheme, value=str(entrez_id[0]), default=0
+            "Entrez_Gene_Id", self.scheme, value=str(entrez_id[0]), default='0'
         )
         return maf_record
 

@@ -242,6 +242,10 @@ def test_variant_without_annotation(
     get_test_vcf_record,
     get_empty_maf_record,
 ):
+    '''
+    Test case where query variant as at a position that doesn't exist in
+    gnomad database
+    '''
 
     # setup annotator
     ref_path = get_test_file("gnomad")
@@ -439,3 +443,132 @@ def test_variant_on_nonexistant_chromosome(
     # annotate maf record
     with pytest.raises(KeyError, match=r'Unrecognized contig encountered: .+'):
         maf_record = annotator.annotate(get_empty_maf_record, vcf_record)
+
+
+def test_unannotated_variant_single_annotated_pos(
+    test_scheme,
+    setup_annotator,
+    get_test_file,
+    get_test_vcf_record,
+    get_empty_maf_record,
+):
+    '''
+    Test case where the query variant does not exist in gnomad annotation but
+    one variant is annotated at the same position.
+    '''
+
+    # setup annotator
+    ref_path = get_test_file("gnomad")
+    ref_pattern = 'gnomad_test.{}.feather'
+    annotator = setup_annotator(test_scheme, ref_path, ref_pattern)
+
+    # setup vcf record
+    vcf_record = get_test_vcf_record(
+        chrom="chr1",
+        pos=10123,
+        stop=10123,
+        ref="CCCTAA",
+        alleles=("CCCTAA", "T"),
+        alts=("T",),
+    )
+
+    # annotate maf record
+    maf_record = annotator.annotate(get_empty_maf_record, vcf_record)
+
+    print(
+        [
+            maf_record["gnomAD_non_cancer_EAS_AF"].value,
+            maf_record["gnomAD_non_cancer_AFR_AF"].value,
+            maf_record["gnomAD_non_cancer_AMI_AF"].value,
+            maf_record["gnomAD_non_cancer_MID_AF"].value,
+            maf_record["gnomAD_non_cancer_SAS_AF"].value,
+            maf_record["gnomAD_non_cancer_NFE_AF"].value,
+            maf_record["gnomAD_non_cancer_AF"].value,
+            maf_record["gnomAD_non_cancer_AMR_AF"].value,
+            maf_record["gnomAD_non_cancer_OTH_AF"].value,
+            maf_record["gnomAD_non_cancer_ASJ_AF"].value,
+            maf_record["gnomAD_non_cancer_FIN_AF"].value,
+            maf_record["gnomAD_non_cancer_MAX_AF_adj"].value,
+            maf_record["gnomAD_non_cancer_MAX_AF_POPS_adj"].value,
+        ]
+    )
+
+    assert all(
+        [
+            maf_record["gnomAD_non_cancer_EAS_AF"].value is None,
+            maf_record["gnomAD_non_cancer_AFR_AF"].value is None,
+            maf_record["gnomAD_non_cancer_AMI_AF"].value is None,
+            maf_record["gnomAD_non_cancer_MID_AF"].value is None,
+            maf_record["gnomAD_non_cancer_SAS_AF"].value is None,
+            maf_record["gnomAD_non_cancer_NFE_AF"].value is None,
+            maf_record["gnomAD_non_cancer_AF"].value is None,
+            maf_record["gnomAD_non_cancer_AMR_AF"].value is None,
+            maf_record["gnomAD_non_cancer_OTH_AF"].value is None,
+            maf_record["gnomAD_non_cancer_ASJ_AF"].value is None,
+            maf_record["gnomAD_non_cancer_FIN_AF"].value is None,
+            maf_record["gnomAD_non_cancer_MAX_AF_adj"].value is None,
+            maf_record["gnomAD_non_cancer_MAX_AF_POPS_adj"].value == [],
+        ]
+    )
+
+
+def test_unannotated_variant_multiply_annotated_pos(
+    test_scheme,
+    setup_annotator,
+    get_test_file,
+    get_test_vcf_record,
+    get_empty_maf_record,
+):
+    '''
+    Test case where the query variant does not exist in gnomad annotation but
+    multiple variants are annotated at the same position.
+    '''
+
+    # setup annotator
+    ref_path = get_test_file("gnomad")
+    ref_pattern = 'gnomad_test.{}.feather'
+    annotator = setup_annotator(test_scheme, ref_path, ref_pattern)
+
+    # setup vcf record
+    vcf_record = get_test_vcf_record(
+        chrom="chr1", pos=10126, stop=10126, ref="T", alleles=("T", "AT"), alts=("AT",),
+    )
+
+    # annotate maf record
+    maf_record = annotator.annotate(get_empty_maf_record, vcf_record)
+
+    print(
+        [
+            maf_record["gnomAD_non_cancer_EAS_AF"].value,
+            maf_record["gnomAD_non_cancer_AFR_AF"].value,
+            maf_record["gnomAD_non_cancer_AMI_AF"].value,
+            maf_record["gnomAD_non_cancer_MID_AF"].value,
+            maf_record["gnomAD_non_cancer_SAS_AF"].value,
+            maf_record["gnomAD_non_cancer_NFE_AF"].value,
+            maf_record["gnomAD_non_cancer_AF"].value,
+            maf_record["gnomAD_non_cancer_AMR_AF"].value,
+            maf_record["gnomAD_non_cancer_OTH_AF"].value,
+            maf_record["gnomAD_non_cancer_ASJ_AF"].value,
+            maf_record["gnomAD_non_cancer_FIN_AF"].value,
+            maf_record["gnomAD_non_cancer_MAX_AF_adj"].value,
+            maf_record["gnomAD_non_cancer_MAX_AF_POPS_adj"].value,
+        ]
+    )
+
+    assert all(
+        [
+            maf_record["gnomAD_non_cancer_EAS_AF"].value is None,
+            maf_record["gnomAD_non_cancer_AFR_AF"].value is None,
+            maf_record["gnomAD_non_cancer_AMI_AF"].value is None,
+            maf_record["gnomAD_non_cancer_MID_AF"].value is None,
+            maf_record["gnomAD_non_cancer_SAS_AF"].value is None,
+            maf_record["gnomAD_non_cancer_NFE_AF"].value is None,
+            maf_record["gnomAD_non_cancer_AF"].value is None,
+            maf_record["gnomAD_non_cancer_AMR_AF"].value is None,
+            maf_record["gnomAD_non_cancer_OTH_AF"].value is None,
+            maf_record["gnomAD_non_cancer_ASJ_AF"].value is None,
+            maf_record["gnomAD_non_cancer_FIN_AF"].value is None,
+            maf_record["gnomAD_non_cancer_MAX_AF_adj"].value is None,
+            maf_record["gnomAD_non_cancer_MAX_AF_POPS_adj"].value == [],
+        ]
+    )

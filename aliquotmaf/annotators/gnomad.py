@@ -35,6 +35,10 @@ GNOMAD_SOURCE_COLUMNS = GNOMAD_SRC_TO_MAF.keys()
 GNOMAD_MAF_COLUMNS = GNOMAD_SRC_TO_MAF.values()
 
 
+def empty_gnomad_record():
+    return pd.Series(dict(zip(GNOMAD_SOURCE_COLUMNS, repeat(""))))
+
+
 class GnomAD(Annotator):
     def __init__(self, scheme, refpath, refpattern):
         super().__init__(name="GnomAD", scheme=scheme)
@@ -72,19 +76,28 @@ class GnomAD(Annotator):
         lookup variant record in currently loaded dataframe
         """
         if pos not in self.df.index:
-            # return empty records
-            return pd.Series(dict(zip(GNOMAD_SOURCE_COLUMNS, repeat(""))))
+            # position has no gnomad annotation -> return empty record
+            return empty_gnomad_record()
         vdf = self.df.loc[pos]
         if type(vdf) is pd.Series:
             # single record at that position
-            return vdf[list(GNOMAD_SOURCE_COLUMNS)].fillna("")
+            target = f'{ref}|{alt}'
+            if vdf['ref_alt'] == target:
+                # record matches variant
+                return vdf[list(GNOMAD_SOURCE_COLUMNS)].fillna("")
+            else:
+                # does not match variant
+                return empty_gnomad_record()
         elif type(vdf) is pd.DataFrame:
             # multiple records at that position
             vdf = vdf.reset_index()
             target = f'{ref}|{alt}'
+            # do as little work as possible to find a match
             for idx, value in vdf['ref_alt'].iteritems():
                 if value == target:
                     return vdf.loc[idx][list(GNOMAD_SOURCE_COLUMNS)].fillna("")
+            # failed to find match
+            return empty_gnomad_record()
 
     def load_chrom(self, chrom):
         """

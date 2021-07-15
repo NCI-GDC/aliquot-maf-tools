@@ -46,7 +46,7 @@ class GDC_1_0_0_Aliquot(BaseRunner):
 
         # Schema
         self.options["version"] = "gdc-1.0.0"
-        self.options["annotation"] = "gdc-1.0.0-aliquot"
+        self.options["annotation"] = "gdc-2.0.0-aliquot"
 
         # Annotators
         self.annotators = {
@@ -56,6 +56,8 @@ class GDC_1_0_0_Aliquot(BaseRunner):
             "mutation_status": None,
             "non_tcga_exac": None,
             "hotspots": None,
+            "gnomad": None,
+            "entrez": None,
         }
 
         # Filters
@@ -67,6 +69,7 @@ class GDC_1_0_0_Aliquot(BaseRunner):
             "multiallelic": None,
             "nonexonic": None,
             "offtarget": None,
+            "gnomad": None,
         }
 
     @classmethod
@@ -485,15 +488,16 @@ class GDC_1_0_0_Aliquot(BaseRunner):
         # Generic data
         collection = InputCollection()
         # is this used anywhere??
-        keys = itemgetter("selected_effect", itemgetter("Hugo_Symbol"))
+        # keys = itemgetter("selected_effect", itemgetter("Hugo_Symbol"))
         collection.add(
             column="Hugo_Symbol",
             value=data["selected_effect"].get("Hugo_Symbol"),
             default="Unknown",
         )
-        collection.add(
-            column="Entrez_Gene_Id", value=data["selected_effect"]["Entrez_Gene_Id"]
-        )
+        # This now occurs in an annotator
+        # collection.add(
+        #     column="Entrez_Gene_Id", value=data["selected_effect"]["Entrez_Gene_Id"]
+        # )
         collection.add(column="Center", value=self.options["maf_center"])
         collection.add(column="NCBI_Build", value="GRCh38")
         collection.add(column="Chromosome", value=vcf_record.chrom)
@@ -749,4 +753,4 @@ class GDC_1_0_0_Aliquot(BaseRunner):
 
     @classmethod
     def __tool_name__(cls):
-        return "gdc-1.0.0-aliquot"
+        return "gdc-2.0.0-aliquot"
