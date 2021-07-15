@@ -45,7 +45,6 @@ class GnomAD(Annotator):
         self.path = refpath
         self.file_template = refpattern
         self.chrom = None
-        self.chrom_list = CHROM_LIST
         self.df = None
 
     @classmethod
@@ -103,7 +102,7 @@ class GnomAD(Annotator):
         """
         Load chromosome into memory
         """
-        if chrom in self.chrom_list:
+        if chrom in CHROM_LIST:
             filepath = os.path.join(self.path, self.file_template.format(chrom))
             return pd.read_feather(filepath).set_index('pos')
         else:

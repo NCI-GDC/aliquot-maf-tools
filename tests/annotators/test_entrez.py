@@ -7,7 +7,7 @@ import pytest
 from maflib.column_types import EntrezGeneId, NullableStringColumn, StringColumn
 from maflib.record import MafColumnRecord
 
-from aliquotmaf.annotators import MAF_FEATURE, MAF_SYMBOL, Entrez
+from aliquotmaf.annotators.entrez import MAF_FEATURE, MAF_SYMBOL, Entrez
 from aliquotmaf.converters.builder import get_builder
 
 

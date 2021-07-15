@@ -5,7 +5,6 @@ Implements the Entrez annotation.
 from __future__ import absolute_import
 
 from json import load
-from typing import TextIO
 
 from maflib.schemes import MafScheme
 
@@ -13,7 +12,6 @@ from aliquotmaf.converters.builder import get_builder
 
 from .annotator import Annotator
 
-# maybe expand this to a full schema at some point?
 MAF_SYMBOL: str = 'Hugo_Symbol'
 MAF_FEATURE: str = 'Feature'
 
