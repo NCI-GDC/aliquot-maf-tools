@@ -77,8 +77,10 @@ pyyaml==5.4.1
     #   pre-commit
 requests==2.25.1
     # via detect-secrets
-six==1.15.0
-    # via virtualenv
+six==1.16.0
+    # via
+    #   -c requirements.txt
+    #   virtualenv
 toml==0.10.2
     # via
     #   pre-commit
