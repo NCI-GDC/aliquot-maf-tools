@@ -32,6 +32,10 @@ class Entrez(Annotator):
             tmp = load(fh)
         curr.gencode = tmp['GENCODE']
         curr.ncbi = tmp['NCBI']
+        curr.logger.info(
+            "Loaded {} GENCODE to ENTREZ mappings".format(len(curr.gencode))
+        )
+        curr.logger.info("Loaded {} NCBI to ENTREZ mappings".format(len(curr.gencode)))
         return curr
 
     def annotate(self, maf_record):

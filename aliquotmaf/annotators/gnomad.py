@@ -40,24 +40,35 @@ def empty_gnomad_record():
 
 
 class GnomAD(Annotator):
-    def __init__(self, scheme, refpath, refpattern):
+    def __init__(self, scheme, ref_prefix):
         super().__init__(name="GnomAD", scheme=scheme)
-        self.path = refpath
-        self.file_template = refpattern
+        self.file_template = ref_prefix + "{}.feather"
         self.chrom = None
         self.df = None
 
     @classmethod
-    def setup(cls, scheme, refpath, refpattern):
+    def setup(cls, scheme, ref_prefix):
         """
         Prepare annotation sources
 
-        refpath should point to directory containing annotation files
-        refpattern should be a template with which to create the file names
-            by substituting chromosome names in for {}
-            it should look like:  reference.{}.feather
+        ref_prefix: prefix used to locate reference files it will be prepended
+            to strings in the form of 'chr1.feather' in order to construct
+            the path to the reference files
         """
-        curr = cls(scheme, refpath, refpattern)
+        curr = cls(scheme, ref_prefix)
+        missing = [
+            chr
+            for chr in CHROM_LIST
+            if not os.path.exists(curr.file_template.format(chr))
+        ]
+        if missing is []:
+            curr.logger.warn(
+                "Missing reference files for chromosomes {}".format(missing)
+            )
+        else:
+            curr.logger.info(
+                "Found GnomAD reference files using prefix {}".format(ref_prefix)
+            )
         return curr
 
     def get_gnomad_record(self, chrom, pos, ref, alt):
@@ -103,7 +114,7 @@ class GnomAD(Annotator):
         Load chromosome into memory
         """
         if chrom in CHROM_LIST:
-            filepath = os.path.join(self.path, self.file_template.format(chrom))
+            filepath = self.file_template.format(chrom)
             return pd.read_feather(filepath).set_index('pos')
         else:
             raise KeyError('Unrecognized contig encountered: {}'.format(chrom))

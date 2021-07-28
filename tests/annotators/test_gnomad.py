@@ -2,6 +2,7 @@
 Tests for the ``aliquotmaf.annotators.GnomAD`` class.
 """
 import math
+import os
 from collections import OrderedDict, namedtuple
 
 import pytest
@@ -16,8 +17,8 @@ from aliquotmaf.converters.builder import get_builder
 def setup_annotator():
     created = []
 
-    def _make_annotator(scheme, refpath, refpattern):
-        curr = GnomAD.setup(scheme, refpath, refpattern)
+    def _make_annotator(scheme, ref_prefix):
+        curr = GnomAD.setup(scheme, ref_prefix)
         created.append(curr)
         return curr
 
@@ -50,9 +51,8 @@ def test_scheme(get_test_scheme):
 
 
 def test_setup_gnomad(test_scheme, setup_annotator, get_test_file):
-    ref_path = get_test_file("gnomad")
-    ref_pattern = 'gnomad_test.{}.feather'
-    annotator = setup_annotator(test_scheme, ref_path, ref_pattern)
+    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    annotator = setup_annotator(test_scheme, ref_prefix)
     assert isinstance(annotator, GnomAD)
 
 
@@ -65,9 +65,8 @@ def test_variant_with_maxAF(
 ):
 
     # setup annotator
-    ref_path = get_test_file("gnomad")
-    ref_pattern = 'gnomad_test.{}.feather'
-    annotator = setup_annotator(test_scheme, ref_path, ref_pattern)
+    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
     vcf_record = get_test_vcf_record(
@@ -128,9 +127,8 @@ def test_without_maxAF(
 ):
 
     # setup annotator
-    ref_path = get_test_file("gnomad")
-    ref_pattern = 'gnomad_test.{}.feather'
-    annotator = setup_annotator(test_scheme, ref_path, ref_pattern)
+    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
     vcf_record = get_test_vcf_record(
@@ -177,6 +175,29 @@ def test_without_maxAF(
     )
 
 
+def test_none_keys(
+    test_scheme,
+    setup_annotator,
+    get_test_file,
+    get_test_vcf_record,
+    get_empty_maf_record,
+):
+
+    # setup annotator
+    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    annotator = setup_annotator(test_scheme, ref_prefix)
+
+    # setup vcf record
+    vcf_record = get_test_vcf_record(
+        chrom="chr1", pos=10111, stop=10111, ref="C", alleles=("C", "A"), alts=("A",)
+    )
+
+    # annotate maf record
+    maf_record = annotator.annotate(get_empty_maf_record, vcf_record)
+
+    assert None not in [i for i in maf_record]
+
+
 def test_multiple_variants_at_position(
     test_scheme,
     setup_annotator,
@@ -186,9 +207,8 @@ def test_multiple_variants_at_position(
 ):
 
     # setup annotator
-    ref_path = get_test_file("gnomad")
-    ref_pattern = 'gnomad_test.{}.feather'
-    annotator = setup_annotator(test_scheme, ref_path, ref_pattern)
+    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
     vcf_record = get_test_vcf_record(
@@ -248,9 +268,8 @@ def test_variant_without_annotation(
     '''
 
     # setup annotator
-    ref_path = get_test_file("gnomad")
-    ref_pattern = 'gnomad_test.{}.feather'
-    annotator = setup_annotator(test_scheme, ref_path, ref_pattern)
+    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
     vcf_record = get_test_vcf_record(
@@ -306,9 +325,8 @@ def test_traverse_chromosomes(
 ):
 
     # setup annotator
-    ref_path = get_test_file("gnomad")
-    ref_pattern = 'gnomad_test.{}.feather'
-    annotator = setup_annotator(test_scheme, ref_path, ref_pattern)
+    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    annotator = setup_annotator(test_scheme, ref_prefix)
 
     # record on chr1
     vcf_record = get_test_vcf_record(
@@ -368,9 +386,8 @@ def test_variant_with_multiple_max_pop(
 ):
 
     # setup annotator
-    ref_path = get_test_file("gnomad")
-    ref_pattern = 'gnomad_test.{}.feather'
-    annotator = setup_annotator(test_scheme, ref_path, ref_pattern)
+    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
     vcf_record = get_test_vcf_record(
@@ -426,9 +443,8 @@ def test_variant_on_nonexistant_chromosome(
 ):
 
     # setup annotator
-    ref_path = get_test_file("gnomad")
-    ref_pattern = 'gnomad_test.{}.feather'
-    annotator = setup_annotator(test_scheme, ref_path, ref_pattern)
+    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
     vcf_record = get_test_vcf_record(
@@ -458,9 +474,8 @@ def test_unannotated_variant_single_annotated_pos(
     '''
 
     # setup annotator
-    ref_path = get_test_file("gnomad")
-    ref_pattern = 'gnomad_test.{}.feather'
-    annotator = setup_annotator(test_scheme, ref_path, ref_pattern)
+    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
     vcf_record = get_test_vcf_record(
@@ -525,9 +540,8 @@ def test_unannotated_variant_multiply_annotated_pos(
     '''
 
     # setup annotator
-    ref_path = get_test_file("gnomad")
-    ref_pattern = 'gnomad_test.{}.feather'
-    annotator = setup_annotator(test_scheme, ref_path, ref_pattern)
+    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
     vcf_record = get_test_vcf_record(

@@ -254,7 +254,9 @@ class EffectsExtractor_102(EffectsExtractor):
                 for aa in cls.AA3TO1:
                     hgvs_p_short = hgvs_p_short.replace(aa, cls.AA3TO1[aa])
                 effect["HGVSp_Short"] = hgvs_p_short
-
+            # else:
+            #     # HGVSp_Short column is never established anywhere
+            #     effect["HGVSp_Short"] = ''
             # Fix HGVSp_Short, CDS_position, and Protein_position for splice
             # acceptor/donor variants
             if (
