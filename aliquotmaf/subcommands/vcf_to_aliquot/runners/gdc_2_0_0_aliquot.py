@@ -1,6 +1,5 @@
-"""Main vcf2maf logic for spec gdc-1.0.0-aliquot"""
+"""Main vcf2maf logic for spec gdc-2.0.0-aliquot"""
 import urllib.parse
-from operator import itemgetter
 
 import pysam
 from maflib.header import MafHeader, MafHeaderRecord
@@ -62,14 +61,13 @@ class GDC_2_0_0_Aliquot(BaseRunner):
 
         # Filters
         self.filters = {
-            "common_in_exac": None,
+            "common_in_gnomAD": None,
             "gdc_blacklist": None,
             "normal_depth": None,
             "gdc_pon": None,
             "multiallelic": None,
             "nonexonic": None,
             "offtarget": None,
-            "gnomad": None,
         }
 
     @classmethod
@@ -194,6 +192,13 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         #     help="Flag variants where the allele frequency in any ExAC population "
         #     + "is great than this value as common_in_exac [0.001]",
         # )
+        filt.add_argument(
+            "--gnomad_af_cutoff",
+            default=0.001,
+            type=float,
+            help="Flag variants where the allele frequency in any gnomAD population "
+            + "is greater than this value as common_in_gnomAD [0.001]",
+        )
         filt.add_argument(
             "--gdc_blacklist",
             type=str,
@@ -613,10 +618,11 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         collection.add(column="Sequencing_Phase", value="")
 
         # I don't think this is needed, all of these are created at initialization from the schema columns
-        # anno_set = ("dbSNP_Val_Status", "COSMIC", "CONTEXT", "Mutation_Status")
-        # for i in self._colset - set(collection.columns()):
-        #     if i not in anno_set:
-        #         collection.add(column=i, value=None)
+        # dbSNP_Val_Status needs to remain as column but will always be empty
+        anno_set = ("COSMIC", "CONTEXT", "Mutation_Status")
+        for i in self._colset - set(collection.columns()):
+            if i not in anno_set:
+                collection.add(column=i, value=None)
         collection.transform(self._scheme)
 
         # Generate maf record
@@ -735,6 +741,11 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         # )
 
         self.filters["multiallelic"] = Filters.Multiallelic.setup()
+
+        if self.options["gnomad_af_cutoff"]:
+            self.filters["common_in_gnomAD"] = Filters.FilterGnomAD.setup(
+                self.options["gnomad_af_cutoff"]
+            )
 
         if self.options["gdc_blacklist"]:
             self.filters["gdc_blacklist"] = Filters.GdcBlacklist.setup(
