@@ -79,6 +79,7 @@ class GnomAD(Annotator):
         if chrom is not self.chrom:
             del self.df
             self.df = self.load_chrom(chrom)
+            self.chrom = chrom
         return self.lookup_variant(pos, ref, alt)
 
     def lookup_variant(self, pos, ref, alt) -> pd.Series:

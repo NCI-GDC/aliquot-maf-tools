@@ -49,7 +49,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
 
         # Annotators
         self.annotators = {
-            "dbsnp_priority_db": None,
+            # "dbsnp_priority_db": None,
             "reference_context": None,
             "cosmic_id": None,
             "mutation_status": None,
@@ -146,9 +146,9 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         anno.add_argument(
             "--custom_enst", default=None, help="Optional custom ENST overrides"
         )
-        anno.add_argument(
-            "--dbsnp_priority_db", default=None, help="DBSNP priority sqlite database"
-        )
+        # anno.add_argument(
+        #     "--dbsnp_priority_db", default=None, help="DBSNP priority sqlite database"
+        # )
         anno.add_argument(
             "--reference_fasta", required=True, help="Reference fasta file"
         )
@@ -636,12 +636,12 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         #     raise KeyError("Unexpected keys found: {}".format(foo))
 
         # Annotations
-        if self.annotators["dbsnp_priority_db"]:
-            maf_record = self.annotators["dbsnp_priority_db"].annotate(maf_record)
-        else:
-            maf_record["dbSNP_Val_Status"] = get_builder(
-                "dbSNP_Val_Status", self._scheme, value=None
-            )
+        # if self.annotators["dbsnp_priority_db"]:
+        #     maf_record = self.annotators["dbsnp_priority_db"].annotate(maf_record)
+        # else:
+        maf_record["dbSNP_Val_Status"] = get_builder(
+            "dbSNP_Val_Status", self._scheme, value=None
+        )
 
         if self.annotators["cosmic_id"]:
             maf_record = self.annotators["cosmic_id"].annotate(maf_record, vcf_record)
@@ -665,8 +665,10 @@ class GDC_2_0_0_Aliquot(BaseRunner):
                 "entrez_gene_id", self._scheme, value=0
             )
 
-        if self.annotators["gnomad"]:
-            maf_record = self.annotators["gnomad"].annotate(maf_record, vcf_record)
+        if self.annotators["gnomad_noncancer"]:
+            maf_record = self.annotators["gnomad_noncancer"].annotate(
+                maf_record, vcf_record
+            )
 
         maf_record = self.annotators["reference_context"].annotate(
             maf_record, vcf_record
@@ -702,10 +704,10 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             self.options["reference_context_size"],
         )
 
-        if self.options["dbsnp_priority_db"]:
-            self.annotators["dbsnp_priority_db"] = Annotators.DbSnpValidation.setup(
-                self._scheme, self.options["dbsnp_priority_db"]
-            )
+        # if self.options["dbsnp_priority_db"]:
+        #     self.annotators["dbsnp_priority_db"] = Annotators.DbSnpValidation.setup(
+        #         self._scheme, self.options["dbsnp_priority_db"]
+        #     )
 
         if self.options["cosmic_vcf"]:
             self.annotators["cosmic_id"] = Annotators.CosmicID.setup(
