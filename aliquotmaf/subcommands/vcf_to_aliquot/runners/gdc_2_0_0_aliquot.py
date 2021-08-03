@@ -168,10 +168,16 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             help="Optional map of ensembl transcript IDs and symbols to entrez gene ID",
         )
         # GnomAD-noncancer Annotator
+        # Kyle H commented out due to scalability and performance issues
+        # anno.add_argument(
+        #    "--gnomad_ref_prefix",
+        #    default=None,
+        #    help="prefix for gnomad reference files (feather format); prefix is added to `{chr}.feather`",
+        # )
         anno.add_argument(
-            "--gnomad_ref_prefix",
+            "--gnomad_noncancer_vcf",
             default=None,
-            help="prefix for gnomad reference files (feather format); prefix is added to `{chr}.feather`",
+            help="Path to the bgzipped and tabix-indexed non-cancer gnomAD allele frequency VCF.",
         )
 
         filt = parser.add_argument_group(title="Filtering Options")
@@ -639,7 +645,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
 
         if self.annotators["gnomad_noncancer"]:
             maf_record = self.annotators["gnomad_noncancer"].annotate(
-                maf_record, vcf_record
+                maf_record, vcf_record, data["var_allele_idx"]
             )
 
         maf_record = self.annotators["reference_context"].annotate(
@@ -691,9 +697,15 @@ class GDC_2_0_0_Aliquot(BaseRunner):
                 self._scheme, self.options["entrez_gene_id_json"]
             )
 
-        if self.options["gnomad_ref_prefix"]:
-            self.annotators["gnomad_noncancer"] = Annotators.GnomAD.setup(
-                self._scheme, self.options["gnomad_ref_prefix"]
+        # Commented out for now due to performance
+        # if self.options["gnomad_ref_prefix"]:
+        #    self.annotators["gnomad_noncancer"] = Annotators.GnomAD_VCF.setup(
+        #        self._scheme, self.options["gnomad_ref_prefix"]
+        #    )
+
+        if self.options["gnomad_noncancer_vcf"]:
+            self.annotators["gnomad_noncancer"] = Annotators.GnomAD_VCF.setup(
+                self._scheme, self.options["gnomad_noncancer_vcf"]
             )
 
     def setup_filters(self):

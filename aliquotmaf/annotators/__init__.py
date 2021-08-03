@@ -4,6 +4,7 @@ from .cosmic import CosmicID
 from .dbsnp_validation import DbSnpValidation
 from .entrez import Entrez
 from .gnomad import GnomAD
+from .gnomad_vcf import GnomAD_VCF
 from .hotspot import Hotspot
 from .mutation_status import MutationStatus
 from .nontcga_exac import NonTcgaExac
@@ -18,4 +19,5 @@ __all__ = [
     Hotspot,
     Entrez,
     GnomAD,
+    GnomAD_VCF,
 ]
