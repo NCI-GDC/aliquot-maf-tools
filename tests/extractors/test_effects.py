@@ -16,6 +16,10 @@ ANNO_COLUMNS = "Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature|BIOTY
     "|"
 )
 
+ANNO_COLUMNS_102 = "Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature|BIOTYPE|EXON|INTRON|HGVSc|HGVSp|cDNA_position|CDS_position|Protein_position|Amino_acids|Codons|Existing_variation|ALLELE_NUM|DISTANCE|STRAND|FLAGS|PICK|VARIANT_CLASS|MINIMISED|SYMBOL_SOURCE|HGNC_ID|CANONICAL|MANE|TSL|APPRIS|CCDS|ENSP|SWISSPROT|TREMBL|UNIPARC|UNIPROT_ISOFORM|RefSeq|GENE_PHENO|SIFT|PolyPhen|DOMAINS|miRNA|HGVS_OFFSET|AF|AFR_AF|AMR_AF|EAS_AF|EUR_AF|SAS_AF|AA_AF|EA_AF|gnomAD_AF|gnomAD_AFR_AF|gnomAD_AMR_AF|gnomAD_ASJ_AF|gnomAD_EAS_AF|gnomAD_FIN_AF|gnomAD_NFE_AF|gnomAD_OTH_AF|gnomAD_SAS_AF|MAX_AF|MAX_AF_POPS|CLIN_SIG|SOMATIC|PHENO|PUBMED|MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE|TRANSCRIPTION_FACTORS".split(
+    "|"
+)
+
 
 def create_basic_effects(allele, allele_num):
     lst = []
@@ -148,7 +152,9 @@ def test_select_one_effect_extractor_vep_102(
     the various nuances of the implementation.
     """
     elist = create_basic_effects("A", var_idx)
-    res = EffectsExtractor_102.extract(effect_priority, ANNO_COLUMNS, elist, var_idx)
+    res = EffectsExtractor_102.extract(
+        effect_priority, ANNO_COLUMNS_102, elist, var_idx
+    )
     all_effects, selected = SelectOneEffectExtractor.extract(
         res, effect_priority, biotype_priority, custom_enst=enst
     )
