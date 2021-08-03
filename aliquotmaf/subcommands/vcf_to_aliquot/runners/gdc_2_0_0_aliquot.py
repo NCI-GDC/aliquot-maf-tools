@@ -49,11 +49,9 @@ class GDC_2_0_0_Aliquot(BaseRunner):
 
         # Annotators
         self.annotators = {
-            # "dbsnp_priority_db": None,
             "reference_context": None,
             "cosmic_id": None,
             "mutation_status": None,
-            "non_tcga_exac": None,
             "hotspots": None,
             "gnomad": None,
             "entrez": None,
@@ -146,9 +144,6 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         anno.add_argument(
             "--custom_enst", default=None, help="Optional custom ENST overrides"
         )
-        # anno.add_argument(
-        #     "--dbsnp_priority_db", default=None, help="DBSNP priority sqlite database"
-        # )
         anno.add_argument(
             "--reference_fasta", required=True, help="Reference fasta file"
         )
@@ -165,11 +160,6 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         anno.add_argument(
             "--cosmic_vcf", default=None, help="Optional COSMIC VCF for annotating"
         )
-        # anno.add_argument(
-        #     "--non_tcga_exac_vcf",
-        #     default=None,
-        #     help="Optional non-TCGA ExAC VCF for annotating and filtering",
-        # )
         anno.add_argument("--hotspot_tsv", default=None, help="Optional hotspot TSV")
         # Entrez gene_id Annotator
         anno.add_argument(
@@ -185,13 +175,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         )
 
         filt = parser.add_argument_group(title="Filtering Options")
-        # filt.add_argument(
-        #     "--exac_freq_cutoff",
-        #     default=0.001,
-        #     type=float,
-        #     help="Flag variants where the allele frequency in any ExAC population "
-        #     + "is great than this value as common_in_exac [0.001]",
-        # )
+
         filt.add_argument(
             "--gnomad_af_cutoff",
             default=0.001,
@@ -492,17 +476,13 @@ class GDC_2_0_0_Aliquot(BaseRunner):
 
         # Generic data
         collection = InputCollection()
-        # is this used anywhere??
-        # keys = itemgetter("selected_effect", itemgetter("Hugo_Symbol"))
+
         collection.add(
             column="Hugo_Symbol",
             value=data["selected_effect"].get("Hugo_Symbol"),
             default="Unknown",
         )
-        # This now occurs in an annotator
-        # collection.add(
-        #     column="Entrez_Gene_Id", value=data["selected_effect"]["Entrez_Gene_Id"]
-        # )
+
         collection.add(column="Center", value=self.options["maf_center"])
         collection.add(column="NCBI_Build", value="GRCh38")
         collection.add(column="Chromosome", value=vcf_record.chrom)
@@ -636,9 +616,6 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         #     raise KeyError("Unexpected keys found: {}".format(foo))
 
         # Annotations
-        # if self.annotators["dbsnp_priority_db"]:
-        #     maf_record = self.annotators["dbsnp_priority_db"].annotate(maf_record)
-        # else:
         maf_record["dbSNP_Val_Status"] = get_builder(
             "dbSNP_Val_Status", self._scheme, value=None
         )
@@ -647,11 +624,6 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             maf_record = self.annotators["cosmic_id"].annotate(maf_record, vcf_record)
         else:
             maf_record["COSMIC"] = get_builder("COSMIC", self._scheme, value=None)
-
-        # if self.annotators["non_tcga_exac"]:
-        #     maf_record = self.annotators["non_tcga_exac"].annotate(
-        #         maf_record, vcf_record, var_allele_idx=data["var_allele_idx"]
-        #     )
 
         if self.annotators["hotspots"]:
             maf_record = self.annotators["hotspots"].annotate(maf_record)
@@ -704,20 +676,10 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             self.options["reference_context_size"],
         )
 
-        # if self.options["dbsnp_priority_db"]:
-        #     self.annotators["dbsnp_priority_db"] = Annotators.DbSnpValidation.setup(
-        #         self._scheme, self.options["dbsnp_priority_db"]
-        #     )
-
         if self.options["cosmic_vcf"]:
             self.annotators["cosmic_id"] = Annotators.CosmicID.setup(
                 self._scheme, self.options["cosmic_vcf"]
             )
-
-        # if self.options["non_tcga_exac_vcf"]:
-        #     self.annotators["non_tcga_exac"] = Annotators.NonTcgaExac.setup(
-        #         self._scheme, self.options["non_tcga_exac_vcf"]
-        #     )
 
         if self.options["hotspot_tsv"]:
             self.annotators["hotspots"] = Annotators.Hotspot.setup(
@@ -738,9 +700,6 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         """
         Sets up all filter classes.
         """
-        # self.filters["common_in_exac"] = Filters.ExAC.setup(
-        #     self.options["exac_freq_cutoff"]
-        # )
 
         self.filters["multiallelic"] = Filters.Multiallelic.setup()
 
