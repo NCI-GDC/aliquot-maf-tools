@@ -14,7 +14,7 @@ PACKAGE = "aliquotmaf"
 PYPI_REPO = "bioinf-{}".format(PACKAGE)
 GIT_REPO_URL = "https://github.com/NCI-GDC/{}".format(GIT_REPO)
 
-INSTALL_REQUIRES = ["bioinf-maflib", "pysam", "pandas", "pyarrow==4.0.*"]
+INSTALL_REQUIRES = ["bioinf-maflib>=1.5.0", "pysam", "pandas", "pyarrow==4.0.*"]
 
 TESTS_REQUIRE = [
     "mock",
