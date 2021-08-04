@@ -4,6 +4,7 @@ Subcommand for masking/filtering a merged aliquot MAF.
 from aliquotmaf.subcommands.base import Subcommand
 from aliquotmaf.subcommands.mask_merged_aliquot.runners import (
     GDC_1_0_0_Aliquot_Merged_Masked,
+    GDC_2_0_0_Aliquot_Merged_Masked,
 )
 
 
@@ -25,6 +26,7 @@ class MaskMergedAliquotMaf(Subcommand):
         subparsers.required = True
 
         GDC_1_0_0_Aliquot_Merged_Masked.add(subparsers=subparsers)
+        GDC_2_0_0_Aliquot_Merged_Masked.add(subparsers=subparsers)
 
     @classmethod
     def __get_description__(cls):
