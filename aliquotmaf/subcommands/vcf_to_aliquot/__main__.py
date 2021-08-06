@@ -2,7 +2,10 @@
 Subcommand for converting a VEP annotated VCF to a raw aliquot MAF.
 """
 from aliquotmaf.subcommands.base import Subcommand
-from aliquotmaf.subcommands.vcf_to_aliquot.runners import GDC_2_0_0_Aliquot
+from aliquotmaf.subcommands.vcf_to_aliquot.runners import (
+    GDC_1_0_0_Aliquot,
+    GDC_2_0_0_Aliquot,
+)
 
 
 class VcfToAliquotMaf(Subcommand):
@@ -22,6 +25,7 @@ class VcfToAliquotMaf(Subcommand):
         subparsers = parser.add_subparsers(dest="subcommand")
         subparsers.required = True
 
+        GDC_1_0_0_Aliquot.add(subparsers=subparsers)
         GDC_2_0_0_Aliquot.add(subparsers=subparsers)
 
     @classmethod
