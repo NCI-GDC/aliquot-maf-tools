@@ -61,7 +61,7 @@ class GnomAD(Annotator):
             for chr in CHROM_LIST
             if not os.path.exists(curr.file_template.format(chr))
         ]
-        if missing is []:
+        if not missing:
             curr.logger.warn(
                 "Missing reference files for chromosomes {}".format(missing)
             )
@@ -90,7 +90,7 @@ class GnomAD(Annotator):
             # position has no gnomad annotation -> return empty record
             return empty_gnomad_record()
         vdf = self.df.loc[pos]
-        if type(vdf) is pd.Series:
+        if isinstance(vdf, pd.Series):
             # single record at that position
             target = f'{ref}|{alt}'
             if vdf['ref_alt'] == target:
@@ -99,7 +99,7 @@ class GnomAD(Annotator):
             else:
                 # does not match variant
                 return empty_gnomad_record()
-        elif type(vdf) is pd.DataFrame:
+        elif isinstance(vdf, pd.DataFrame):
             # multiple records at that position
             vdf = vdf.reset_index()
             target = f'{ref}|{alt}'
