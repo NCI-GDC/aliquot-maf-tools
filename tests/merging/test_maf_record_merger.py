@@ -74,6 +74,10 @@ def test_record_merge_3(
         assert result["n_depth"].value == 14
         assert result["n_ref_count"].value == 14
         assert result["n_alt_count"].value == 0
+        assert result["RNA_Support"].value.value == "Unknown"
+        assert result["RNA_depth"].value is None
+        assert result["RNA_ref_count"].value is None
+        assert result["RNA_alt_count"].value is None
 
 
 def test_record_merge_4(
