@@ -41,6 +41,9 @@ class GnomAD_VCF(Annotator):
 
     @classmethod
     def setup(cls, scheme, source):
+        """
+        Setup with a scheme object and the path to the gnomAD non-cancer VCF.
+        """
         curr = cls(scheme, source)
         curr.f = pysam.VariantFile(curr.source)
         return curr
@@ -59,8 +62,8 @@ class GnomAD_VCF(Annotator):
                 and vcf_record.ref == record.ref
                 and alt in record.alts
             ):
+                found = True
                 for source_col, maf_col in GNOMAD_SRC_TO_MAF.items():
-                    found = True
                     value = record.info.get(source_col)
                     default = ''
 
@@ -68,7 +71,7 @@ class GnomAD_VCF(Annotator):
                         value = list(value)
                         default = []
 
-                    elif type(value) == tuple:
+                    elif isinstance(value, tuple):
                         value = value[0]
 
                     maf_record[maf_col] = get_builder(
