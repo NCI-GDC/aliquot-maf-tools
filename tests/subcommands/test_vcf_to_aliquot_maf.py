@@ -27,7 +27,7 @@ def test_validation_tumor_only():
         "./fake.vcf.gz",
         "--output_maf",
         "./fake.maf.gz",
-        "gdc-1.0.0-aliquot",
+        "gdc-2.0.0-aliquot",
         "--caller_id",
         "mutect",
         "--src_vcf_uuid",

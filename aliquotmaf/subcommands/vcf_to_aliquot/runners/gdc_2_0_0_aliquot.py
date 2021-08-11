@@ -1,6 +1,5 @@
-"""Main vcf2maf logic for spec gdc-1.0.0-aliquot"""
+"""Main vcf2maf logic for spec gdc-2.0.0-aliquot"""
 import urllib.parse
-from operator import itemgetter
 
 import pysam
 from maflib.header import MafHeader, MafHeaderRecord
@@ -30,9 +29,9 @@ from aliquotmaf.subcommands.utils import (
 from aliquotmaf.subcommands.vcf_to_aliquot.runners import BaseRunner
 
 
-class GDC_1_0_0_Aliquot(BaseRunner):
+class GDC_2_0_0_Aliquot(BaseRunner):
     def __init__(self, options=dict()):
-        super(GDC_1_0_0_Aliquot, self).__init__(options)
+        super(GDC_2_0_0_Aliquot, self).__init__(options)
 
         # Load the resource files
         self.logger.info("Loading priority files")
@@ -50,11 +49,9 @@ class GDC_1_0_0_Aliquot(BaseRunner):
 
         # Annotators
         self.annotators = {
-            "dbsnp_priority_db": None,
             "reference_context": None,
             "cosmic_id": None,
             "mutation_status": None,
-            "non_tcga_exac": None,
             "hotspots": None,
             "gnomad": None,
             "entrez": None,
@@ -62,14 +59,13 @@ class GDC_1_0_0_Aliquot(BaseRunner):
 
         # Filters
         self.filters = {
-            "common_in_exac": None,
+            "common_in_gnomAD": None,
             "gdc_blacklist": None,
             "normal_depth": None,
             "gdc_pon": None,
             "multiallelic": None,
             "nonexonic": None,
             "offtarget": None,
-            "gnomad": None,
         }
 
     @classmethod
@@ -149,9 +145,6 @@ class GDC_1_0_0_Aliquot(BaseRunner):
             "--custom_enst", default=None, help="Optional custom ENST overrides"
         )
         anno.add_argument(
-            "--dbsnp_priority_db", default=None, help="DBSNP priority sqlite database"
-        )
-        anno.add_argument(
             "--reference_fasta", required=True, help="Reference fasta file"
         )
         anno.add_argument(
@@ -167,11 +160,6 @@ class GDC_1_0_0_Aliquot(BaseRunner):
         anno.add_argument(
             "--cosmic_vcf", default=None, help="Optional COSMIC VCF for annotating"
         )
-        anno.add_argument(
-            "--non_tcga_exac_vcf",
-            default=None,
-            help="Optional non-TCGA ExAC VCF for annotating and filtering",
-        )
         anno.add_argument("--hotspot_tsv", default=None, help="Optional hotspot TSV")
         # Entrez gene_id Annotator
         anno.add_argument(
@@ -180,24 +168,26 @@ class GDC_1_0_0_Aliquot(BaseRunner):
             help="Optional map of ensembl transcript IDs and symbols to entrez gene ID",
         )
         # GnomAD-noncancer Annotator
+        # Kyle H commented out due to scalability and performance issues
+        # anno.add_argument(
+        #    "--gnomad_ref_prefix",
+        #    default=None,
+        #    help="prefix for gnomad reference files (feather format); prefix is added to `{chr}.feather`",
+        # )
         anno.add_argument(
-            "--gnomad_ref_path",
+            "--gnomad_noncancer_vcf",
             default=None,
-            help="Path to directory containing GnomAD non-cancer AF reference",
-        )
-        anno.add_argument(
-            "--gnomad_ref_pattern",
-            default="non_cancer.gnomad.genomes.v3.1.1.gdc.{}.feather",
-            help="Filename pattern that can be used to compose the reference file names",
+            help="Path to the bgzipped and tabix-indexed non-cancer gnomAD allele frequency VCF.",
         )
 
         filt = parser.add_argument_group(title="Filtering Options")
+
         filt.add_argument(
-            "--exac_freq_cutoff",
+            "--gnomad_af_cutoff",
             default=0.001,
             type=float,
-            help="Flag variants where the allele frequency in any ExAC population "
-            + "is great than this value as common_in_exac [0.001]",
+            help="Flag variants where the allele frequency in any gnomAD population "
+            + "is greater than this value as common_in_gnomAD [0.001]",
         )
         filt.add_argument(
             "--gdc_blacklist",
@@ -346,6 +336,12 @@ class GDC_1_0_0_Aliquot(BaseRunner):
                     vcf_record, data, is_tumor_only, line_number=line
                 )
 
+                # badkeys = set(maf_record.keys()) - set(self._columns)
+                # if badkeys is not set():
+
+                #     raise KeyError("Unexpected keys {k}: {v} found in maf_record".format(
+                #         k=badkeys, v=maf_record[list(badkeys)[0]]))
+
                 # Add to sorter
                 sorter += maf_record
 
@@ -434,9 +430,8 @@ class GDC_1_0_0_Aliquot(BaseRunner):
         )
 
         # Handle effects
-        effects = Extractors.EffectsExtractor.extract(
+        effects = Extractors.EffectsExtractor_102.extract(
             effect_priority=self.effect_priority,
-            biotype_priority=self.biotype_priority,
             effect_keys=ann_cols,
             effect_list=[
                 urllib.parse.unquote(i).split("|") for i in record.info[vep_key]
@@ -487,17 +482,13 @@ class GDC_1_0_0_Aliquot(BaseRunner):
 
         # Generic data
         collection = InputCollection()
-        # is this used anywhere??
-        # keys = itemgetter("selected_effect", itemgetter("Hugo_Symbol"))
+
         collection.add(
             column="Hugo_Symbol",
             value=data["selected_effect"].get("Hugo_Symbol"),
             default="Unknown",
         )
-        # This now occurs in an annotator
-        # collection.add(
-        #     column="Entrez_Gene_Id", value=data["selected_effect"]["Entrez_Gene_Id"]
-        # )
+
         collection.add(column="Center", value=self.options["maf_center"])
         collection.add(column="NCBI_Build", value="GRCh38")
         collection.add(column="Chromosome", value=vcf_record.chrom)
@@ -586,6 +577,7 @@ class GDC_1_0_0_Aliquot(BaseRunner):
             for k in ["n_depth", "n_ref_count", "n_alt_count"]:
                 collection.add(column=k, value=None)
 
+        # Add other columns from selected_effect if they are canonical in the schema
         for k in data["selected_effect"]:
             if k in self._colset and k not in collection._colset:
                 collection.add(column=k, value=data["selected_effect"][k])
@@ -611,7 +603,9 @@ class GDC_1_0_0_Aliquot(BaseRunner):
         collection.add(column="BAM_File", value="")
         collection.add(column="Sequencing_Phase", value="")
 
-        anno_set = ("dbSNP_Val_Status", "COSMIC", "CONTEXT", "Mutation_Status")
+        # I don't think this is needed, all of these are created at initialization from the schema columns
+        # dbSNP_Val_Status needs to remain as column but will always be empty
+        anno_set = ("COSMIC", "CONTEXT", "Mutation_Status")
         for i in self._colset - set(collection.columns()):
             if i not in anno_set:
                 collection.add(column=i, value=None)
@@ -622,23 +616,20 @@ class GDC_1_0_0_Aliquot(BaseRunner):
         for i in collection:
             maf_record += i.transformed
 
+        # # check if None introduced before here <------ DEBUG
+        # foo = set(maf_record.keys()) - set(self._columns)
+        # if len(foo) != 0:
+        #     raise KeyError("Unexpected keys found: {}".format(foo))
+
         # Annotations
-        if self.annotators["dbsnp_priority_db"]:
-            maf_record = self.annotators["dbsnp_priority_db"].annotate(maf_record)
-        else:
-            maf_record["dbSNP_Val_Status"] = get_builder(
-                "dbSNP_Val_Status", self._scheme, value=None
-            )
+        maf_record["dbSNP_Val_Status"] = get_builder(
+            "dbSNP_Val_Status", self._scheme, value=None
+        )
 
         if self.annotators["cosmic_id"]:
             maf_record = self.annotators["cosmic_id"].annotate(maf_record, vcf_record)
         else:
             maf_record["COSMIC"] = get_builder("COSMIC", self._scheme, value=None)
-
-        if self.annotators["non_tcga_exac"]:
-            maf_record = self.annotators["non_tcga_exac"].annotate(
-                maf_record, vcf_record, var_allele_idx=data["var_allele_idx"]
-            )
 
         if self.annotators["hotspots"]:
             maf_record = self.annotators["hotspots"].annotate(maf_record)
@@ -650,6 +641,11 @@ class GDC_1_0_0_Aliquot(BaseRunner):
         else:
             maf_record["Entrez_Gene_Id"] = get_builder(
                 "entrez_gene_id", self._scheme, value=0
+            )
+
+        if self.annotators["gnomad_noncancer"]:
+            maf_record = self.annotators["gnomad_noncancer"].annotate(
+                maf_record, vcf_record, data["var_allele_idx"]
             )
 
         maf_record = self.annotators["reference_context"].annotate(
@@ -686,19 +682,9 @@ class GDC_1_0_0_Aliquot(BaseRunner):
             self.options["reference_context_size"],
         )
 
-        if self.options["dbsnp_priority_db"]:
-            self.annotators["dbsnp_priority_db"] = Annotators.DbSnpValidation.setup(
-                self._scheme, self.options["dbsnp_priority_db"]
-            )
-
         if self.options["cosmic_vcf"]:
             self.annotators["cosmic_id"] = Annotators.CosmicID.setup(
                 self._scheme, self.options["cosmic_vcf"]
-            )
-
-        if self.options["non_tcga_exac_vcf"]:
-            self.annotators["non_tcga_exac"] = Annotators.NonTcgaExac.setup(
-                self._scheme, self.options["non_tcga_exac_vcf"]
             )
 
         if self.options["hotspot_tsv"]:
@@ -711,22 +697,28 @@ class GDC_1_0_0_Aliquot(BaseRunner):
                 self._scheme, self.options["entrez_gene_id_json"]
             )
 
-        if self.options["gnomad_ref_path"]:
-            self.annotators["gnomad_noncancer"] = Annotators.GnomAD.setup(
-                self._scheme,
-                self.options["gnomad_ref_path"],
-                self.options["gnomad_ref_pattern"],
+        # Commented out for now due to performance
+        # if self.options["gnomad_ref_prefix"]:
+        #    self.annotators["gnomad_noncancer"] = Annotators.GnomAD_VCF.setup(
+        #        self._scheme, self.options["gnomad_ref_prefix"]
+        #    )
+
+        if self.options["gnomad_noncancer_vcf"]:
+            self.annotators["gnomad_noncancer"] = Annotators.GnomAD_VCF.setup(
+                self._scheme, self.options["gnomad_noncancer_vcf"]
             )
 
     def setup_filters(self):
         """
         Sets up all filter classes.
         """
-        self.filters["common_in_exac"] = Filters.ExAC.setup(
-            self.options["exac_freq_cutoff"]
-        )
 
         self.filters["multiallelic"] = Filters.Multiallelic.setup()
+
+        if self.options["gnomad_af_cutoff"]:
+            self.filters["common_in_gnomAD"] = Filters.FilterGnomAD.setup(
+                self.options["gnomad_af_cutoff"]
+            )
 
         if self.options["gdc_blacklist"]:
             self.filters["gdc_blacklist"] = Filters.GdcBlacklist.setup(

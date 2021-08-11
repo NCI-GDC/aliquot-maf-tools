@@ -254,7 +254,9 @@ class EffectsExtractor_102(EffectsExtractor):
                 for aa in cls.AA3TO1:
                     hgvs_p_short = hgvs_p_short.replace(aa, cls.AA3TO1[aa])
                 effect["HGVSp_Short"] = hgvs_p_short
-
+            else:
+                # HGVSp_Short column is never established anywhere
+                effect["HGVSp_Short"] = ''
             # Fix HGVSp_Short, CDS_position, and Protein_position for splice
             # acceptor/donor variants
             if (
@@ -293,6 +295,15 @@ class EffectsExtractor_102(EffectsExtractor):
             effect["Transcript_ID"] = effect["Feature"]
             effect["Exon_Number"] = effect["EXON"]
             effect["Hugo_Symbol"] = effect["SYMBOL"]
+            effect["TRANSCRIPT_STRAND"] = effect["STRAND"]
+            effect["1000G_AF"] = effect["AF"]
+            effect["1000G_AFR_AF"] = effect["AFR_AF"]
+            effect["1000G_AMR_AF"] = effect["AMR_AF"]
+            effect["1000G_EAS_AF"] = effect["EAS_AF"]
+            effect["1000G_EUR_AF"] = effect["EUR_AF"]
+            effect["1000G_SAS_AF"] = effect["SAS_AF"]
+            effect["ESP_AA_AF"] = effect["AA_AF"]
+            effect["ESP_EA_AF"] = effect["EA_AF"]
 
             # If VEP couldn't find this variant in dbSNP/etc., we'll say it's "novel"
             if effect["Existing_variation"]:
