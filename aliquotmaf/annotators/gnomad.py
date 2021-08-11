@@ -61,7 +61,7 @@ class GnomAD(Annotator):
             for chr in CHROM_LIST
             if not os.path.exists(curr.file_template.format(chr))
         ]
-        if not missing:
+        if missing:
             curr.logger.warn(
                 "Missing reference files for chromosomes {}".format(missing)
             )
