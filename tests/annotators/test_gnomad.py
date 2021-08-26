@@ -3,14 +3,12 @@ Tests for the ``aliquotmaf.annotators.GnomAD`` class.
 """
 import math
 import os
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict
 
 import pytest
 from maflib.column_types import NullableFloatColumn, SequenceOfStrings
-from maflib.record import MafColumnRecord
 
 from aliquotmaf.annotators import GnomAD
-from aliquotmaf.converters.builder import get_builder
 
 
 @pytest.fixture
@@ -218,24 +216,6 @@ def test_multiple_variants_at_position(
     # annotate maf record
     maf_record = annotator.annotate(get_empty_maf_record, vcf_record)
 
-    print(
-        [
-            maf_record["gnomAD_non_cancer_EAS_AF"].value,
-            maf_record["gnomAD_non_cancer_AFR_AF"].value,
-            maf_record["gnomAD_non_cancer_AMI_AF"].value,
-            maf_record["gnomAD_non_cancer_MID_AF"].value,
-            maf_record["gnomAD_non_cancer_SAS_AF"].value,
-            maf_record["gnomAD_non_cancer_NFE_AF"].value,
-            maf_record["gnomAD_non_cancer_AF"].value,
-            maf_record["gnomAD_non_cancer_AMR_AF"].value,
-            maf_record["gnomAD_non_cancer_OTH_AF"].value,
-            maf_record["gnomAD_non_cancer_ASJ_AF"].value,
-            maf_record["gnomAD_non_cancer_FIN_AF"].value,
-            maf_record["gnomAD_non_cancer_MAX_AF_adj"].value,
-            maf_record["gnomAD_non_cancer_MAX_AF_POPS_adj"].value,
-        ]
-    )
-
     assert all(
         [
             math.isclose(maf_record["gnomAD_non_cancer_EAS_AF"].value, 0.000974659),
@@ -262,10 +242,10 @@ def test_variant_without_annotation(
     get_test_vcf_record,
     get_empty_maf_record,
 ):
-    '''
+    """
     Test case where query variant as at a position that doesn't exist in
     gnomad database
-    '''
+    """
 
     # setup annotator
     ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
@@ -278,24 +258,6 @@ def test_variant_without_annotation(
 
     # annotate maf record
     maf_record = annotator.annotate(get_empty_maf_record, vcf_record)
-
-    print(
-        [
-            maf_record["gnomAD_non_cancer_EAS_AF"].value,
-            maf_record["gnomAD_non_cancer_AFR_AF"].value,
-            maf_record["gnomAD_non_cancer_AMI_AF"].value,
-            maf_record["gnomAD_non_cancer_MID_AF"].value,
-            maf_record["gnomAD_non_cancer_SAS_AF"].value,
-            maf_record["gnomAD_non_cancer_NFE_AF"].value,
-            maf_record["gnomAD_non_cancer_AF"].value,
-            maf_record["gnomAD_non_cancer_AMR_AF"].value,
-            maf_record["gnomAD_non_cancer_OTH_AF"].value,
-            maf_record["gnomAD_non_cancer_ASJ_AF"].value,
-            maf_record["gnomAD_non_cancer_FIN_AF"].value,
-            maf_record["gnomAD_non_cancer_MAX_AF_adj"].value,
-            maf_record["gnomAD_non_cancer_MAX_AF_POPS_adj"].value,
-        ]
-    )
 
     assert all(
         [
@@ -468,10 +430,10 @@ def test_unannotated_variant_single_annotated_pos(
     get_test_vcf_record,
     get_empty_maf_record,
 ):
-    '''
+    """
     Test case where the query variant does not exist in gnomad annotation but
     one variant is annotated at the same position.
-    '''
+    """
 
     # setup annotator
     ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
@@ -534,10 +496,10 @@ def test_unannotated_variant_multiply_annotated_pos(
     get_test_vcf_record,
     get_empty_maf_record,
 ):
-    '''
+    """
     Test case where the query variant does not exist in gnomad annotation but
     multiple variants are annotated at the same position.
-    '''
+    """
 
     # setup annotator
     ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
@@ -545,7 +507,12 @@ def test_unannotated_variant_multiply_annotated_pos(
 
     # setup vcf record
     vcf_record = get_test_vcf_record(
-        chrom="chr1", pos=10126, stop=10126, ref="T", alleles=("T", "AT"), alts=("AT",),
+        chrom="chr1",
+        pos=10126,
+        stop=10126,
+        ref="T",
+        alleles=("T", "AT"),
+        alts=("AT",),
     )
 
     # annotate maf record

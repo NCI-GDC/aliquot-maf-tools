@@ -1,7 +1,6 @@
 """
 Main logic for merging raw aliquot MAFs on schema gdc-1.0.0-aliquot-merged.
 """
-import json
 
 from maflib.header import MafHeader
 from maflib.overlap_iter import LocatableOverlapIterator

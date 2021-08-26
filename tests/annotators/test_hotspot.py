@@ -5,7 +5,6 @@ from collections import OrderedDict
 
 import pytest
 from maflib.column_types import NullableStringColumn, NullableYOrN, StringColumn
-from maflib.record import MafColumnRecord
 
 from aliquotmaf.annotators import Hotspot
 from aliquotmaf.converters.builder import get_builder
@@ -48,7 +47,7 @@ def test_hotspot_annotator_no_overlap_1(
     test_scheme, setup_annotator, get_test_file, get_empty_maf_record
 ):
     """
-    Not a hotspot 
+    Not a hotspot
     """
     tsv_path = get_test_file("fake_hotspot.tsv")
     annotator = setup_annotator(test_scheme, source=tsv_path)
@@ -66,7 +65,7 @@ def test_hotspot_annotator_no_overlap_2(
     test_scheme, setup_annotator, get_test_file, get_empty_maf_record
 ):
     """
-    Not a hotspot 
+    Not a hotspot
     """
     tsv_path = get_test_file("fake_hotspot.tsv")
     annotator = setup_annotator(test_scheme, source=tsv_path)
@@ -86,7 +85,7 @@ def test_hotspot_annotator_overlap(
     test_scheme, setup_annotator, get_test_file, get_empty_maf_record
 ):
     """
-    Is a hotspot 
+    Is a hotspot
     """
     tsv_path = get_test_file("fake_hotspot.tsv")
     annotator = setup_annotator(test_scheme, source=tsv_path)

@@ -4,7 +4,6 @@ Builder classes assist in creating a MafColumnRecord.
 import abc
 import sys
 
-import maflib.column_types as coltypes
 from maflib.column import MafColumnRecord
 
 

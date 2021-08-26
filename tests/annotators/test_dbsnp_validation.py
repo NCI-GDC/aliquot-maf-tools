@@ -3,10 +3,8 @@ Tests for the ``aliquotmaf.annotators.DbSnpValidation`` class.
 """
 from collections import OrderedDict
 
-import pysam
 import pytest
 from maflib.column_types import SequenceOfStrings
-from maflib.record import MafColumnRecord
 
 from aliquotmaf.annotators import DbSnpValidation
 from aliquotmaf.converters.builder import get_builder
@@ -47,14 +45,14 @@ def test_annotate_dbsnp(
     db_path = get_test_file("dbsnp_valstatus.db")
     annotator = setup_annotator(test_scheme, source=db_path)
 
-    ## should match
+    # should match
     maf_record = get_empty_maf_record
     maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="rs540")
     maf_record = annotator.annotate(maf_record)
 
     assert maf_record["dbSNP_Val_Status"].value == ["byOtherPop"]
 
-    ## novel should return empty list
+    # novel should return empty list
     maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value="novel")
     maf_record["dbSNP_Val_Status"] = get_builder(
         "dbSNP_Val_Status", test_scheme, value=None
@@ -63,7 +61,7 @@ def test_annotate_dbsnp(
 
     assert maf_record["dbSNP_Val_Status"].value == []
 
-    ## empty should return empty list
+    # empty should return empty list
     maf_record["dbSNP_RS"] = get_builder("dbSNP_RS", test_scheme, value=None)
     maf_record["dbSNP_Val_Status"] = get_builder(
         "dbSNP_Val_Status", test_scheme, value=None

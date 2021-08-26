@@ -39,13 +39,13 @@ def test_setup_normal_depth(setup_filter):
 
 
 @pytest.mark.parametrize(
-    "normal_depth, expected", [(None, False), (7, True), (8, False),]
+    "normal_depth, expected", [(None, False), (7, True), (8, False)]
 )
 def test_normal_depth_filter(
     test_scheme, setup_filter, get_empty_maf_record, normal_depth, expected
 ):
     """
-    Test Normal Depth filter 
+    Test Normal Depth filter
     """
     filterer = setup_filter(7)
     maf_record = get_empty_maf_record

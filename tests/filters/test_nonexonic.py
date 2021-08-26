@@ -59,7 +59,7 @@ def test_nonexonic_filter(
     expected,
 ):
     """
-    Test nonexonic filter 
+    Test nonexonic filter
     """
     bed_file = get_test_file("fake_regions.bed.gz")
     filterer = setup_filter(bed_file)

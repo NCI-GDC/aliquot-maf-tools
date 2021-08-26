@@ -68,7 +68,7 @@ def test_exac_filter_1(test_scheme, setup_filter, get_empty_maf_record):
 
 def test_exac_filter_2(test_scheme, setup_filter, get_empty_maf_record):
     """
-    Test exac filter when all freqs are below cutoff 
+    Test exac filter when all freqs are below cutoff
     """
     cutoff = 0.0004
     filterer = setup_filter(cutoff)
@@ -81,7 +81,7 @@ def test_exac_filter_2(test_scheme, setup_filter, get_empty_maf_record):
 
 def test_exac_filter_3(test_scheme, setup_filter, get_empty_maf_record):
     """
-    Test exac filter when all freqs are exactly cutoff 
+    Test exac filter when all freqs are exactly cutoff
     """
     cutoff = 0.0004
     filterer = setup_filter(cutoff)
@@ -94,7 +94,7 @@ def test_exac_filter_3(test_scheme, setup_filter, get_empty_maf_record):
 
 def test_exac_filter_4(test_scheme, setup_filter, get_empty_maf_record):
     """
-    Test exac filter when all but 1 freqs is above cutoff 
+    Test exac filter when all but 1 freqs is above cutoff
     """
     cutoff = 0.0004
     filterer = setup_filter(cutoff)

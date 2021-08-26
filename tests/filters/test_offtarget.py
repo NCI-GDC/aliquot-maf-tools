@@ -61,7 +61,7 @@ def test_offtarget_filter(
     expected,
 ):
     """
-    Test offtarget filter 
+    Test offtarget filter
     """
     bed_file = [
         get_test_file("fake_regions.bed.gz"),

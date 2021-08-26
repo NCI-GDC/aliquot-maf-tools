@@ -52,7 +52,7 @@ def test_multiallelic_filter(
     test_scheme, setup_filter, get_empty_maf_record, vcf_region, expected
 ):
     """
-    Test multiallelic filter 
+    Test multiallelic filter
     """
     filterer = setup_filter()
     maf_record = get_empty_maf_record
