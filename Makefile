@@ -2,42 +2,38 @@ REPO = aliquot-maf-tools
 
 MODULE = aliquotmaf
 
+# Redirect error when run in container
 COMMIT_HASH:=$(shell git rev-parse HEAD 2>/dev/null)
+GIT_DESCRIBE:=$(shell git describe --tags 2>/dev/null)
 
 DOCKER_REPO := quay.io/ncigdc
 DOCKER_IMAGE_COMMIT := ${DOCKER_REPO}/${REPO}:${COMMIT_HASH}
+DOCKER_IMAGE_DESCRIBE := ${DOCKER_REPO}/${REPO}:${GIT_DESCRIBE}
 DOCKER_IMAGE_LATEST := ${DOCKER_REPO}/${REPO}:latest
 
 TWINE_REPOSITORY_URL?=
-PIP_EXTRA_INDEX_URL?=
 
 .PHONY: version version-* print-*
 version:
-	@echo --- VERSION: ${PYPI_VERSION} ---
+	@python setup.py --version
 
 version-docker:
-	@python setup.py -q print_version --docker
+	@echo ${DOCKER_IMAGE_DESCRIBE}
 
 version-docker-tag:
-	@docker run --rm --entrypoint="make" ${DOCKER_IMAGE_LATEST} "version-docker"
+	@echo
 
 .PHONY: docker-login
 docker-login:
 	docker login -u="${QUAY_USERNAME}" -p="${QUAY_PASSWORD}" quay.io
 
 
-.PHONY: build build-* clean clean-* init init-* lint requirements run version
+.PHONY: init init-*
 init: init-pip init-hooks
-
-# Include next line if publishing to Jenkins
-# --extra-index-url ${TWINE_REPOSITORY_URL}
-init-pip:
+init-pip: init-venv
 	@echo
 	@echo -- Installing pip packages --
-	pip3 install \
-		--no-cache-dir \
-		-r dev-requirements.txt \
-		-r requirements.txt
+	pip-sync requirements.txt dev-requirements.txt
 	python3 setup.py develop
 
 init-hooks:
@@ -47,29 +43,24 @@ init-hooks:
 
 init-venv:
 	@echo
-	PIP_REQUIRE_VIRTUALENV=true pip3 install --upgrade pip-tools
+	PIP_REQUIRE_VIRTUALENV=true python3 -m pip install --upgrade pip pip-tools
 
-clean:
+.PHONY: clean clean-*
+clean: clean-dirs
+clean-dirs:
 	rm -rf ./build/
 	rm -rf ./dist/
 	rm -rf ./*.egg-info/
+	rm -rf ./test-reports/
+	rm -rf ./htmlcov/
 
 clean-docker:
-	@echo "Removing latest image: ${DOCKER_IMAGE_LATEST}"
-	docker rmi -f ${DOCKER_IMAGE_LATEST}
-
-lint:
 	@echo
-	@echo -- Lint --
-	python3 -m flake8 ${MODULE}/
 
-run:
-	bin/run
 
+.PHONY: requirements requirements-*
 requirements: init-venv requirements-prod requirements-dev
-
 requirements-dev:
-	python3 setup.py -q capture_requirements --dev
 	pip-compile -o dev-requirements.txt dev-requirements.in
 
 requirements-prod:
@@ -79,47 +70,50 @@ requirements-prod:
 
 build: build-docker
 
-build-docker:
+build-docker: clean
 	@echo
 	@echo -- Building docker --
 	docker build . \
-		--file ./Dockerfile.multistage \
+		--file ./Dockerfile \
 		--build-arg http_proxy=${PROXY} \
 		--build-arg https_proxy=${PROXY} \
 		-t "${DOCKER_IMAGE_COMMIT}" \
 		-t "${DOCKER_IMAGE_LATEST}"
 
-build-pypi:
+build-pypi: clean
 	@echo
-	@echo Building wheel - ${PYPI_VERSION}
-	python3 setup.py bdist_wheel -b ${MODULE}.egg-info
+	tox -e check_dist
 
-.PHONY: test test-* tox
-test: lint test-unit
-
-tox:
-	@tox
+.PHONY: lint test test-* tox
+test: test-unit
+lint:
+	@echo
+	@echo -- Lint --
+	tox -p -e flake8
 
 test-unit:
+	pytest tests/
+
+test-tox:
 	@echo
 	@echo -- Unit Test --
-	python3 -m pytest --cov-report term-missing \
-		--junitxml=build/unit-test.xml \
-		--cov=${MODULE} \
-		tests/
+	tox
 
 test-docker:
 	@echo
-	@echo -- Running Docker Test --
-	docker run --rm ${DOCKER_IMAGE_LATEST} test
+
+tox:
+	@echo
+	TOX_PARALLEL_NO_SPINNER=1 tox -p --recreate
 
 .PHONY: publish-*
 publish-docker:
-	docker tag ${DOCKER_IMAGE_COMMIT} ${DOCKER_REPO}/${REPO}:${DOCKER_TAG}
+	docker tag ${DOCKER_IMAGE_COMMIT} ${DOCKER_IMAGE_DESCRIBE}
 	docker push ${DOCKER_IMAGE_COMMIT}
-	docker push ${DOCKER_REPO}/${REPO}:${DOCKER_TAG}
+	docker push ${DOCKER_IMAGE_DESCRIBE}
 
 publish-pypi:
 	@echo
 	@echo Publishing wheel
-	python3 -m twine upload $(shell ls -1 dist/*.whl | head -1)
+	@python3 -m pip install --user --upgrade twine
+	python3 -m twine upload dist/*

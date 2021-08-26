@@ -5,10 +5,8 @@ from collections import OrderedDict
 
 import pytest
 from maflib.column_types import NullableFloatColumn
-from maflib.record import MafColumnRecord
 
 from aliquotmaf.annotators import NonTcgaExac
-from aliquotmaf.converters.builder import get_builder
 
 popkeys = ["AFR", "AMR", "EAS", "FIN", "NFE", "OTH", "SAS"]
 
@@ -152,7 +150,7 @@ def test_exac_annotator_4(
     get_empty_maf_record,
 ):
     """
-    SNP should not match due to alleles 
+    SNP should not match due to alleles
     """
     vcf_path = get_test_file("fake_exac.vcf.gz")
     annotator = setup_annotator(test_scheme, source=vcf_path)

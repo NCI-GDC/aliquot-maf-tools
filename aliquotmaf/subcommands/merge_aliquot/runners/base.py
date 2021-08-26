@@ -7,7 +7,6 @@ from abc import ABCMeta, abstractmethod
 from maflib.header import MafHeaderRecord
 
 from aliquotmaf.logger import Logger
-from aliquotmaf.metrics.metrics_collection import MafMetricsCollection
 
 
 class BaseRunner(metaclass=ABCMeta):

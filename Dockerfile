@@ -1,15 +1,22 @@
-FROM quay.io/ncigdc/bio-python:3.6
+FROM quay.io/ncigdc/python36-builder as builder
 
-ENV BINARY=aliquotmaf
-
-COPY ./dist/ /opt
+COPY ./ /opt
 
 WORKDIR /opt
 
-RUN make init-pip \
-  && ln -s /opt/bin/${BINARY} /bin/${BINARY} \
-  && chmod +x /bin/${BINARY}
+RUN pip install tox && tox -p
 
-ENTRYPOINT ["/bin/aliquotmaf"]
+FROM quay.io/ncigdc/python36
+
+COPY --from=builder /opt/dist/*.tar.gz /opt
+COPY requirements.txt /opt
+
+WORKDIR /opt
+
+RUN pip install -r requirements.txt \
+	&& pip install *.tar.gz \
+	&& rm -f *.tar.gz requirements.txt
+
+ENTRYPOINT ["aliquotmaf"]
 
 CMD ["--help"]

@@ -4,10 +4,7 @@ Implements the gnomAD annotation using the gnomAD VCF.
 
 from __future__ import absolute_import
 
-import os
 from collections import OrderedDict
-from itertools import repeat
-from sys import path
 
 import pysam
 

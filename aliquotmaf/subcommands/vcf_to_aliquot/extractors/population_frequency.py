@@ -1,7 +1,6 @@
 """
 Extractor class for population frequency.
 """
-import re
 
 from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
 

@@ -2,15 +2,12 @@
 Tests for the ``aliquotmaf.annotators.GnomAD_VCF`` class.
 """
 import math
-import os
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict
 
 import pytest
 from maflib.column_types import NullableFloatColumn, SequenceOfStrings
-from maflib.record import MafColumnRecord
 
 from aliquotmaf.annotators import GnomAD_VCF
-from aliquotmaf.converters.builder import get_builder
 
 
 @pytest.fixture
@@ -70,7 +67,12 @@ def test_variant_with_maxAF(
 
     # setup vcf record
     vcf_record = get_test_vcf_record(
-        chrom="chr1", pos=10, stop=10, ref="T", alleles=("T", "A"), alts=("A",),
+        chrom="chr1",
+        pos=10,
+        stop=10,
+        ref="T",
+        alleles=("T", "A"),
+        alts=("A",),
     )
 
     # annotate maf record

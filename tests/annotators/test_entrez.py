@@ -1,11 +1,10 @@
 """
 Tests for the ``aliquotmaf.annotators.Cosmic`` class.
 """
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict
 
 import pytest
 from maflib.column_types import EntrezGeneId, NullableStringColumn, StringColumn
-from maflib.record import MafColumnRecord
 
 from aliquotmaf.annotators.entrez import MAF_FEATURE, MAF_SYMBOL, Entrez
 from aliquotmaf.converters.builder import get_builder
@@ -45,7 +44,10 @@ def test_setup_entrez(test_scheme, setup_annotator, get_test_file):
 
 
 def test_entrez_symbol_and_feature(
-    test_scheme, setup_annotator, get_test_file, get_empty_maf_record,
+    test_scheme,
+    setup_annotator,
+    get_test_file,
+    get_empty_maf_record,
 ):
 
     # setup annotator
@@ -67,7 +69,10 @@ def test_entrez_symbol_and_feature(
 
 
 def test_entrez_symbol_only(
-    test_scheme, setup_annotator, get_test_file, get_empty_maf_record,
+    test_scheme,
+    setup_annotator,
+    get_test_file,
+    get_empty_maf_record,
 ):
 
     # setup annotator
@@ -85,7 +90,10 @@ def test_entrez_symbol_only(
 
 
 def test_feature_only(
-    test_scheme, setup_annotator, get_test_file, get_empty_maf_record,
+    test_scheme,
+    setup_annotator,
+    get_test_file,
+    get_empty_maf_record,
 ):
 
     # setup annotator
@@ -105,7 +113,10 @@ def test_feature_only(
 
 
 def test_neither_id_present_in_query(
-    test_scheme, setup_annotator, get_test_file, get_empty_maf_record,
+    test_scheme,
+    setup_annotator,
+    get_test_file,
+    get_empty_maf_record,
 ):
 
     # setup annotator
@@ -121,7 +132,10 @@ def test_neither_id_present_in_query(
 
 
 def test_symbol_not_present_in_database(
-    test_scheme, setup_annotator, get_test_file, get_empty_maf_record,
+    test_scheme,
+    setup_annotator,
+    get_test_file,
+    get_empty_maf_record,
 ):
     # setup annotator
     json_path = get_test_file("ex_entrez.json")
@@ -139,7 +153,10 @@ def test_symbol_not_present_in_database(
 
 
 def test_gencode_id_not_present_in_database(
-    test_scheme, setup_annotator, get_test_file, get_empty_maf_record,
+    test_scheme,
+    setup_annotator,
+    get_test_file,
+    get_empty_maf_record,
 ):
     # setup annotator
     json_path = get_test_file("ex_entrez.json")

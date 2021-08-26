@@ -7,8 +7,6 @@ from aliquotmaf.subcommands.vcf_to_aliquot.extractors.location import (
     LocationDataExtractor,
 )
 
-# VariantAlleleIndexExtractor -> GenotypeAndDepthsExtractor -> LocationDataExtractor -> EffectsExtractor -> SelectOneEffectExtractor -> PopulationFrequencyExtractor -> VariantClassExtractor
-
 
 @pytest.mark.parametrize(
     "ref_allele, var_allele, position, alleles, expected",
@@ -80,7 +78,7 @@ def test_location_data_extractor_nps(
 ):
     """
     Tests the normalization of alleles and postions into the MAF format and
-    the detection of variant types for SNP/MNPs 
+    the detection of variant types for SNP/MNPs
     """
     res = LocationDataExtractor.extract(ref_allele, var_allele, position, alleles)
     assert res == expected
@@ -126,7 +124,7 @@ def test_location_data_extractor_ins(
 ):
     """
     Tests the normalization of alleles and postions into the MAF format and
-    the detection of variant types for insertions 
+    the detection of variant types for insertions
     """
     res = LocationDataExtractor.extract(ref_allele, var_allele, position, alleles)
     assert res == expected
@@ -187,7 +185,7 @@ def test_location_data_extractor_del(
 ):
     """
     Tests the normalization of alleles and postions into the MAF format and
-    the detection of variant types for deletions 
+    the detection of variant types for deletions
     """
     res = LocationDataExtractor.extract(ref_allele, var_allele, position, alleles)
     assert res == expected
@@ -233,7 +231,7 @@ def test_location_data_extractor_indel(
 ):
     """
     Tests the normalization of alleles and postions into the MAF format and
-    the detection of variant types for indels. 
+    the detection of variant types for indels.
     """
     res = LocationDataExtractor.extract(ref_allele, var_allele, position, alleles)
     assert res == expected

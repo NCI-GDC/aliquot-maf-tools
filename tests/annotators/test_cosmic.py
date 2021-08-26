@@ -6,7 +6,6 @@ from collections import OrderedDict, namedtuple
 import pysam
 import pytest
 from maflib.column_types import SequenceOfStrings
-from maflib.record import MafColumnRecord
 
 from aliquotmaf.annotators import CosmicID
 from aliquotmaf.converters.builder import get_builder
@@ -78,7 +77,7 @@ def test_cosmic_snp(
     # simple snp
     record = gen.snp1
 
-    ## setup
+    # setup
     vcf_record = get_test_vcf_record(
         chrom=record.chrom,
         pos=record.pos,
@@ -102,7 +101,7 @@ def test_cosmic_snp(
 
     record = gen.snp2
 
-    ## setup
+    # setup
     vcf_record = get_test_vcf_record(
         chrom=record.chrom,
         pos=record.pos,
@@ -117,7 +116,7 @@ def test_cosmic_snp(
     assert maf_record["COSMIC"].value == ["COSM0003"]
     assert maf_record["dbSNP_RS"].value == []
 
-    ## setup no overlap alleles
+    # setup no overlap alleles
     vcf_record = get_test_vcf_record(
         chrom=record.chrom,
         pos=record.pos,
@@ -132,7 +131,7 @@ def test_cosmic_snp(
     assert maf_record["COSMIC"].value == []
     assert maf_record["dbSNP_RS"].value == ["novel"]
 
-    ## setup no overlap pos
+    # setup no overlap pos
     vcf_record = get_test_vcf_record(
         chrom=record.chrom,
         pos=101,
@@ -164,7 +163,7 @@ def test_cosmic_del(
     # deletion
     record = gen.deletion
 
-    ## setup
+    # setup
     vcf_record = get_test_vcf_record(
         chrom=record.chrom,
         pos=record.pos,
@@ -196,7 +195,7 @@ def test_cosmic_ins(
     # insertion
     record = gen.insertion
 
-    ## setup
+    # setup
     vcf_record = get_test_vcf_record(
         chrom=record.chrom,
         pos=record.pos,
