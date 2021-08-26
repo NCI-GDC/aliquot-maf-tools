@@ -17,6 +17,6 @@ RUN pip install -r requirements.txt \
 	&& pip install *.tar.gz \
 	&& rm -f *.tar.gz requirements.txt
 
-ENTRYPOINT ["aliquotmaf"]
+ENTRYPOINT ["aliquot_maf_tools"]
 
 CMD ["--help"]
