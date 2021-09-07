@@ -6,19 +6,17 @@
 #
 --extra-index-url https://nexus.osdc.io/repository/pypi-all/simple
 
-appdirs==1.4.4
-    # via
-    #   black
-    #   virtualenv
-attrs==20.3.0
+attrs==21.2.0
     # via pytest
-black==21.7b0
+backports.entry-points-selectable==1.1.0
+    # via virtualenv
+black==21.8b0
     # via -r dev-requirements.in
-certifi==2020.12.5
+certifi==2021.5.30
     # via requests
-cfgv==3.2.0
+cfgv==3.3.1
     # via pre-commit
-chardet==4.0.0
+charset-normalizer==2.0.4
     # via requests
 click==8.0.1
     # via black
@@ -28,23 +26,23 @@ dataclasses==0.8
     # via black
 detect-secrets==0.13.1
     # via -r dev-requirements.in
-distlib==0.3.1
+distlib==0.3.2
     # via virtualenv
 filelock==3.0.12
     # via
     #   tox
     #   virtualenv
-flake8==3.9.1
+flake8==3.9.2
     # via
     #   -r dev-requirements.in
     #   flake8-docstrings
 flake8-docstrings==1.6.0
     # via -r dev-requirements.in
-identify==2.2.3
+identify==2.2.13
     # via pre-commit
-idna==2.10
+idna==3.2
     # via requests
-importlib-metadata==4.0.0
+importlib-metadata==4.8.1
     # via
     #   click
     #   flake8
@@ -53,13 +51,13 @@ importlib-metadata==4.0.0
     #   pytest
     #   tox
     #   virtualenv
-importlib-resources==5.1.2
+importlib-resources==5.2.2
     # via
     #   pre-commit
     #   virtualenv
 iniconfig==1.1.1
     # via pytest
-isort==5.8.0
+isort==5.9.3
     # via -r dev-requirements.in
 mccabe==0.6.1
     # via flake8
@@ -73,17 +71,21 @@ mypy-extensions==0.4.3
     #   mypy
 nodeenv==1.6.0
     # via pre-commit
-packaging==20.9
+packaging==21.0
     # via
     #   pytest
     #   tox
 pathspec==0.9.0
     # via black
-pluggy==0.13.1
+platformdirs==2.3.0
+    # via
+    #   black
+    #   virtualenv
+pluggy==1.0.0
     # via
     #   pytest
     #   tox
-pre-commit==2.12.1
+pre-commit==2.15.0
     # via -r dev-requirements.in
 py==1.10.0
     # via
@@ -97,19 +99,19 @@ pyflakes==2.3.1
     # via flake8
 pyparsing==2.4.7
     # via packaging
-pytest==6.2.3
+pytest==6.2.5
     # via
     #   -r dev-requirements.in
     #   pytest-cov
-pytest-cov==2.11.1
+pytest-cov==2.12.1
     # via -r dev-requirements.in
 pyyaml==5.4.1
     # via
     #   detect-secrets
     #   pre-commit
-regex==2021.8.21
+regex==2021.8.28
     # via black
-requests==2.25.1
+requests==2.26.0
     # via detect-secrets
 six==1.16.0
     # via
@@ -123,6 +125,7 @@ toml==0.10.2
     #   mypy
     #   pre-commit
     #   pytest
+    #   pytest-cov
     #   tox
 tomli==1.2.1
     # via black
@@ -132,18 +135,18 @@ typed-ast==1.4.3
     # via
     #   black
     #   mypy
-typing-extensions==3.7.4.3
+typing-extensions==3.10.0.2
     # via
     #   black
     #   importlib-metadata
     #   mypy
-urllib3==1.26.4
+urllib3==1.26.6
     # via requests
-virtualenv==20.4.4
+virtualenv==20.7.2
     # via
     #   pre-commit
     #   tox
-zipp==3.4.1
+zipp==3.5.0
     # via
     #   importlib-metadata
     #   importlib-resources
