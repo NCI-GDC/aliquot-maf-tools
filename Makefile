@@ -85,7 +85,7 @@ build-pypi: clean
 	tox -e check_dist
 
 .PHONY: lint test test-* tox
-test: test-unit
+test: tox
 lint:
 	@echo
 	@echo -- Lint --
