@@ -10,6 +10,7 @@ from maflib.column_types import (
     SequenceOfStrings,
     StringColumn,
     VariantType,
+    YesNoOrUnknown,
     ZeroBasedIntegerColumn,
 )
 from maflib.record import MafRecord
@@ -39,6 +40,10 @@ def test_output_scheme(get_test_scheme):
         ("n_alt_count", NullableZeroBasedIntegerColumn),
         ("extra", NullableStringColumn),
         ("GDC_FILTER", SequenceOfStrings),
+        ("RNA_Support", YesNoOrUnknown),
+        ("RNA_depth", NullableZeroBasedIntegerColumn),
+        ("RNA_ref_count", NullableZeroBasedIntegerColumn),
+        ("RNA_alt_count", NullableZeroBasedIntegerColumn),
         ("callers", SequenceOfStrings),
     ]
 

@@ -2,7 +2,10 @@
 Subcommand for merging single caller raw aliquot MAFs to merged raw MAFs.
 """
 from aliquotmaf.subcommands.base import Subcommand
-from aliquotmaf.subcommands.merge_aliquot.runners import GDC_1_0_0_Aliquot_Merged
+from aliquotmaf.subcommands.merge_aliquot.runners import (
+    GDC_1_0_0_Aliquot_Merged,
+    GDC_2_0_0_Aliquot_Merged,
+)
 
 
 class MergeAliquotMafs(Subcommand):
@@ -20,6 +23,7 @@ class MergeAliquotMafs(Subcommand):
         subparsers.required = True
 
         GDC_1_0_0_Aliquot_Merged.add(subparsers=subparsers)
+        GDC_2_0_0_Aliquot_Merged.add(subparsers=subparsers)
 
     @classmethod
     def __get_description__(cls):

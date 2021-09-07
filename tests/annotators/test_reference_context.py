@@ -67,16 +67,16 @@ def test_reference_context_snp(
     # simple snp
     record = gen.snp
 
-    ## default context
+    # default context
     maf_record = annotator.annotate(get_empty_maf_record, record)
     assert maf_record["CONTEXT"].value == "AGTGGCTCATT"
 
-    ## truncated left context
+    # truncated left context
     annotator.context_size = 12
     maf_record = annotator.annotate(get_empty_maf_record, record)
     assert maf_record["CONTEXT"].value == "CACTAGTGGCTCATTGTAAATG"
 
-    ## truncated both context
+    # truncated both context
     annotator.context_size = 1575
     maf_record = annotator.annotate(get_empty_maf_record, record)
     assert maf_record["CONTEXT"].value == annotator.fa.fetch(region=record.chrom)

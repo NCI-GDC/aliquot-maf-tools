@@ -1,6 +1,6 @@
 import logging
 import os
-from collections import OrderedDict, namedtuple
+from collections import namedtuple
 
 import pysam
 import pytest

@@ -184,6 +184,18 @@ class MafRecordMerger_1_0_0(
                 )
                 maf_dic[column] = get_builder(column, self.scheme, value=vals)
 
+            # NOTE: Not a solution, just a temp place holder until we fully build out the RNA annotator
+            elif column == 'RNA_Support':
+                maf_dic[column] = get_builder(column, self.scheme, value='Unknown')
+
+            # NOTE: Not a solution, just a temp place holder until we fully build out the RNA annotator
+            elif column in (
+                'RNA_ref_count',
+                'RNA_alt_count',
+                'RNA_depth',
+            ):
+                maf_dic[column] = get_builder(column, self.scheme, value=None)
+
             else:
                 maf_dic[column] = selected_caller[column]
 

@@ -3,8 +3,6 @@ MutationStatus annotator. Sets the Germline/Somatic/LOH/Unknown etc status for M
 """
 from __future__ import absolute_import
 
-import pysam
-
 from aliquotmaf.converters.builder import get_builder
 
 from .annotator import Annotator

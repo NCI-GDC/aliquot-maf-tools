@@ -1,5 +1,5 @@
 """
-Tests for functions parsing the VCF headers. 
+Tests for functions parsing the VCF headers.
 """
 import pytest
 
