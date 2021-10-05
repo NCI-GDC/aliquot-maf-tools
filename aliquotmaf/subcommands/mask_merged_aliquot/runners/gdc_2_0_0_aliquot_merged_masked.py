@@ -79,7 +79,7 @@ class GDC_2_0_0_Aliquot_Merged_Masked(GDC_1_0_0_Aliquot_Merged_Masked):
                         other_filts = gfset - hotspot_gdc_set
                         if len(other_filts) == 0:
                             self.write_record(record)
-                        elif len(other_filts - nonexonic_set) == 0 and self.is_slpice(
+                        elif len(other_filts - nonexonic_set) == 0 and self.is_splice(
                             record
                         ):
                             # Rescue splicing if NonExonic
