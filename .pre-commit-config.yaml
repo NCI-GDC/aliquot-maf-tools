@@ -4,7 +4,7 @@ default_language_version:
 
 repos:
   - repo: git@github.com:Yelp/detect-secrets
-    rev: v0.13.1
+    rev: v1.0.3
     hooks:
       - id: detect-secrets
         args: ['--baseline', '.secrets.baseline']
