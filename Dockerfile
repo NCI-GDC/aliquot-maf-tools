@@ -1,4 +1,4 @@
-FROM quay.io/ncigdc/python36-builder as builder
+FROM quay.io/ncigdc/python38-builder as builder
 
 COPY ./ /opt
 
@@ -6,7 +6,7 @@ WORKDIR /opt
 
 RUN pip install tox && tox -p
 
-FROM quay.io/ncigdc/python36
+FROM quay.io/ncigdc/python38
 
 COPY --from=builder /opt/dist/*.tar.gz /opt
 COPY requirements.txt /opt
