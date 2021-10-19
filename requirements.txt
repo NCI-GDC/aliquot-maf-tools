@@ -6,7 +6,7 @@
 #
 --extra-index-url https://nexus.osdc.io/repository/pypi-all/simple
 
-bioinf-maflib==1.6.0
+bioinf-maflib==2.0.0
     # via bioinf-aliquotmaf (setup.py)
 numpy==1.19.5
     # via
