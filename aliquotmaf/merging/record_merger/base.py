@@ -1,14 +1,27 @@
 """
 Base Class for merging MAF records.
 """
+import logging
 from abc import ABCMeta, abstractmethod
+from typing import TYPE_CHECKING, Any, Dict, List, Protocol
 
 from aliquotmaf.converters.builder import get_builder
 from aliquotmaf.logger import Logger
 
+if TYPE_CHECKING:
+    from maflib.column import MafColumnRecord
+    from maflib.record import MafRecord
+    from maflib.schemes import MafScheme
 
-class BaseMafRecordMerger(metaclass=ABCMeta):
-    def __init__(self, scheme):
+    from aliquotmaf.merging.overlap_set import OverlapSet
+
+
+class BaseMafRecordMerger(Protocol):
+    logger: logging.Logger
+    scheme: 'MafScheme'
+    columns: Any
+
+    def __init__(self, scheme: 'MafScheme'):
         """
         Initialize the MAF record merging object which has the main `merge_records`
         function to take an `aliquotmaf.merging.overlap_set.OverlapSet`
@@ -22,19 +35,19 @@ class BaseMafRecordMerger(metaclass=ABCMeta):
         self.logger.info("Loading MAF record merger...")
 
     @abstractmethod
-    def caller_order(self):
+    def caller_order(self) -> list:
         """
         :return: a ``list`` of caller names in their order of priority.
         """
 
     @abstractmethod
-    def caller_type_order(self):
+    def caller_type_order(self) -> list:
         """
         :return: a ``list`` of ``tuples`` of the format (caller, variant type)
         in their order of priority.
         """
 
-    def allele_columns(self):
+    def allele_columns(self) -> tuple:
         """
         :return: a ``tuple`` of column names that contain allele information
         """
@@ -46,7 +59,9 @@ class BaseMafRecordMerger(metaclass=ABCMeta):
         )
 
     @abstractmethod
-    def merge_records(self, results, tumor_only=False):
+    def merge_records(
+        self, results: 'OverlapSet', tumor_only: bool = False
+    ) -> List['MafRecord']:
         """
         The main function for merging a MAF recrods from an
         `aliquotmaf.merging.overlap_set.OverlapSet` instance. The idea is to
@@ -59,7 +74,9 @@ class BaseMafRecordMerger(metaclass=ABCMeta):
         :return: a list of merged `maflib.maf_record.MafRecord` instance
         """
 
-    def standardize_alleles(self, maf_dic, tumor_only=False):
+    def standardize_alleles(
+        self, maf_dic: Dict[str, 'MafColumnRecord'], tumor_only: bool = False
+    ) -> Dict[str, 'MafColumnRecord']:
         """
         Helper utility to standardize all alleles to Ref/Alt tumor and
         Ref/Ref normal.
@@ -77,22 +94,20 @@ class BaseMafRecordMerger(metaclass=ABCMeta):
             "Tumor_Seq_Allele2", self.scheme, value=alt
         )
         if tumor_only is False:
-            maf_dic["Match_Norm_Seq_Allele1"] = get_builder(
-                "Match_Norm_Seq_Allele1", self.scheme, value=ref
-            )
-            maf_dic["Match_Norm_Seq_Allele2"] = get_builder(
-                "Match_Norm_Seq_Allele2", self.scheme, value=ref
-            )
+            norm_val = ref
         else:
-            maf_dic["Match_Norm_Seq_Allele1"] = get_builder(
-                "Match_Norm_Seq_Allele1", self.scheme, value=None
-            )
-            maf_dic["Match_Norm_Seq_Allele2"] = get_builder(
-                "Match_Norm_Seq_Allele2", self.scheme, value=None
-            )
+            norm_val = None
+        maf_dic["Match_Norm_Seq_Allele1"] = get_builder(
+            "Match_Norm_Seq_Allele1", self.scheme, value=norm_val
+        )
+        maf_dic["Match_Norm_Seq_Allele2"] = get_builder(
+            "Match_Norm_Seq_Allele2", self.scheme, value=norm_val
+        )
         return maf_dic
 
-    def fix_depths(self, maf_dic, tumor_only=False):
+    def fix_depths(
+        self, maf_dic: Dict[str, 'MafColumnRecord'], tumor_only: bool = False
+    ) -> Dict[str, 'MafColumnRecord']:
         """
         Sets the total depths of tumor/normal to be the sum of the ref and alt
         count columns if the sum of the ref and alt count columns is less than
