@@ -69,7 +69,7 @@ class InputCollection:
 
     def add(
         self,
-        value: str,
+        value: Optional[str],
         column: str,
         default: Optional[str] = None,
         data: Optional[InputData] = None,
