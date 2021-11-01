@@ -2,9 +2,16 @@
 Class containing a set of overlapping records and utilities.
 """
 
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List
+
+from maflib.overlap_iter import LocatableOverlapIterator
+
+if TYPE_CHECKING:
+    from maflib.record import MafRecord
+
 
 class OverlapSet:
-    def __init__(self, result, maf_keys):
+    def __init__(self, result: List[List['MafRecord']], maf_keys: list):
         """
         Container for the results of an iteration of the overlap iterator. The
         results are converted to a dictionary where the caller is the key and the
@@ -13,12 +20,13 @@ class OverlapSet:
         :param result: result from an iteration of `maflib.overlap_iter.LocatableOverlapIterator`
         :param maf_keys: list of callers in same order as results
         """
-        self._data = dict(zip(maf_keys, result))
-        self._locus_allele_map = None
-        self._caller_type_map = None
+        self._data: Dict[str, Any] = dict(zip(maf_keys, result))
         self._has_indels = None
-        self._callers = None
-        self._variant_types = None
+
+        self._callers: List[str]
+        self._locus_allele_map: Dict[str, Dict[str, list]] = {}
+        self._caller_type_map: dict
+        self._variant_types: tuple
 
         self._type_dic = {
             "SNP": "SNP",
@@ -29,13 +37,13 @@ class OverlapSet:
             "INS": "INS",
         }
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Any]:
         """
         Iterate over caller-records dictionary.
         """
         return iter(self._data)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Any:
         """
         Get results from particular caller like a dictionary.
 
@@ -43,7 +51,7 @@ class OverlapSet:
         """
         return self._data[key]
 
-    def is_singleton(self):
+    def is_singleton(self) -> bool:
         """
         Returns ``True`` if only a single variant from a single caller is
         present.
@@ -56,11 +64,11 @@ class OverlapSet:
         return False
 
     @property
-    def callers(self):
+    def callers(self) -> List[str]:
         """
         Returns a list of callers containing an overlapping MAF record.
         """
-        if self._callers is None:
+        if getattr(self, "_callers", None) is None:
             lst = []
             for caller in sorted(self._data):
                 if self._data[caller]:
@@ -69,13 +77,13 @@ class OverlapSet:
         return self._callers
 
     @property
-    def variant_types(self):
+    def variant_types(self) -> tuple:
         """
         Returns a ``tuple`` of variant types detected. The variant types are mapped
         using the self._type_dic dictionary lookup which converts DNP/TNP/ONP to
         MNP.
         """
-        if self._variant_types is None:
+        if getattr(self, "_variant_types", None) is None:
             lst = []
             for caller in self:
                 for record in self[caller]:
@@ -85,41 +93,31 @@ class OverlapSet:
         return self._variant_types
 
     @property
-    def locus_allele_map(self):
+    def locus_allele_map(self) -> Dict[str, Dict[str, list]]:
         """
         Dictionary where the keys are Start_Postion:End_Position:Allele MAF columns
         and values are lists of records.
         """
-        if self._locus_allele_map is None:
-            self._locus_allele_map = {}
+        if getattr(self, "_locus_allele_map", None) is None:
+            locus_allele_map: Dict[str, Dict[str, list]] = {}
             for caller in self._data:
                 for record in self._data[caller]:
-                    key = ":".join(
-                        list(
-                            map(
-                                str,
-                                [
-                                    record["Start_Position"],
-                                    record["End_Position"],
-                                    record["Allele"],
-                                ],
-                            )
-                        )
-                    )
+                    key = f"{record['Start_Position']}:{record['End_Position']}:{record['Allele']}"
                     if key not in self._locus_allele_map:
-                        self._locus_allele_map[key] = {}
-                    if caller not in self._locus_allele_map[key]:
-                        self._locus_allele_map[key][caller] = []
-                    self._locus_allele_map[key][caller].append(record)
+                        locus_allele_map[key] = {}
+                    if caller not in locus_allele_map[key]:
+                        locus_allele_map[key][caller] = []
+                    locus_allele_map[key][caller].append(record)
+            self._locus_allele_map = locus_allele_map
         return self._locus_allele_map
 
     @property
-    def caller_type_map(self):
+    def caller_type_map(self) -> dict:
         """
         Dictionary where the keys are a ``tuple`` of caller and variant types
         mapped using self._type_dic and values are a list of records.
         """
-        if self._caller_type_map is None:
+        if getattr(self, "_caller_type_map", None) is None:
             self._caller_type_map = {}
             for caller in self._data:
                 for record in self._data[caller]:
@@ -130,7 +128,7 @@ class OverlapSet:
                     self._caller_type_map[key].append(record)
         return self._caller_type_map
 
-    def all_single_record(self):
+    def all_single_record(self) -> bool:
         """
         Returns ``True`` if all the callers contain one or zero records.
         """
