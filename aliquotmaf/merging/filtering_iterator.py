@@ -4,31 +4,35 @@ and filtering records before even considering for overlap comparisons. This clas
 should be passed to the ``maflib.overlap_iter.LocatableOverlapIterator`` class.
 """
 
+from typing import Any
 
-class FilteringPeekableIterator:
+from maflib.util import PeekableIterator
+
+
+class FilteringPeekableIterator(PeekableIterator):
     """An iterator that has a `peek()` method.
     All filtering occurs on the __update_peek method.
     """
 
-    def __init__(self, _iter):
+    def __init__(self, _iter: Any):
         self._iter = _iter
         self.__update_peek()
 
-    def __iter__(self):
+    def __iter__(self) -> 'FilteringPeekableIterator':
         return self
 
-    def next(self):
+    def next(self) -> Any:
         """Gets the next record"""
         return self.__next__()
 
-    def __next__(self):
+    def __next__(self) -> Any:
         if self._peek is None:
             raise StopIteration
         to_return = self._peek
         self.__update_peek()
         return to_return
 
-    def __update_peek(self):
+    def __update_peek(self) -> None:
         """
         Filters any variant that:
           - Isn't Somatic
@@ -63,7 +67,7 @@ class FilteringPeekableIterator:
             else:
                 can_skip = False
 
-    def peek(self):
+    def peek(self) -> Any:
         """Returns the next element without consuming it, or None
         if there are no more elements."""
         return self._peek
