@@ -1,26 +1,41 @@
 """Base class for all vcf2maf runners"""
 import datetime
 from abc import ABCMeta, abstractmethod
+from typing import TYPE_CHECKING, List, Optional, Protocol
 
 from maflib.header import MafHeaderRecord
+from maflib.schemes import MafScheme
 
 from aliquotmaf.logger import Logger
 
+if TYPE_CHECKING:
+    from argparse import ArgumentParser, Namespace, _SubParsersAction
 
-class BaseRunner(metaclass=ABCMeta):
-    def __init__(self, options=dict()):
+    from maflib.header import MafHeader
+    from maflib.schemes import MafScheme
+    from maflib.writer import MafWriter
+
+
+class BaseRunner(Protocol):
+    logger: Logger
+    options: dict
+    maf_header: 'MafHeader'
+    maf_writer: 'MafWriter'
+    _scheme: Optional['MafScheme'] = None
+    _columns: Optional[List[str]] = None
+    _colset: Optional[set] = None
+
+    def __init__(self, options: Optional[dict] = None):
         self.logger = Logger.get_logger(self.__class__.__name__)
-        self.options = options
+        self.options = options if options is not None else {}
 
         # Maf stuff
-        self.maf_header = None
-        self.maf_writer = None
         self._scheme = None
         self._columns = None
         self._colset = None
 
     @staticmethod
-    def get_header_date():
+    def get_header_date() -> MafHeaderRecord:
         """
         Returns a MafHeaderRecord of the filedate.
         """
@@ -29,42 +44,42 @@ class BaseRunner(metaclass=ABCMeta):
         )
 
     @classmethod
-    def __validate_options__(cls, options):
+    def __validate_options__(cls, options: 'Namespace') -> None:
         """
         Optional function to validate other options
         """
         pass
 
     @classmethod
-    def __get_description__(cls):
+    def __get_description__(cls) -> Optional[str]:
         """
         Optionally returns description
         """
         return None
 
     @classmethod
-    def from_args(cls, args):
+    def from_args(cls, args: 'Namespace') -> 'BaseRunner':
         cls.__validate_options__(args)
         return cls(options=vars(args))
 
     @abstractmethod
-    def do_work(self):
+    def do_work(self) -> None:
         """Main wrapper function for running vcf2maf"""
 
     @classmethod
     @abstractmethod
-    def __add_arguments__(cls, parser):
+    def __add_arguments__(cls, parser: 'ArgumentParser') -> None:
         """Add the arguments to the parser"""
 
     @classmethod
     @abstractmethod
-    def __tool_name__(cls):
+    def __tool_name__(cls) -> str:
         """
         Tool name to use for the subparser
         """
 
     @classmethod
-    def add(cls, subparsers):
+    def add(cls, subparsers: '_SubParsersAction') -> 'ArgumentParser':
         """Adds the given subcommand to the subprsers."""
         subparser = subparsers.add_parser(
             name=cls.__tool_name__(), description=cls.__get_description__()
