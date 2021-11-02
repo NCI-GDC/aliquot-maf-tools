@@ -2,6 +2,8 @@
 Main logic for merging raw aliquot MAFs on schema gdc-1.0.0-aliquot-merged.
 """
 
+from typing import TYPE_CHECKING, Iterable, Optional
+
 from maflib.header import MafHeader
 from maflib.overlap_iter import LocatableOverlapIterator
 from maflib.reader import MafReader
@@ -18,17 +20,27 @@ from aliquotmaf.merging.overlap_set import OverlapSet
 from aliquotmaf.merging.record_merger.impl.v1_0 import MafRecordMerger_1_0_0
 from aliquotmaf.subcommands.merge_aliquot.runners import BaseRunner
 
+if TYPE_CHECKING:
+    import argparse
+
+    from maflib.schemes import MafScheme
+
+
+MAF_KEYS = ("mutect2", "muse", "vardict", "varscan2", "somaticsniper", "pindel")
+
 
 class GDC_1_0_0_Aliquot_Merged(BaseRunner):
-    def __init__(self, options=dict()):
+    def __init__(self, options: Optional[dict] = None):
         super(GDC_1_0_0_Aliquot_Merged, self).__init__(options)
 
         # Schema
         self.options["version"] = "gdc-1.0.0"
         self.options["annotation"] = "gdc-1.0.0-aliquot-merged"
 
+        self._scheme: 'MafScheme'
+
     @classmethod
-    def __add_arguments__(cls, parser):
+    def __add_arguments__(cls, parser: 'argparse.ArgumentParser') -> None:
         """Add the arguments to the parser"""
         parser.add_argument(
             "--tumor_only", action="store_true", help="If this is a tumor-only MAF"
@@ -56,11 +68,10 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
             + "depths across callers [7]",
         )
 
-    def load_readers(self):
+    def load_readers(self, maf_keys: Iterable[str] = MAF_KEYS) -> None:
         """
         Loads the array of MafReaders and sets the callers list.
         """
-        maf_keys = ["mutect2", "muse", "vardict", "varscan2", "somaticsniper", "pindel"]
 
         for maf_key in maf_keys:
             if self.options[maf_key]:
@@ -73,7 +84,7 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
                 )
                 self.callers.append(maf_key)
 
-    def setup_maf_header(self):
+    def setup_maf_header(self) -> None:
         """
         Sets up the maf header.
         """
@@ -97,7 +108,7 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
         tkey = _hdr["tumor.aliquot"]
         self.maf_header["tumor.aliquot"] = tkey
 
-    def do_work(self):
+    def do_work(self) -> None:
         """Main wrapper function for running protect MAF merging"""
 
         # Reader
@@ -106,7 +117,7 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
         # Header
         self.setup_maf_header()
 
-        self._scheme = self.maf_header.scheme()
+        self._scheme = self.maf_header.scheme()  # type: ignore
         self._columns = get_columns_from_header(self.maf_header)
 
         # Sorter
@@ -166,7 +177,7 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
                             )
 
                         # Add to sorter
-                        sorter += maf_record
+                        sorter += maf_record  # type: ignore
 
                 processed += 1
 
@@ -180,12 +191,12 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
             )
 
             counter = 0
-            for record in sorter:
+            for record in sorter:  # type: ignore
                 if counter > 0 and counter % 1000 == 0:
                     self.logger.info(
                         "Wrote {0} sorted, merged records...".format(counter)
                     )
-                self.maf_writer += record
+                self.maf_writer += record  # type: ignore
                 counter += 1
 
             self.logger.info(
@@ -202,5 +213,5 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
                 self.maf_writer.close()
 
     @classmethod
-    def __tool_name__(cls):
+    def __tool_name__(cls) -> str:
         return "gdc-1.0.0-aliquot-merged"
