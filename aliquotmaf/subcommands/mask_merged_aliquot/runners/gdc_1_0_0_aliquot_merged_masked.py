@@ -3,9 +3,12 @@ Main logic for filtering merged aliquot MAFs for spec
 gdc-1.0.0-aliquot-merged-masked.
 """
 import json
+from typing import TYPE_CHECKING, Optional
 
 from maflib.header import MafHeader
 from maflib.reader import MafReader
+from maflib.record import MafRecord
+from maflib.schemes import MafScheme
 from maflib.sort_order import BarcodesAndCoordinate
 from maflib.validation import ValidationStringency
 from maflib.writer import MafWriter
@@ -14,9 +17,12 @@ from aliquotmaf.converters.builder import get_builder
 from aliquotmaf.converters.utils import get_columns_from_header, init_empty_maf_record
 from aliquotmaf.subcommands.mask_merged_aliquot.runners import BaseRunner
 
+if TYPE_CHECKING:
+    from argparse import ArgumentParser
+
 
 class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
-    def __init__(self, options=dict()):
+    def __init__(self, options: Optional[dict] = None):
         super(GDC_1_0_0_Aliquot_Merged_Masked, self).__init__(options)
 
         # Schema
@@ -24,7 +30,7 @@ class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
         self.options["annotation"] = "gdc-1.0.0-aliquot-merged-masked"
 
     @classmethod
-    def __add_arguments__(cls, parser):
+    def __add_arguments__(cls, parser: 'ArgumentParser') -> None:
         """Add the arguments to the parser"""
         parser.add_argument(
             "--tumor_only", action="store_true", help="Is this a tumor-only VCF?"
@@ -41,7 +47,7 @@ class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
             help="Minimum number of callers required [2]",
         )
 
-    def setup_maf_header(self):
+    def setup_maf_header(self) -> None:
         """
         Sets up the maf header.
         """
@@ -77,7 +83,7 @@ class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
         tkey = _hdr["tumor.aliquot"]
         self.maf_header["tumor.aliquot"] = tkey
 
-    def do_work(self):
+    def do_work(self) -> None:
         """Main wrapper function for running public MAF filter"""
         self.logger.info(
             "Processing input maf {0}...".format(self.options["input_maf"])
@@ -99,7 +105,7 @@ class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
             validation_stringency=ValidationStringency.Strict,
         )
 
-        self._scheme = self.maf_header.scheme()
+        self._scheme: MafScheme = self.maf_header.scheme()  # type: ignore
         self._columns = get_columns_from_header(self.maf_header)
         self._colset = set(self._columns)
 
@@ -107,21 +113,22 @@ class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
         processed = 0
         hotspot_gdc_set = set(["gdc_pon", "common_in_exac"])
 
+        record: MafRecord
         try:
-            for record in self.maf_reader:
+            for record in self.maf_reader:  # type: ignore
 
                 if processed > 0 and processed % 1000 == 0:
                     self.logger.info("Processed {0} records...".format(processed))
 
-                callers = record["callers"].value
+                callers = record["callers"].value  # type: ignore
                 if (
                     len(callers) >= self.options["min_callers"]
-                    and record["Mutation_Status"].value.value == "Somatic"
+                    and record["Mutation_Status"].value.value == "Somatic"  # type: ignore
                 ):
 
                     self.metrics.add_sample_swap_metric(record)
 
-                    gdc_filters = record["GDC_FILTER"].value
+                    gdc_filters = record["GDC_FILTER"].value  # type: ignore
                     gfset = set(gdc_filters)
 
                     if self.is_hotspot(record):
@@ -142,15 +149,15 @@ class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
             self.maf_reader.close()
             self.maf_writer.close()
 
-    def is_hotspot(self, record):
+    def is_hotspot(self, record: MafRecord) -> bool:
         """
         Helper function to test if the record is marked as a hotspot.
         """
-        if record["hotspot"].value and record["hotspot"].value.value == "Y":
+        if record["hotspot"].value and record["hotspot"].value.value == "Y":  # type: ignore
             return True
         return False
 
-    def write_record(self, record):
+    def write_record(self, record: MafRecord) -> None:
         """
         Helper function to write out the formatted merged public record.
         """
@@ -168,9 +175,9 @@ class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
             if column in to_null:
                 new_record[column] = get_builder(column, self._scheme, value=None)
             else:
-                new_record[column] = record[column]
+                new_record[column] = record[column]  # type: ignore
         self.maf_writer += new_record
 
     @classmethod
-    def __tool_name__(cls):
+    def __tool_name__(cls) -> str:
         return "gdc-1.0.0-aliquot-merged-masked"
