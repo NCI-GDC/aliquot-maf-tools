@@ -13,13 +13,15 @@ from aliquotmaf.subcommands.vcf_to_aliquot.__main__ import VcfToAliquotMaf
 
 signal(SIGPIPE, SIG_DFL)
 
+from typing import Optional
+
 try:
     from aliquotmaf import __version__
 except ImportError:
     __version__ = '0'
 
 
-def main(args=None):
+def main(args: Optional[list] = None) -> None:
     """
     The main method for aliquot-maf-tools.
     """
