@@ -12,7 +12,7 @@ from aliquotmaf.logger import Logger
 from aliquotmaf.metrics.metrics_collection import MafMetricsCollection
 
 if TYPE_CHECKING:
-    from argparse import ArgumentParser
+    from argparse import ArgumentParser, Namespace, _SubParsersAction
 
     from maflib.header import MafHeader
     from maflib.reader import MafReader
@@ -60,3 +60,30 @@ class BaseRunner(Protocol):
     @abstractmethod
     def __tool_name__(cls) -> str:
         pass
+
+    @classmethod
+    def __get_description__(cls) -> Optional[str]:
+        """
+        Optionally returns description
+        """
+        pass
+
+    @classmethod
+    def from_args(cls, args: 'Namespace') -> 'BaseRunner':
+        cls.__validate_options__(args)
+        return cls(options=vars(args))
+
+    @classmethod
+    def __validate_options__(cls, options: 'Namespace') -> None:
+        pass
+
+    @classmethod
+    def add(cls, subparsers: '_SubParsersAction') -> 'ArgumentParser':
+        """Adds the given subcommand to the subparsers."""
+        subparser = subparsers.add_parser(
+            name=cls.__tool_name__(), description=cls.__get_description__()
+        )
+
+        cls.__add_arguments__(subparser)
+        subparser.set_defaults(func=cls.from_args)
+        return subparser
