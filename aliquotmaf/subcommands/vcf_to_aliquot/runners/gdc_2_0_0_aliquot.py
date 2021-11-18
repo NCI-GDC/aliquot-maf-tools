@@ -1,5 +1,6 @@
 """Main vcf2maf logic for spec gdc-2.0.0-aliquot"""
 import urllib.parse
+from typing import TYPE_CHECKING, Any, List, Optional
 
 import pysam
 from maflib.header import MafHeader, MafHeaderRecord
@@ -28,9 +29,14 @@ from aliquotmaf.subcommands.utils import (
 )
 from aliquotmaf.subcommands.vcf_to_aliquot.runners import BaseRunner
 
+if TYPE_CHECKING:
+    from argparse import ArgumentParser, Namespace
+
+    from maflib.record import MafRecord
+
 
 class GDC_2_0_0_Aliquot(BaseRunner):
-    def __init__(self, options=dict()):
+    def __init__(self, options: Optional[dict] = None):
         super(GDC_2_0_0_Aliquot, self).__init__(options)
 
         # Load the resource files
@@ -69,7 +75,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         }
 
     @classmethod
-    def __validate_options__(cls, options):
+    def __validate_options__(cls, options: 'Namespace') -> None:
         """Validates the tumor only stuff"""
         if options.tumor_only:
             options.normal_vcf_id = None
@@ -82,7 +88,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
                 raise ValueError("--normal_bam_uuid is required")
 
     @classmethod
-    def __add_arguments__(cls, parser):
+    def __add_arguments__(cls, parser: 'ArgumentParser') -> None:
         """Add the arguments to the parser"""
         vcf = parser.add_argument_group(title="VCF options")
         vcf.add_argument(
@@ -223,7 +229,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             + "as off_target. Use one or more times.",
         )
 
-    def setup_maf_header(self):
+    def setup_maf_header(self) -> None:
         """
         Sets up the maf header.
         """
@@ -251,7 +257,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         )
         self.maf_header[tumor_aliquot.key] = tumor_aliquot
 
-    def do_work(self):
+    def do_work(self) -> None:
         """Main wrapper function for running vcf2maf"""
         self.logger.info(
             "Processing input vcf {0}...".format(self.options["input_vcf"])
@@ -267,7 +273,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             fasta_index=self.options["reference_fasta_index"],
         )
 
-        self._scheme = self.maf_header.scheme()
+        self._scheme = self.maf_header.scheme()  # type: ignore
         self._columns = get_columns_from_header(self.maf_header)
         self._colset = set(self._columns)
 
@@ -343,7 +349,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
                 #         k=badkeys, v=maf_record[list(badkeys)[0]]))
 
                 # Add to sorter
-                sorter += maf_record
+                sorter += maf_record  # type: ignore
 
             # Write
             self.logger.info("Writing {0} sorted records...".format(line))
@@ -361,7 +367,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
                 if counter % 1000 == 0:
                     self.logger.info("Wrote {0} records...".format(counter))
 
-                self.maf_writer += record
+                self.maf_writer += record  # type: ignore
 
             self.logger.info("Finished writing {0} records".format(counter))
 
@@ -371,36 +377,25 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             if self.maf_writer:
                 self.maf_writer.close()
             for anno in self.annotators:
-                if self.annotators[anno]:
-                    self.annotators[anno].shutdown()
+                if (annotator := self.annotators[anno]) is not None:
+                    annotator.shutdown()
 
         self.logger.info("Finished")
 
     def extract(
         self,
-        tumor_sample_id,
-        normal_sample_id,
-        tumor_idx,
-        normal_idx,
-        ann_cols,
-        vep_key,
-        record,
-        is_tumor_only,
-    ):
+        tumor_sample_id: str,
+        normal_sample_id: str,
+        tumor_idx: int,
+        normal_idx: int,
+        ann_cols: list,
+        vep_key: str,
+        record: Any,
+        is_tumor_only: bool,
+    ) -> dict:
         """
         Extract the VCF information needed to transform into MAF.
         """
-        dic = {
-            "var_allele_idx": None,
-            "tumor_gt": None,
-            "tumor_depths": None,
-            "normal_gt": None,
-            "normal_depths": None,
-            "location_data": None,
-            "effects": None,
-            "selected_effect": None,
-            "variant_class": None,
-        }
 
         # Genotypes
         var_allele_idx = Extractors.VariantAlleleIndexExtractor.extract(
@@ -457,6 +452,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             inframe=location_data["inframe"],
         )
 
+        dic = dict()
         # Make return dictionary
         dic["var_allele_idx"] = var_allele_idx
         dic["tumor_gt"] = tumor_gt
@@ -475,7 +471,13 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         )
         return dic
 
-    def transform(self, vcf_record, data, is_tumor_only, line_number=None):
+    def transform(
+        self,
+        vcf_record: Any,
+        data: dict,
+        is_tumor_only: bool,
+        line_number: Optional[int] = None,
+    ) -> 'MafRecord':
         """
         Transform into maf record.
         """
@@ -501,6 +503,8 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             column="Reference_Allele", value=data["location_data"]["ref_allele"]
         )
 
+        k: Any
+        v: Any
         for k, v in zip(
             ["Tumor_Seq_Allele1", "Tumor_Seq_Allele2"],
             format_alleles(
@@ -626,37 +630,37 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             "dbSNP_Val_Status", self._scheme, value=None
         )
 
-        if self.annotators["cosmic_id"]:
-            maf_record = self.annotators["cosmic_id"].annotate(maf_record, vcf_record)
+        if (gnomad_annotator := self.annotators["gnomad_noncancer"]) is not None:
+            maf_record = gnomad_annotator.annotate(
+                maf_record, vcf_record, data["var_allele_idx"]
+            )
+
+        if (cosmic_annotator := self.annotators["cosmic_id"]) is not None:
+            maf_record = cosmic_annotator.annotate(maf_record, vcf_record)
         else:
             maf_record["COSMIC"] = get_builder("COSMIC", self._scheme, value=None)
 
-        if self.annotators["hotspots"]:
-            maf_record = self.annotators["hotspots"].annotate(maf_record)
+        if (hotspot_annotator := self.annotators["hotspots"]) is not None:
+            maf_record = hotspot_annotator.annotate(maf_record)
         else:
             maf_record["hotspot"] = get_builder("hotspot", self._scheme, value=None)
 
-        if self.annotators["entrez_gene_id"]:
-            maf_record = self.annotators["entrez_gene_id"].annotate(maf_record)
+        if (entrez_annotator := self.annotators["entrez_gene_id"]) is not None:
+            maf_record = entrez_annotator.annotate(maf_record)
         else:
             maf_record["Entrez_Gene_Id"] = get_builder(
                 "entrez_gene_id", self._scheme, value=0
             )
 
-        if self.annotators["gnomad_noncancer"]:
-            maf_record = self.annotators["gnomad_noncancer"].annotate(
-                maf_record, vcf_record, data["var_allele_idx"]
+        if (ref_context := self.annotators["reference_context"]) is not None:
+            maf_record = ref_context.annotate(maf_record, vcf_record)
+        if (mutation_status := self.annotators["mutation_status"]) is not None:
+            maf_record = mutation_status.annotate(
+                maf_record, vcf_record, self.options["tumor_vcf_id"]
             )
 
-        maf_record = self.annotators["reference_context"].annotate(
-            maf_record, vcf_record
-        )
-        maf_record = self.annotators["mutation_status"].annotate(
-            maf_record, vcf_record, self.options["tumor_vcf_id"]
-        )
-
         # Filters
-        gdc_filters = []
+        gdc_filters: List[str] = []
         for filt_key in self.filters:
             filt_obj = self.filters[filt_key]
             if filt_obj and filt_obj.filter(maf_record):
@@ -668,7 +672,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
 
         return maf_record
 
-    def setup_annotators(self):
+    def setup_annotators(self) -> None:
         """
         Sets up all annotator classes.
         """
@@ -693,7 +697,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             )
 
         if self.options["entrez_gene_id_json"]:
-            self.annotators["entrez_gene_id"] = Annotators.Entrez.setup(
+            self.annotators["entrez_gene_id"] = Annotators.Entrez.setup(  # type: ignore
                 self._scheme, self.options["entrez_gene_id_json"]
             )
 
@@ -708,7 +712,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
                 self._scheme, self.options["gnomad_noncancer_vcf"]
             )
 
-    def setup_filters(self):
+    def setup_filters(self) -> None:
         """
         Sets up all filter classes.
         """
@@ -721,7 +725,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             )
 
         if self.options["gdc_blacklist"]:
-            self.filters["gdc_blacklist"] = Filters.GdcBlacklist.setup(
+            self.filters["gdc_blacklist"] = Filters.GdcBlacklist.setup(  # type: ignore
                 self.options["gdc_blacklist"]
             )
 
@@ -744,5 +748,5 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             )
 
     @classmethod
-    def __tool_name__(cls):
+    def __tool_name__(cls) -> str:
         return "gdc-2.0.0-aliquot"
