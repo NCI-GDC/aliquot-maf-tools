@@ -2,8 +2,12 @@
 Base class for all annotators.
 """
 from abc import ABCMeta, abstractmethod
+from typing import TYPE_CHECKING
 
 from aliquotmaf.logger import Logger
+
+if TYPE_CHECKING:
+    from maflib.record import MafRecord
 
 
 class Annotator(metaclass=ABCMeta):
@@ -21,7 +25,7 @@ class Annotator(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def annotate(self, **kwargs):
+    def annotate(self, *args, **kwargs) -> 'MafRecord':
         """
         Performs the annotation.
         """

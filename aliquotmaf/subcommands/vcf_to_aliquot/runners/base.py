@@ -21,18 +21,18 @@ class BaseRunner(Protocol):
     options: dict
     maf_header: 'MafHeader'
     maf_writer: 'MafWriter'
-    _scheme: Optional['MafScheme'] = None
-    _columns: Optional[List[str]] = None
-    _colset: Optional[set] = None
+    _scheme: 'MafScheme'
+    _columns: List[str]
+    _colset: set
 
     def __init__(self, options: Optional[dict] = None):
         self.logger = Logger.get_logger(self.__class__.__name__)
         self.options = options if options is not None else {}
 
         # Maf stuff
-        self._scheme = None
-        self._columns = None
-        self._colset = None
+        self._scheme: 'MafScheme'
+        self._columns: List[str]
+        self._colset: set
 
     @staticmethod
     def get_header_date() -> MafHeaderRecord:
