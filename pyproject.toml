@@ -25,3 +25,11 @@ python_version = 3.8
 disallow_untyped_defs = true
 warn_return_any = true
 warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = [
+        "aliquotmaf.annotators",
+        "aliquotmaf.filters",
+        "aliquot.subcommands.vcf_to_aliquot.extractors",
+]
+ignore_errors = true
