@@ -4,8 +4,6 @@ Class containing a set of overlapping records and utilities.
 
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List
 
-from maflib.overlap_iter import LocatableOverlapIterator
-
 if TYPE_CHECKING:
     from maflib.record import MafRecord
 
@@ -24,7 +22,7 @@ class OverlapSet:
         self._has_indels = None
 
         self._callers: List[str]
-        self._locus_allele_map: Dict[str, Dict[str, list]] = {}
+        self._locus_allele_map: Dict[str, Dict[str, list]]
         self._caller_type_map: dict
         self._variant_types: tuple
 
@@ -99,16 +97,15 @@ class OverlapSet:
         and values are lists of records.
         """
         if getattr(self, "_locus_allele_map", None) is None:
-            locus_allele_map: Dict[str, Dict[str, list]] = {}
+            self._locus_allele_map = {}
             for caller in self._data:
                 for record in self._data[caller]:
                     key = f"{record['Start_Position']}:{record['End_Position']}:{record['Allele']}"
                     if key not in self._locus_allele_map:
-                        locus_allele_map[key] = {}
-                    if caller not in locus_allele_map[key]:
-                        locus_allele_map[key][caller] = []
-                    locus_allele_map[key][caller].append(record)
-            self._locus_allele_map = locus_allele_map
+                        self._locus_allele_map[key] = {}
+                    if caller not in self._locus_allele_map[key]:
+                        self._locus_allele_map[key][caller] = []
+                    self._locus_allele_map[key][caller].append(record)
         return self._locus_allele_map
 
     @property
