@@ -5,8 +5,6 @@ MAF columns.
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Generator, List, Optional
 
-from maflib.schemes import MafScheme
-
 from aliquotmaf.converters.builder import get_builder
 
 if TYPE_CHECKING:

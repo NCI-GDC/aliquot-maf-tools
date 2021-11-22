@@ -3,7 +3,7 @@ Applies the common in non-tcga ExAC filter.
 """
 from __future__ import absolute_import
 
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Union
 
 from .filter_base import Filter
 

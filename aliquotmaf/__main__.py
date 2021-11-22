@@ -5,6 +5,7 @@ import argparse
 import datetime
 import sys
 from signal import SIG_DFL, SIGPIPE, signal
+from typing import Optional
 
 from aliquotmaf.logger import Logger
 from aliquotmaf.subcommands.mask_merged_aliquot.__main__ import MaskMergedAliquotMaf
@@ -13,7 +14,6 @@ from aliquotmaf.subcommands.vcf_to_aliquot.__main__ import VcfToAliquotMaf
 
 signal(SIGPIPE, SIG_DFL)
 
-from typing import Optional
 
 try:
     from aliquotmaf import __version__
