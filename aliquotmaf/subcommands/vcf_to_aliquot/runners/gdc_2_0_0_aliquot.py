@@ -21,7 +21,6 @@ from aliquotmaf.converters.formatters import (
     format_vcf_columns,
 )
 from aliquotmaf.converters.utils import get_columns_from_header, init_empty_maf_record
-from aliquotmaf.logger import Logger
 from aliquotmaf.subcommands.utils import (
     assert_sample_in_header,
     extract_annotation_from_header,

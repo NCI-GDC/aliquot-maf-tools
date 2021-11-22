@@ -3,7 +3,7 @@ Base Class for merging MAF records.
 """
 import logging
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Dict, List, Protocol
+from typing import TYPE_CHECKING, Any, Dict, List
 
 from aliquotmaf.converters.builder import get_builder
 from aliquotmaf.logger import Logger
