@@ -3,7 +3,7 @@ Base class for all protected -> public MAF runners.
 """
 import datetime
 import logging
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 from typing import TYPE_CHECKING, Optional, Protocol
 
 from maflib.header import MafHeaderRecord

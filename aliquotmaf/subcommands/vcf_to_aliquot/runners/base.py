@@ -1,10 +1,9 @@
 """Base class for all vcf2maf runners"""
 import datetime
-from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, List, Optional, Protocol
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, List, Optional
 
 from maflib.header import MafHeaderRecord
-from maflib.schemes import MafScheme
 
 from aliquotmaf.logger import Logger
 
@@ -16,7 +15,7 @@ if TYPE_CHECKING:
     from maflib.writer import MafWriter
 
 
-class BaseRunner(Protocol):
+class BaseRunner(ABC):
     logger: Logger
     options: dict
     maf_header: 'MafHeader'

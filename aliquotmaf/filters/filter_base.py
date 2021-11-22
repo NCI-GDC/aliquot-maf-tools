@@ -1,19 +1,17 @@
 """
 Base class for all filters.
 """
-from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, Any, List, Optional, Protocol
+import logging
+from abc import ABC, abstractmethod
+from typing import Any, List, Optional
 
 from aliquotmaf.logger import Logger
 
-if TYPE_CHECKING:
-    import logger
 
-
-class Filter(Protocol):
+class Filter(ABC):
     name: str
     source: Optional[str]
-    logger: 'logger.Logger'
+    logger: logging.Logger
     tags: List[str] = []
 
     def __init__(self, name: str, source: Optional[str] = None):

@@ -2,7 +2,7 @@
 Base Class for merging MAF records.
 """
 import logging
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Dict, List, Protocol
 
 from aliquotmaf.converters.builder import get_builder
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from aliquotmaf.merging.overlap_set import OverlapSet
 
 
-class BaseMafRecordMerger(Protocol):
+class BaseMafRecordMerger(ABC):
     logger: logging.Logger
     scheme: 'MafScheme'
     columns: Any
