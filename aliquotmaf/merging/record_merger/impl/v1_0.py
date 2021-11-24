@@ -36,7 +36,7 @@ class MafRecordMerger_1_0_0(
         else:
             return ("t_depth", "t_ref_count", "t_alt_count")
 
-    def combine_columns(self) -> str:
+    def combine_columns(self) -> str:  # type: ignore
         # FIXME: ???
         """
         :return: a ``tuple`` of column names that should be combined into

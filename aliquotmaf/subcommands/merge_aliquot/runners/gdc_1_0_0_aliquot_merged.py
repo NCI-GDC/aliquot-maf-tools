@@ -18,7 +18,7 @@ from aliquotmaf.converters.utils import get_columns_from_header
 from aliquotmaf.merging.filtering_iterator import FilteringPeekableIterator
 from aliquotmaf.merging.overlap_set import OverlapSet
 from aliquotmaf.merging.record_merger.impl.v1_0 import MafRecordMerger_1_0_0
-from aliquotmaf.subcommands.merge_aliquot.runners import BaseRunner
+from aliquotmaf.subcommands.merge_aliquot.runners.base import BaseRunner
 
 if TYPE_CHECKING:
     import argparse

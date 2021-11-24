@@ -3,8 +3,8 @@ Base class for all protected -> public MAF runners.
 """
 import datetime
 import logging
-from abc import abstractmethod
-from typing import TYPE_CHECKING, Optional, Protocol
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Optional
 
 from maflib.header import MafHeaderRecord
 
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from maflib.writer import MafWriter
 
 
-class BaseRunner(Protocol):
+class BaseRunner(ABC):
 
     logger: logging.Logger
     options: dict

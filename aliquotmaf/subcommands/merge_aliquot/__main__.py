@@ -4,8 +4,10 @@ Subcommand for merging single caller raw aliquot MAFs to merged raw MAFs.
 from typing import TYPE_CHECKING
 
 from aliquotmaf.subcommands.base import Subcommand
-from aliquotmaf.subcommands.merge_aliquot.runners import (
+from aliquotmaf.subcommands.merge_aliquot.runners.gdc_1_0_0_aliquot_merged import (
     GDC_1_0_0_Aliquot_Merged,
+)
+from aliquotmaf.subcommands.merge_aliquot.runners.gdc_2_0_0_aliquot_merged import (
     GDC_2_0_0_Aliquot_Merged,
 )
 

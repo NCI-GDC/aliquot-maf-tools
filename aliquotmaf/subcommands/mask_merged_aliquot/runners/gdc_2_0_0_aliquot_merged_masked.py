@@ -11,7 +11,7 @@ from maflib.validation import ValidationStringency
 from maflib.writer import MafWriter
 
 from aliquotmaf.converters.utils import get_columns_from_header
-from aliquotmaf.subcommands.mask_merged_aliquot.runners import (
+from aliquotmaf.subcommands.mask_merged_aliquot.runners.gdc_1_0_0_aliquot_merged_masked import (
     GDC_1_0_0_Aliquot_Merged_Masked,
 )
 

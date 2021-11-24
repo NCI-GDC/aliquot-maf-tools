@@ -28,7 +28,7 @@ from aliquotmaf.subcommands.utils import (
     load_enst,
     load_json,
 )
-from aliquotmaf.subcommands.vcf_to_aliquot.runners import BaseRunner
+from aliquotmaf.subcommands.vcf_to_aliquot.runners.base import BaseRunner
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
@@ -309,8 +309,8 @@ class GDC_1_0_0_Aliquot(BaseRunner):
                 data = self.extract(
                     tumor_sample_id,
                     normal_sample_id,
-                    tumor_idx,
-                    normal_idx,
+                    tumor_idx,  # type: ignore
+                    normal_idx,  # type: ignore
                     ann_cols_format,
                     vep_key,
                     vcf_record,

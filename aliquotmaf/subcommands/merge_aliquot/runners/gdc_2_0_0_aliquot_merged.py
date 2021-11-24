@@ -1,6 +1,8 @@
 from typing import Optional
 
-from aliquotmaf.subcommands.merge_aliquot.runners import GDC_1_0_0_Aliquot_Merged
+from aliquotmaf.subcommands.merge_aliquot.runners.gdc_1_0_0_aliquot_merged import (
+    GDC_1_0_0_Aliquot_Merged,
+)
 
 
 class GDC_2_0_0_Aliquot_Merged(GDC_1_0_0_Aliquot_Merged):

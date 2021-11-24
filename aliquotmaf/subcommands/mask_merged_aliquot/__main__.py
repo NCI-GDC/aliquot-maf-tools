@@ -4,8 +4,10 @@ Subcommand for masking/filtering a merged aliquot MAF.
 from typing import TYPE_CHECKING
 
 from aliquotmaf.subcommands.base import Subcommand
-from aliquotmaf.subcommands.mask_merged_aliquot.runners import (
+from aliquotmaf.subcommands.mask_merged_aliquot.runners.gdc_1_0_0_aliquot_merged_masked import (
     GDC_1_0_0_Aliquot_Merged_Masked,
+)
+from aliquotmaf.subcommands.mask_merged_aliquot.runners.gdc_2_0_0_aliquot_merged_masked import (
     GDC_2_0_0_Aliquot_Merged_Masked,
 )
 

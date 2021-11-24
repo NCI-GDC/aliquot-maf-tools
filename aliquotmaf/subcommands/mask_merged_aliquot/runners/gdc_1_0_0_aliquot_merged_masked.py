@@ -15,7 +15,7 @@ from maflib.writer import MafWriter
 
 from aliquotmaf.converters.builder import get_builder
 from aliquotmaf.converters.utils import get_columns_from_header, init_empty_maf_record
-from aliquotmaf.subcommands.mask_merged_aliquot.runners import BaseRunner
+from aliquotmaf.subcommands.mask_merged_aliquot.runners.base import BaseRunner
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser
