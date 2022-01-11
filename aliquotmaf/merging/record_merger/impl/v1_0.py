@@ -1,6 +1,8 @@
 """
 Maf recorder merger implementation v1.0
 """
+from typing import TYPE_CHECKING, List, Union
+
 from aliquotmaf.converters.builder import get_builder
 from aliquotmaf.converters.utils import init_empty_maf_record
 from aliquotmaf.merging.record_merger.base import BaseMafRecordMerger
@@ -9,11 +11,16 @@ from aliquotmaf.merging.record_merger.mixins import (
     MafMergingCombineColumnsMixin,
 )
 
+if TYPE_CHECKING:
+    from maflib.record import MafRecord
+
+    from aliquotmaf.merging.overlap_set import OverlapSet
+
 
 class MafRecordMerger_1_0_0(
     BaseMafRecordMerger, MafMergingAverageColumnsMixin, MafMergingCombineColumnsMixin
 ):
-    def average_columns(self, tumor_only=False):
+    def average_columns(self, tumor_only: bool = False) -> tuple:
         """
         :return: a ``tuple`` of column names that should be averaged.
         """
@@ -29,20 +36,21 @@ class MafRecordMerger_1_0_0(
         else:
             return ("t_depth", "t_ref_count", "t_alt_count")
 
-    def combine_columns(self):
+    def combine_columns(self) -> str:  # type: ignore
+        # FIXME: ???
         """
         :return: a ``tuple`` of column names that should be combined into
         a unique set.
         """
         return "GDC_FILTER"
 
-    def caller_order(self):
+    def caller_order(self) -> list:
         """
         :return: a ``list`` of caller names in their order of priority.
         """
         return ["vardict", "pindel", "mutect2", "muse", "varscan2", "somaticsniper"]
 
-    def caller_type_order(self):
+    def caller_type_order(self) -> list:
         """
         :return: a ``list`` of ``tuples`` of the format (caller, variant type)
         in their order of priority.
@@ -66,7 +74,7 @@ class MafRecordMerger_1_0_0(
             ("somaticsniper", "SNP"),
         ]
 
-    def merge_records(self, results, tumor_only=False):
+    def merge_records(self, results: 'OverlapSet', tumor_only: bool = False) -> list:
         """
         Returns one or more merged MAF records. This implementation is:
 
@@ -81,7 +89,7 @@ class MafRecordMerger_1_0_0(
                else -> collapse by self.caller_type_order (see self.collapse_by_caller_type)
         5. else -> collapse by self.caller_type_order (see self.collapse_by_caller_type)
         """
-        maf_records = []
+        maf_records: List['MafRecord'] = []
 
         if results.is_singleton():
             # Simple just extract first element from results for the caller and write
@@ -150,8 +158,12 @@ class MafRecordMerger_1_0_0(
         return maf_records
 
     def maf_from_first_element(
-        self, results, callers, star_callers=[], tumor_only=False
-    ):
+        self,
+        results: Union[dict, 'OverlapSet'],
+        callers: list,
+        star_callers: list = [],
+        tumor_only: bool = False,
+    ) -> 'MafRecord':
         """
         Simply creates a MAF record from the first record in each caller.
         """
@@ -197,13 +209,16 @@ class MafRecordMerger_1_0_0(
                 maf_dic[column] = get_builder(column, self.scheme, value=None)
 
             else:
-                maf_dic[column] = selected_caller[column]
+                maf_dic[column] = selected_caller[column]  # type: ignore
 
-        return self.format_dic_to_record(
+        maf_record: 'MafRecord' = self.format_dic_to_record(
             maf_dic, callers, star_callers=star_callers, tumor_only=tumor_only
         )
+        return maf_record
 
-    def collapse_by_caller_type(self, results, tumor_only=False):
+    def collapse_by_caller_type(
+        self, results: 'OverlapSet', tumor_only: bool = False
+    ) -> 'MafRecord':
         """
         Use the caller type list to select.
         """
@@ -218,24 +233,13 @@ class MafRecordMerger_1_0_0(
         # If there is only a single record for the selected caller-type
         if len(results.caller_type_map[selected_key]) == 1:
             record = results.caller_type_map[selected_key][0]
-            new_rec = {selected_key[0]: [record]}
+            new_rec = {selected_key[0]: [record]}  # type: ignore
 
-            key = ":".join(
-                list(
-                    map(
-                        str,
-                        [
-                            record["Start_Position"],
-                            record["End_Position"],
-                            record["Allele"],
-                        ],
-                    )
-                )
-            )
+            key = f"{record['Start_Position']}:{record['End_Position']}:{record['Allele']}"
             other_matches = {
                 k: results.locus_allele_map[key][k]
                 for k in results.locus_allele_map[key]
-                if k != selected_key[0]
+                if k != selected_key[0]  # type: ignore
             }
             new_rec.update(other_matches)
             star_callers = sorted(list(all_callers - set(new_rec.keys())))
@@ -253,28 +257,17 @@ class MafRecordMerger_1_0_0(
             lst = []
             _selected_dic = {}
             for record in results.caller_type_map[selected_key]:
-                key = ":".join(
-                    list(
-                        map(
-                            str,
-                            [
-                                record["Start_Position"],
-                                record["End_Position"],
-                                record["Allele"],
-                            ],
-                        )
-                    )
-                )
+                key = f"{record['Start_Position']}:{record['End_Position']}:{record['Allele']}"
                 _selected_dic[key] = [record]
                 n = len(results.locus_allele_map[key])
                 val = (n, key)
                 lst.append(val)
             selected_allele = sorted(lst, reverse=True)[0][1]
-            new_rec = {selected_key[0]: _selected_dic[selected_allele]}
+            new_rec = {selected_key[0]: _selected_dic[selected_allele]}  # type: ignore
             other_matches = {
                 k: results.locus_allele_map[selected_allele][k]
                 for k in results.locus_allele_map[selected_allele]
-                if k != selected_key[0]
+                if k != selected_key[0]  # type: ignore
             }
             new_rec.update(other_matches)
             star_callers = sorted(list(all_callers - set(new_rec.keys())))
@@ -286,7 +279,13 @@ class MafRecordMerger_1_0_0(
             )
             return maf_record
 
-    def format_dic_to_record(self, maf_dic, callers, star_callers=[], tumor_only=False):
+    def format_dic_to_record(
+        self,
+        maf_dic: dict,
+        callers: list,
+        star_callers: list = [],
+        tumor_only: bool = False,
+    ) -> 'MafRecord':
         """
         Formats the dictionary into a MafRecord.
         """
@@ -297,7 +296,7 @@ class MafRecordMerger_1_0_0(
         maf_dic = self.standardize_alleles(maf_dic, tumor_only=tumor_only)
 
         # Callers
-        _callers = callers + ["{0}*".format(i) for i in star_callers]
+        _callers = callers + [f"{i}*" for i in star_callers]
         maf_dic["callers"] = get_builder("callers", self.scheme, value=sorted(_callers))
 
         # Create MafRecord

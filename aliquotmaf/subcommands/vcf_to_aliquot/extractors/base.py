@@ -1,11 +1,12 @@
 """Abstract base class for extracting data"""
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
+from typing import Any, Protocol
 
 
-class Extractor(metaclass=ABCMeta):
+class Extractor(Protocol):
     @classmethod
     @abstractmethod
-    def extract(cls, **kwargs):
+    def extract(cls, *args: Any, **kwargs: Any) -> Any:
         """
         All extractors much implement the extraction function.
         """

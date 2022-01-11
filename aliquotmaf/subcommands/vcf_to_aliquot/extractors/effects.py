@@ -193,7 +193,7 @@ class EffectsExtractor_102(EffectsExtractor):
         cls,
         effect_priority: Dict[str, int],
         effect_keys: List[str],
-        effect_list: List[str],
+        effect_list: List[List[str]],
         var_idx: int,
     ) -> List[Dict[str, Optional[str]]]:
         """

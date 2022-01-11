@@ -4,8 +4,12 @@ Applies the GDC Blacklist filter.
 from __future__ import absolute_import
 
 import gzip
+from typing import TYPE_CHECKING
 
 from .filter_base import Filter
+
+if TYPE_CHECKING:
+    from maflib.record import MafRecord
 
 
 class GdcBlacklist(Filter):
@@ -16,7 +20,7 @@ class GdcBlacklist(Filter):
         self.logger.info("Using GDC Blacklist {0}".format(source))
 
     @classmethod
-    def setup(cls, source):
+    def setup(cls, source: str) -> 'GdcBlacklist':
         # Load blacklist
         data = {}
         head = []
@@ -53,7 +57,7 @@ class GdcBlacklist(Filter):
         curr = cls(source, data)
         return curr
 
-    def filter(self, maf_record):
+    def filter(self, maf_record: 'MafRecord') -> bool:
         self.tags = []
         flag = False
         tumor_aliquot = str(maf_record["Tumor_Sample_UUID"].value)
@@ -62,5 +66,5 @@ class GdcBlacklist(Filter):
             flag = True
         return flag
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         pass

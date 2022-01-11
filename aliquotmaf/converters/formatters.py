@@ -2,8 +2,12 @@
 A module containing formatting utility functions needed when converting from a VCF to a MAF.
 """
 
+from typing import Any, Dict, List, Optional, Union
 
-def format_alleles(genotype, alleles, defaults=None):
+
+def format_alleles(
+    genotype: Dict[str, Any], alleles: list, defaults: Optional[List[str]] = None
+) -> List[str]:
     """
     Formats the alleles from a genotype record.
     """
@@ -13,7 +17,7 @@ def format_alleles(genotype, alleles, defaults=None):
         al2 = defaults[1]
 
     if "GT" in genotype and genotype["GT"]:
-        als = genotype["GT"]
+        als: list = genotype["GT"]
         if len(als) == 1:
             als = sorted(list(als) + [0])
         al1 = alleles[als[0]]
@@ -21,7 +25,12 @@ def format_alleles(genotype, alleles, defaults=None):
     return [al1, al2]
 
 
-def format_depths(genotype, depths, var_allele_idx, default_total_dp=None):
+def format_depths(
+    genotype: Dict[str, Any],
+    depths: List[int],
+    var_allele_idx: int,
+    default_total_dp: Optional[int] = None,
+) -> List[Union[int, None]]:
     """
     Format the variant allele depths based on the selected variant allele.
     """
@@ -39,7 +48,7 @@ def format_depths(genotype, depths, var_allele_idx, default_total_dp=None):
     return [_dp, ref_dp, alt_dp]
 
 
-def format_all_effects(all_effects):
+def format_all_effects(all_effects: List[dict]) -> list:
     """
     Formats the all effects column.
     """
@@ -81,28 +90,19 @@ def format_all_effects(all_effects):
     return fmt_all_effects
 
 
-def format_vcf_columns(vcf_record, vep_key, tumor_idx, normal_idx=None):
+def format_vcf_columns(
+    vcf_record: Any, vep_key: str, tumor_idx: int, normal_idx: Optional[int] = None
+) -> dict:
     """
     Formats the VCF columns that are stored in the MAF record.
     """
-    dic = {
-        "vcf_region": None,
-        "vcf_info": None,
-        "vcf_format": None,
-        "vcf_tumor_gt": None,
-        "FILTER": None,
-    }
     # Convert pysam object to string representation
     cols = str(vcf_record).rstrip("\r\n").split("\t")
-    dic["vcf_region"] = "{0}:{1}:{2}:{3}:{4}".format(
-        vcf_record.chrom,
-        vcf_record.pos,
-        vcf_record.id if vcf_record.id else ".",
-        vcf_record.ref,
-        ",".join(list(vcf_record.alts)),
-    )
+    vcf_id = vcf_record.id if vcf_record.id else "."
+    alts = ','.join(list(vcf_record.alts))
+    vcf_region = f"{vcf_record.chrom}:{vcf_record.pos}:{vcf_id}:{vcf_record.ref}:{alts}"
 
-    dic["vcf_info"] = ";".join(
+    vcf_info = ";".join(
         [
             i
             for i in cols[7].split(";")
@@ -112,10 +112,21 @@ def format_vcf_columns(vcf_record, vep_key, tumor_idx, normal_idx=None):
         ]
     )
 
-    dic["vcf_format"] = cols[8]
-    dic["vcf_tumor_gt"] = cols[tumor_idx]
+    vcf_format = cols[8]
+    vcf_tumor_gt = cols[tumor_idx]
+    vcf_normal_gt: Optional[str]
     if normal_idx is not None:
-        dic["vcf_normal_gt"] = cols[normal_idx]
+        vcf_normal_gt = cols[normal_idx]
+    else:
+        vcf_normal_gt = None
 
-    dic["FILTER"] = cols[6]
+    filt = cols[6]
+    dic = {
+        "vcf_region": vcf_region,
+        "vcf_info": vcf_info,
+        "vcf_format": vcf_format,
+        "vcf_tumor_gt": vcf_tumor_gt,
+        "vcf_normal_gt": vcf_normal_gt,
+        "FILTER": filt,
+    }
     return dic

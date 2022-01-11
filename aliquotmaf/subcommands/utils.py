@@ -2,9 +2,10 @@
 import gzip
 import json
 import re
+from typing import Any, Callable, List, Optional, Tuple
 
 
-def get_open_function(fil):
+def get_open_function(fil: str) -> Callable:
     """
     Returns the appropriate open function based on gz ending.
     """
@@ -13,7 +14,7 @@ def get_open_function(fil):
     return open
 
 
-def load_json(fil):
+def load_json(fil: str) -> Any:
     """
     Loads a json file.
     """
@@ -23,7 +24,9 @@ def load_json(fil):
     return dat
 
 
-def assert_sample_in_header(vcf_object, sample, can_fail=False):
+def assert_sample_in_header(
+    vcf_object: Any, sample: str, can_fail: bool = False
+) -> Optional[int]:
     """
     Asserts that a given sample is in the VCF header and returns the index.
 
@@ -46,7 +49,9 @@ def assert_sample_in_header(vcf_object, sample, can_fail=False):
     return idx
 
 
-def extract_annotation_from_header(vcf_object, vep_key="CSQ"):
+def extract_annotation_from_header(
+    vcf_object: Any, vep_key: str = "CSQ"
+) -> Tuple[List[str], str]:
     """
     Extract the VEP annotation columns from the VCF header.
 
@@ -64,7 +69,7 @@ def extract_annotation_from_header(vcf_object, vep_key="CSQ"):
             if iname and str(iname) == vep_key:
                 vep_key = iname
                 anno_line = re.search(r'Format: (\S+)"$', record["Description"])
-                raw_ann_cols_format = anno_line.group(1).split("|")
+                raw_ann_cols_format = anno_line.group(1).split("|")  # type: ignore
                 for ann in raw_ann_cols_format:
                     if ann.startswith("ExAC"):
                         ann_cols_format.append(fix_exac(ann))
@@ -78,7 +83,7 @@ def extract_annotation_from_header(vcf_object, vep_key="CSQ"):
     return ann_cols_format, vep_key
 
 
-def fix_exac(ann):
+def fix_exac(ann: str) -> str:
     """
     Convert the to the "OLD" version of ExAC headers from the old plugin.
     before VEP included it built in.
@@ -100,7 +105,7 @@ def fix_exac(ann):
     return lookup[ann]
 
 
-def load_enst(fpath):
+def load_enst(fpath: str) -> set:
     """
     Loads the custom transcript overrides file if the user provided it
 
