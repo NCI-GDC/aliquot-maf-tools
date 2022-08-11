@@ -1,6 +1,6 @@
 default_stages: [commit, push]
 default_language_version:
-  python_venv: python3.6
+  python_venv: python3.10
 
 repos:
   - repo: git@github.com:Yelp/detect-secrets
@@ -23,7 +23,7 @@ repos:
       - id: isort
         name: isort
   - repo: https://github.com/psf/black
-    rev: 20.8b1
+    rev: 22.3.0
     hooks:
       - id: black
 
