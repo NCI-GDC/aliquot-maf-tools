@@ -47,7 +47,8 @@ class MafRecordMerger_1_0_0(
             "muse",
             "varscan2",
             "caveman",
-            "somaticsniper",
+            "sanger_pindel",
+            "gatk4_mutect2_pair" "somaticsniper",
         ]
 
     def caller_type_order(self):
@@ -58,20 +59,27 @@ class MafRecordMerger_1_0_0(
         # TODO: add svaba?
         return [
             ("mutect2", "MNP"),
+            ("gatk4_mutect2_pair", "MNP"),
             ("vardict", "MNP"),
             ("pindel", "MNP"),
+            ("sanger_pindel", "MNP"),
             ("caveman", "MNP"),
             ("mutect2", "DEL"),
+            ("gatk4_mutect2_pair", "DEL"),
             ("vardict", "DEL"),
             ("pindel", "DEL"),
+            ("sanger_pindel", "DEL"),
             ("varscan2", "DEL"),
             ("caveman", "DEL"),
             ("mutect2", "INS"),
+            ("gatk4_mutect2_pair", "INS"),
             ("vardict", "INS"),
             ("pindel", "INS"),
+            ("sanger_pindel", "INS"),
             ("varscan2", "INS"),
             ("caveman", "INS"),
             ("mutect2", "SNP"),
+            ("gatk4_mutect2_pair", "SNP"),
             ("muse", "SNP"),
             ("vardict", "SNP"),
             ("varscan2", "SNP"),
