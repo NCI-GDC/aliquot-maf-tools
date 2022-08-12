@@ -20,6 +20,7 @@ class MutationStatus(Annotator):
             "VarScan2": self._varscan,
             "Pindel": self._muse,
             "VarDict": self._vardict,
+            "CaVEMan": self._mutect2,
         }
 
     @classmethod
