@@ -21,6 +21,8 @@ class MutationStatus(Annotator):
             "Pindel": self._muse,
             "VarDict": self._vardict,
             "CaVEMan": self._mutect2,
+            "Sanger Pindel": self._mutect2,
+            "GATK4 MuTect2 Pair": self._mutect2,
         }
 
     @classmethod
