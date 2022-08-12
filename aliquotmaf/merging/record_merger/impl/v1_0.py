@@ -48,7 +48,8 @@ class MafRecordMerger_1_0_0(
             "varscan2",
             "caveman",
             "sanger_pindel",
-            "gatk4_mutect2_pair" "somaticsniper",
+            "gatk4_mutect2_pair",
+            "somaticsniper",
         ]
 
     def caller_type_order(self):
