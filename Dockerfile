@@ -1,20 +1,25 @@
-FROM quay.io/ncigdc/python3.10-builder as builder
+ARG REGISTRY=quay.io
+ARG BASE_CONTAINER_VERSION=2.0.1
 
-COPY ./ /opt
+FROM ${REGISTRY}/ncigdc/python3.10-builder:${BASE_CONTAINER_VERSION} as builder
 
-WORKDIR /opt
+COPY ./ /opt/build
 
-RUN pip install tox && tox -p
+WORKDIR /opt/build
 
-FROM quay.io/ncigdc/python3.10
+RUN pip install tox && tox -e build
 
-COPY --from=builder /opt/dist/*.tar.gz /opt
-COPY requirements.txt /opt
+FROM ${REGISTRY}/ncigdc/python3.10-builder:${BASE_CONTAINER_VERSION}
 
-WORKDIR /opt
+COPY --from=builder /opt/build/dist/*.tar.gz /opt/build/
+COPY requirements.txt /opt/build/
 
-RUN pip install -r requirements.txt \
-	&& pip install *.tar.gz \
+WORKDIR /opt/build
+
+ARG PIP_EXTRA_INDEX_URL
+
+RUN --mount=type=ssh pip install --no-deps -r requirements.txt \
+	&& pip install --no-deps *.tar.gz \
 	&& rm -f *.tar.gz requirements.txt
 
 ENTRYPOINT ["aliquot_maf_tools"]

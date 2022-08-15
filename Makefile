@@ -11,9 +11,13 @@ DOCKER_IMAGE_COMMIT := ${DOCKER_REPO}/${REPO}:${COMMIT_HASH}
 DOCKER_IMAGE_DESCRIBE := ${DOCKER_REPO}/${REPO}:${GIT_DESCRIBE}
 DOCKER_IMAGE_LATEST := ${DOCKER_REPO}/${REPO}:latest
 
-TWINE_REPOSITORY_URL?=
+# Env args
+PIP_EXTRA_INDEX_URL ?=
+http_proxy ?=
+https_proxy ?=
+REGISTRY ?= quay.io
 
-.PHONY: version version-* print-*
+.PHONY: version version-*
 version:
 	@python setup.py --version
 
@@ -27,14 +31,13 @@ version-docker-tag:
 docker-login:
 	docker login -u="${QUAY_USERNAME}" -p="${QUAY_PASSWORD}" quay.io
 
-
 .PHONY: init init-*
 init: init-pip init-hooks
 init-pip: init-venv
 	@echo
 	@echo -- Installing pip packages --
 	pip-sync requirements.txt dev-requirements.txt
-	python3 setup.py develop
+	pip install -e .
 
 init-hooks:
 	@echo
@@ -43,7 +46,7 @@ init-hooks:
 
 init-venv:
 	@echo
-	PIP_REQUIRE_VIRTUALENV=true python3 -m pip install --upgrade pip pip-tools
+	PIP_REQUIRE_VIRTUALENV=true python -m pip install --upgrade pip pip-tools
 
 .PHONY: clean clean-*
 clean: clean-dirs
@@ -57,14 +60,13 @@ clean-dirs:
 clean-docker:
 	@echo
 
-
 .PHONY: requirements requirements-*
 requirements: init-venv requirements-prod requirements-dev
 requirements-dev:
 	pip-compile -o dev-requirements.txt dev-requirements.in
 
 requirements-prod:
-	pip-compile -o requirements.txt
+	pip-compile -o requirements.txt pyproject.toml
 
 .PHONY: build build-*
 
@@ -75,14 +77,25 @@ build-docker: clean
 	@echo -- Building docker --
 	docker build . \
 		--file ./Dockerfile \
-		--build-arg http_proxy=${PROXY} \
-		--build-arg https_proxy=${PROXY} \
+		--build-arg http_proxy=$(http_proxy) \
+		--build-arg https_proxy=$(https_proxy) \
+		--build-arg registry=$(REGISTRY) \
+		--build-arg PIP_EXTRA_INDEX_URL=${PIP_EXTRA_INDEX_URL} \
 		-t "${DOCKER_IMAGE_COMMIT}" \
-		-t "${DOCKER_IMAGE_LATEST}"
+		-t "${DOCKER_IMAGE_LATEST}" \
+		-t "${REPO}"
 
 build-pypi: clean
 	@echo
 	tox -e check_dist
+
+.PHONY: run run-*
+run:
+	@echo
+
+run-docker:
+	@echo
+	docker run --rm "${DOCKER_IMAGE_COMMIT}"
 
 .PHONY: lint test test-* tox
 test: tox
@@ -93,11 +106,6 @@ lint:
 
 test-unit:
 	pytest tests/
-
-test-tox:
-	@echo
-	@echo -- Unit Test --
-	tox
 
 test-docker:
 	@echo
@@ -115,5 +123,4 @@ publish-docker:
 publish-pypi:
 	@echo
 	@echo Publishing wheel
-	@python3 -m pip install --user --upgrade twine
 	python3 -m twine upload dist/*
