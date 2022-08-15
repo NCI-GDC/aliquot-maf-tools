@@ -55,12 +55,33 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
             + "This is performed after averaging "
             + "depths across callers [7]",
         )
+        parser.add_argument(
+            "--caveman", help="Path to input protected CaVEMan MAF file"
+        )
+        parser.add_argument(
+            "--sanger-pindel", help="Path to input protected Sanger Pindel MAF file"
+        )
+        parser.add_argument(
+            "--gatk4-mutect2-pair",
+            help="Path to input protected GATK4 MuTect2 Pair MAF file",
+        )
 
     def load_readers(self):
         """
         Loads the array of MafReaders and sets the callers list.
         """
-        maf_keys = ["mutect2", "muse", "vardict", "varscan2", "somaticsniper", "pindel"]
+        # TODO: Add more callers
+        maf_keys = [
+            "mutect2",
+            "muse",
+            "vardict",
+            "varscan2",
+            "somaticsniper",
+            "pindel",
+            "caveman",
+            "sanger_pindel",
+            "gatk4_mutect2_pair",
+        ]
 
         for maf_key in maf_keys:
             if self.options[maf_key]:
