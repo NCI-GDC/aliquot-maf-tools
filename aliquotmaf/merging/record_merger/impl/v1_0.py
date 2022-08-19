@@ -40,30 +40,52 @@ class MafRecordMerger_1_0_0(
         """
         :return: a ``list`` of caller names in their order of priority.
         """
-        return ["vardict", "pindel", "mutect2", "muse", "varscan2", "somaticsniper"]
+        return [
+            "vardict",
+            "pindel",
+            "mutect2",
+            "muse",
+            "varscan2",
+            "caveman",
+            "sanger_pindel",
+            "gatk4_mutect2_pair",
+            "somaticsniper",
+        ]
 
     def caller_type_order(self):
         """
         :return: a ``list`` of ``tuples`` of the format (caller, variant type)
         in their order of priority.
         """
+        # TODO: add svaba?
         return [
             ("mutect2", "MNP"),
+            ("gatk4_mutect2_pair", "MNP"),
             ("vardict", "MNP"),
             ("pindel", "MNP"),
+            ("sanger_pindel", "MNP"),
+            ("caveman", "MNP"),
             ("mutect2", "DEL"),
+            ("gatk4_mutect2_pair", "DEL"),
             ("vardict", "DEL"),
             ("pindel", "DEL"),
+            ("sanger_pindel", "DEL"),
             ("varscan2", "DEL"),
+            ("caveman", "DEL"),
             ("mutect2", "INS"),
+            ("gatk4_mutect2_pair", "INS"),
             ("vardict", "INS"),
             ("pindel", "INS"),
+            ("sanger_pindel", "INS"),
             ("varscan2", "INS"),
+            ("caveman", "INS"),
             ("mutect2", "SNP"),
+            ("gatk4_mutect2_pair", "SNP"),
             ("muse", "SNP"),
             ("vardict", "SNP"),
             ("varscan2", "SNP"),
             ("somaticsniper", "SNP"),
+            ("caveman", "SNP"),
         ]
 
     def merge_records(self, results, tumor_only=False):
@@ -232,6 +254,7 @@ class MafRecordMerger_1_0_0(
                     )
                 )
             )
+            # save lower priority matches
             other_matches = {
                 k: results.locus_allele_map[key][k]
                 for k in results.locus_allele_map[key]
