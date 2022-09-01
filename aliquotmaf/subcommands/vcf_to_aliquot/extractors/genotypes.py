@@ -85,6 +85,31 @@ class GenotypeAndDepthsExtractor(Extractor):
             bcount = list(genotype["BCOUNT"])
             depths = [bcount[b_idx[i]] if i in b_idx else None for i in alleles]
 
+        # Handle CaVEMan which provides genotype and counts for all nucleotides in forward and reverse strands
+        elif all(
+            set(["GT", "FAZ", "FCZ", "FGZ", "FTZ", "RAZ", "RCZ", "RGZ", "RTZ"])
+            in genotype.keys()
+        ):
+            var_allele = alleles[var_allele_idx]
+            var_f_count_name = f"F{var_allele}Z"
+            var_r_count_name = f"R{var_allele}Z"
+            var_count = genotype[var_f_count_name] + genotype[var_r_count_name]
+            ref_allele = [al for al in alleles if not var_allele][0]
+            ref_f_count_name = f"F{ref_allele}Z"
+            ref_r_count_name = f"R{ref_allele}Z"
+            ref_count = genotype[ref_f_count_name] + genotype[ref_r_count_name]
+
+            # set depths of alleles
+            depths = [ref_count, var_count]
+
+            # set DP to be sum of all observed base counts
+            genotype["DP"] = sum(
+                [
+                    genotype[i]
+                    for i in ["FAZ", "FCZ", "FGZ", "FTZ", "RAZ", "RCZ", "RGZ", "RTZ"]
+                ]
+            )
+
         # If N depths not equal to N alleles, blank out the depths
         elif depths and len(depths) != len(alleles):
             cls.logger.warning("The length of DP array != length of allele array")
