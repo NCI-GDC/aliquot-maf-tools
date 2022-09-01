@@ -59,10 +59,6 @@ class GenotypeAndDepthsExtractor(Extractor):
         if not genotype["GT"]:
             return new_gt, depths
 
-        # If DP is defined, set it in new_gt
-        if "DP" in genotype and genotype["DP"] is not None:
-            new_gt["DP"] = genotype["DP"]
-
         # If AD is defined, then parse out all REF/ALT allele depths, or whatever is in it
         if "AD" in genotype and genotype["AD"] is not None:
             if isinstance(genotype["AD"], int):
@@ -86,15 +82,14 @@ class GenotypeAndDepthsExtractor(Extractor):
             depths = [bcount[b_idx[i]] if i in b_idx else None for i in alleles]
 
         # Handle CaVEMan which provides genotype and counts for all nucleotides in forward and reverse strands
-        elif all(
-            set(["GT", "FAZ", "FCZ", "FGZ", "FTZ", "RAZ", "RCZ", "RGZ", "RTZ"])
-            in genotype.keys()
-        ):
+        elif set(
+            ["GT", "FAZ", "FCZ", "FGZ", "FTZ", "RAZ", "RCZ", "RGZ", "RTZ"]
+        ).issubset(genotype.keys()):
             var_allele = alleles[var_allele_idx]
             var_f_count_name = f"F{var_allele}Z"
             var_r_count_name = f"R{var_allele}Z"
             var_count = genotype[var_f_count_name] + genotype[var_r_count_name]
-            ref_allele = [al for al in alleles if not var_allele][0]
+            ref_allele = [al for al in alleles if al != var_allele][0]
             ref_f_count_name = f"F{ref_allele}Z"
             ref_r_count_name = f"R{ref_allele}Z"
             ref_count = genotype[ref_f_count_name] + genotype[ref_r_count_name]
@@ -109,6 +104,10 @@ class GenotypeAndDepthsExtractor(Extractor):
                     for i in ["FAZ", "FCZ", "FGZ", "FTZ", "RAZ", "RCZ", "RGZ", "RTZ"]
                 ]
             )
+
+        # If DP is defined, set it in new_gt
+        if "DP" in genotype and genotype["DP"] is not None:
+            new_gt["DP"] = genotype["DP"]
 
         # If N depths not equal to N alleles, blank out the depths
         elif depths and len(depths) != len(alleles):
@@ -132,7 +131,7 @@ class GenotypeAndDepthsExtractor(Extractor):
                 )
             )
         ):
-            cls.logger.warning("REF/ALT allele depths are lower than total depth!!")
+            cls.logger.warning("REF/ALT allele depths are larger than total depth!!")
             new_gt["DP"] = 0
             for i in depths:
                 if i and i != ".":
