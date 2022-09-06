@@ -98,7 +98,7 @@ class GenotypeAndDepthsExtractor(Extractor):
             depths = [ref_count, var_count]
 
             # set DP to be sum of all observed base counts
-            genotype["DP"] = sum(
+            new_gt["DP"] = sum(
                 [
                     genotype[i]
                     for i in ["FAZ", "FCZ", "FGZ", "FTZ", "RAZ", "RCZ", "RGZ", "RTZ"]
