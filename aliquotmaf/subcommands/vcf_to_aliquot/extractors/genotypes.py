@@ -4,8 +4,21 @@ here are subclasses of `~maf_converter_lib.extractor.Extractor` objects.
 * ExtractVariantAlleleIndexParser   extracts the variant allele index
 * ExtractGenotypeAndDepthsParser    extracts the genotype and depths
 """
+from typing import Final, List
+
 from aliquotmaf.logger import Logger
 from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
+
+CAVEMAN_NUCLEOTIDE_COUNTS: Final[List[str]] = [
+    "FAZ",
+    "FCZ",
+    "FGZ",
+    "FTZ",
+    "RAZ",
+    "RCZ",
+    "RGZ",
+    "RTZ",
+]
 
 
 class VariantAlleleIndexExtractor(Extractor):
@@ -82,9 +95,7 @@ class GenotypeAndDepthsExtractor(Extractor):
             depths = [bcount[b_idx[i]] if i in b_idx else None for i in alleles]
 
         # Handle CaVEMan which provides genotype and counts for all nucleotides in forward and reverse strands
-        elif set(
-            ["GT", "FAZ", "FCZ", "FGZ", "FTZ", "RAZ", "RCZ", "RGZ", "RTZ"]
-        ).issubset(genotype.keys()):
+        elif set(["GT"] + CAVEMAN_NUCLEOTIDE_COUNTS).issubset(genotype.keys()):
             var_allele = alleles[var_allele_idx]
             var_f_count_name = f"F{var_allele}Z"
             var_r_count_name = f"R{var_allele}Z"
@@ -98,21 +109,16 @@ class GenotypeAndDepthsExtractor(Extractor):
             depths = [ref_count, var_count]
 
             # set DP to be sum of all observed base counts
-            new_gt["DP"] = sum(
-                [
-                    genotype[i]
-                    for i in ["FAZ", "FCZ", "FGZ", "FTZ", "RAZ", "RCZ", "RGZ", "RTZ"]
-                ]
-            )
-
-        # If DP is defined, set it in new_gt
-        if "DP" in genotype and genotype["DP"] is not None:
-            new_gt["DP"] = genotype["DP"]
+            new_gt["DP"] = sum([genotype[i] for i in CAVEMAN_NUCLEOTIDE_COUNTS])
 
         # If N depths not equal to N alleles, blank out the depths
         elif depths and len(depths) != len(alleles):
             cls.logger.warning("The length of DP array != length of allele array")
             depths = [None for i in alleles]
+
+        # If DP is defined, set it in new_gt
+        if "DP" in genotype and genotype["DP"] is not None:
+            new_gt["DP"] = genotype["DP"]
 
         # Sanity check that REF/ALT allele depths are lower than total depth
         if (
