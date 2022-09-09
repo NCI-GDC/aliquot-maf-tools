@@ -74,6 +74,22 @@ def test_variant_allele_index_extractor(genotype, expected):
             {"GT": (0, 0), "DP": 11, "AD": (1, 10)},
             [1, 10],
         ),
+        (
+            {
+                "GT": (0, 1),
+                "FAZ": 5,
+                "FCZ": 3,
+                "FGZ": 0,
+                "FTZ": 0,
+                "RAZ": 6,
+                "RCZ": 4,
+                "RGZ": 0,
+                "RTZ": 0,
+            },
+            ("A", "C"),
+            {"GT": (0, 1), "DP": 18, "AD": (11, 7)},
+            [11, 7],
+        ),
     ],
 )
 def test_genotype_and_depths_extractor(genotype, alleles, expected_gt, expected_dp):

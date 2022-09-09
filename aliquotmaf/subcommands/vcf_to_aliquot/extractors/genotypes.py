@@ -4,8 +4,21 @@ here are subclasses of `~maf_converter_lib.extractor.Extractor` objects.
 * ExtractVariantAlleleIndexParser   extracts the variant allele index
 * ExtractGenotypeAndDepthsParser    extracts the genotype and depths
 """
+from typing import Final, List
+
 from aliquotmaf.logger import Logger
 from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
+
+CAVEMAN_NUCLEOTIDE_COUNTS: Final[List[str]] = [
+    "FAZ",
+    "FCZ",
+    "FGZ",
+    "FTZ",
+    "RAZ",
+    "RCZ",
+    "RGZ",
+    "RTZ",
+]
 
 
 class VariantAlleleIndexExtractor(Extractor):
@@ -59,10 +72,6 @@ class GenotypeAndDepthsExtractor(Extractor):
         if not genotype["GT"]:
             return new_gt, depths
 
-        # If DP is defined, set it in new_gt
-        if "DP" in genotype and genotype["DP"] is not None:
-            new_gt["DP"] = genotype["DP"]
-
         # If AD is defined, then parse out all REF/ALT allele depths, or whatever is in it
         if "AD" in genotype and genotype["AD"] is not None:
             if isinstance(genotype["AD"], int):
@@ -85,10 +94,31 @@ class GenotypeAndDepthsExtractor(Extractor):
             bcount = list(genotype["BCOUNT"])
             depths = [bcount[b_idx[i]] if i in b_idx else None for i in alleles]
 
+        # Handle CaVEMan which provides genotype and counts for all nucleotides in forward and reverse strands
+        elif set(["GT"] + CAVEMAN_NUCLEOTIDE_COUNTS).issubset(genotype.keys()):
+            var_allele = alleles[var_allele_idx]
+            var_f_count_name = f"F{var_allele}Z"
+            var_r_count_name = f"R{var_allele}Z"
+            var_count = genotype[var_f_count_name] + genotype[var_r_count_name]
+            ref_allele = [al for al in alleles if al != var_allele][0]
+            ref_f_count_name = f"F{ref_allele}Z"
+            ref_r_count_name = f"R{ref_allele}Z"
+            ref_count = genotype[ref_f_count_name] + genotype[ref_r_count_name]
+
+            # set depths of alleles
+            depths = [ref_count, var_count]
+
+            # set DP to be sum of all observed base counts
+            new_gt["DP"] = sum([genotype[i] for i in CAVEMAN_NUCLEOTIDE_COUNTS])
+
         # If N depths not equal to N alleles, blank out the depths
         elif depths and len(depths) != len(alleles):
             cls.logger.warning("The length of DP array != length of allele array")
             depths = [None for i in alleles]
+
+        # If DP is defined, set it in new_gt
+        if "DP" in genotype and genotype["DP"] is not None:
+            new_gt["DP"] = genotype["DP"]
 
         # Sanity check that REF/ALT allele depths are lower than total depth
         if (
@@ -107,7 +137,7 @@ class GenotypeAndDepthsExtractor(Extractor):
                 )
             )
         ):
-            cls.logger.warning("REF/ALT allele depths are lower than total depth!!")
+            cls.logger.warning("REF/ALT allele depths are larger than total depth!!")
             new_gt["DP"] = 0
             for i in depths:
                 if i and i != ".":
