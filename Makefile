@@ -4,37 +4,42 @@ MODULE = aliquotmaf
 
 # Redirect error when run in container
 COMMIT_HASH:=$(shell git rev-parse HEAD 2>/dev/null)
-GIT_DESCRIBE:=$(shell git describe --tags 2>/dev/null)
+GIT_DESCRIBE:=$(shell git describe --tags --always 2>/dev/null)
 
-DOCKER_REPO := quay.io/ncigdc
-DOCKER_IMAGE_COMMIT := ${DOCKER_REPO}/${REPO}:${COMMIT_HASH}
-DOCKER_IMAGE_DESCRIBE := ${DOCKER_REPO}/${REPO}:${GIT_DESCRIBE}
-DOCKER_IMAGE_LATEST := ${DOCKER_REPO}/${REPO}:latest
+DOCKER_REGISTRY := docker.osdc.io
+DOCKER_IMAGE_COMMIT := ${DOCKER_REGISTRY}/ncigdc/${REPO}:${COMMIT_HASH}
+DOCKER_IMAGE_DESCRIBE := ${DOCKER_REGISTRY}/ncigdc/${REPO}:${GIT_DESCRIBE}
+DOCKER_IMAGE_LATEST := ${DOCKER_REGISTRY}/ncigdc/${REPO}:latest
 
-TWINE_REPOSITORY_URL?=
+# Env args
+PIP_EXTRA_INDEX_URL ?=
+PROXY ?=
 
-.PHONY: version version-* print-*
+
+.PHONY: version version-*
 version:
-	@python setup.py --version
+	@python -m setuptools_scm
 
 version-docker:
 	@echo ${DOCKER_IMAGE_DESCRIBE}
-
-version-docker-tag:
-	@echo
 
 .PHONY: docker-login
 docker-login:
 	docker login -u="${QUAY_USERNAME}" -p="${QUAY_PASSWORD}" quay.io
 
+.PHONY: venv
+venv:
+	@echo
+	rm -rf .venv/
+	tox -r -e dev --devenv .venv
 
 .PHONY: init init-*
 init: init-pip init-hooks
-init-pip: init-venv
+init-pip:
 	@echo
 	@echo -- Installing pip packages --
 	pip-sync requirements.txt dev-requirements.txt
-	python3 setup.py develop
+	python -m pip install -e .
 
 init-hooks:
 	@echo
@@ -43,7 +48,7 @@ init-hooks:
 
 init-venv:
 	@echo
-	PIP_REQUIRE_VIRTUALENV=true python3 -m pip install --upgrade pip pip-tools
+	PIP_REQUIRE_VIRTUALENV=true python -m pip install --upgrade pip pip-tools
 
 .PHONY: clean clean-*
 clean: clean-dirs
@@ -64,7 +69,7 @@ requirements-dev:
 	pip-compile -o dev-requirements.txt dev-requirements.in
 
 requirements-prod:
-	pip-compile -o requirements.txt
+	pip-compile -o requirements.txt pyproject.toml
 
 .PHONY: build build-*
 
@@ -75,14 +80,25 @@ build-docker: clean
 	@echo -- Building docker --
 	docker build . \
 		--file ./Dockerfile \
-		--build-arg http_proxy=${PROXY} \
-		--build-arg https_proxy=${PROXY} \
+		--build-arg http_proxy="${PROXY}" \
+		--build-arg https_proxy="${PROXY}" \
+		--build-arg REGISTRY="${DOCKER_REGISTRY}" \
+		--build-arg PIP_EXTRA_INDEX_URL=${PIP_EXTRA_INDEX_URL} \
 		-t "${DOCKER_IMAGE_COMMIT}" \
-		-t "${DOCKER_IMAGE_LATEST}"
+		-t "${DOCKER_IMAGE_DESCRIBE}" \
+		-t "${REPO}"
 
 build-pypi: clean
 	@echo
 	tox -e check_dist
+
+.PHONY: run run-*
+run:
+	@echo
+
+run-docker:
+	@echo
+	docker run --rm "${DOCKER_IMAGE_COMMIT}"
 
 .PHONY: lint test test-* tox
 test: tox
@@ -94,11 +110,6 @@ lint:
 test-unit:
 	pytest tests/
 
-test-tox:
-	@echo
-	@echo -- Unit Test --
-	tox
-
 test-docker:
 	@echo
 
@@ -108,12 +119,10 @@ tox:
 
 .PHONY: publish-*
 publish-docker:
-	docker tag ${DOCKER_IMAGE_COMMIT} ${DOCKER_IMAGE_DESCRIBE}
 	docker push ${DOCKER_IMAGE_COMMIT}
 	docker push ${DOCKER_IMAGE_DESCRIBE}
 
 publish-pypi:
 	@echo
 	@echo Publishing wheel
-	@python3 -m pip install --user --upgrade twine
 	python3 -m twine upload dist/*
