@@ -6,7 +6,7 @@
 #
 --extra-index-url https://nexus.osdc.io/repository/pypi-all/simple
 
-bioinf-maflib==2.0.0
+bioinf-maflib==2.3.0
     # via aliquot-maf-tools (pyproject.toml)
 click==8.1.3
     # via aliquot-maf-tools (pyproject.toml)
