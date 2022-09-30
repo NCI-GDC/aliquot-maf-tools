@@ -1,4 +1,4 @@
-FROM quay.io/ncigdc/python3.8-builder as builder
+FROM docker.osdc.io/ncigdc/python3.8-builder as builder
 
 COPY ./ /opt
 
@@ -6,7 +6,7 @@ WORKDIR /opt
 
 RUN pip install tox && tox -p
 
-FROM quay.io/ncigdc/python3.8
+FROM docker.osdc.io/ncigdc/python3.8
 
 COPY --from=builder /opt/dist/*.tar.gz /opt
 COPY requirements.txt /opt
