@@ -29,48 +29,55 @@ def test_variant_allele_index_extractor(genotype, expected):
 
 
 @pytest.mark.parametrize(
-    "genotype, alleles, expected_gt, expected_dp",
+    "genotype, alleles, caller_id, expected_gt, expected_dp",
     [
-        ({"GT": None}, (), {}, []),
+        ({"GT": None}, (), '', {}, []),
         (
             {"GT": (0, 0), "DP": 10, "AD": (9, 1)},
             ("A", "T"),
+            "Unknown",
             {"GT": (0, 0), "DP": 10, "AD": (9, 1)},
             [9, 1],
         ),
         (
             {"GT": (0, 0), "DP": 10, "AD": 8, "RD": 2},
             ("A", "T"),
+            "Unknown",
             {"GT": (0, 0), "DP": 10, "AD": (2, 8)},
             [2, 8],
         ),
         (
             {"GT": (0, 0), "DP": 10, "AD": (8), "RD": 2},
             ("A", "T"),
+            "Unknown",
             {"GT": (0, 0), "DP": 10, "AD": (2, 8)},
             [2, 8],
         ),
         (
             {"GT": (0, 0), "DP": 10, "BCOUNT": (8, 0, 0, 2)},
             ("A", "T"),
+            "Unknown",
             {"GT": (0, 0), "DP": 10, "AD": (8, 2)},
             [8, 2],
         ),
         (
             {"GT": (0, 0), "DP": 10, "AD": (11, 1)},
             ("A", "T"),
+            "Unknown",
             {"GT": (0, 0), "DP": 12, "AD": (11, 1)},
             [11, 1],
         ),
         (
             {"GT": (0, 0), "DP": 10, "AD": (1, 11)},
             ("A", "T"),
+            "Unknown",
             {"GT": (0, 0), "DP": 12, "AD": (1, 11)},
             [1, 11],
         ),
         (
             {"GT": (0, 0), "DP": 10, "AD": (1, 10)},
             ("A", "T"),
+            "Unknown",
             {"GT": (0, 0), "DP": 11, "AD": (1, 10)},
             [1, 10],
         ),
@@ -87,16 +94,42 @@ def test_variant_allele_index_extractor(genotype, expected):
                 "RTZ": 0,
             },
             ("A", "C"),
+            "CaVEMan",
             {"GT": (0, 1), "DP": 18, "AD": (11, 7)},
             [11, 7],
         ),
+        (
+            {
+                "GT": (0, 1),
+                "PP": 4,
+                "NP": 6,
+                "PB": 6,
+                "NB": 9,
+                "PD": 13,
+                "ND": 14,
+                "PR": 13,
+                "NR": 14,
+                "PU": 6,
+                "NU": 9,
+                "FD": 24,
+                "FC": 14,
+            },
+            ("GA", "G"),
+            "Sanger Pindel",
+            {"GT": (0, 1), "DP": 27, "AD": (17, 10)},
+            [17, 10],
+        ),
     ],
 )
-def test_genotype_and_depths_extractor(genotype, alleles, expected_gt, expected_dp):
+def test_genotype_and_depths_extractor(
+    genotype, alleles, caller_id, expected_gt, expected_dp
+):
     """
     Tests the extraction of the genotype and depths data from the vcf
     """
     idx = VariantAlleleIndexExtractor.extract(genotype)
-    new_gt, depths = GenotypeAndDepthsExtractor.extract(idx, genotype, alleles)
+    new_gt, depths = GenotypeAndDepthsExtractor.extract(
+        idx, genotype, alleles, caller_id
+    )
     assert new_gt == expected_gt
     assert depths == expected_dp

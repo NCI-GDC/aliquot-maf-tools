@@ -386,6 +386,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         vep_key,
         record,
         is_tumor_only,
+        caller_id,
     ):
         """
         Extract the VCF information needed to transform into MAF.
@@ -410,6 +411,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             var_allele_idx=var_allele_idx,
             genotype=record.samples[tumor_sample_id],
             alleles=record.alleles,
+            caller_id=caller_id,
         )
 
         if not is_tumor_only:
@@ -417,6 +419,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
                 var_allele_idx=var_allele_idx,
                 genotype=record.samples[normal_sample_id],
                 alleles=record.alleles,
+                caller_id=caller_id,
             )
         else:
             normal_gt, normal_depths = None, None

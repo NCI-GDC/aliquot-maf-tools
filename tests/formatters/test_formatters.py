@@ -9,27 +9,48 @@ import aliquotmaf.subcommands.vcf_to_aliquot.extractors as Extractors
 
 
 @pytest.mark.parametrize(
-    "genotype, ref_allele, var_allele, position, alleles, expected",
+    "genotype, ref_allele, var_allele, position, alleles, caller_id, expected",
     [
-        ({"GT": {}}, "A", "T", 100, ("A", "T"), ("A", "T")),
-        ({"GT": (0, 1), "AD": (1, 9), "DP": 10}, "A", "T", 100, ("A", "T"), ("A", "T")),
-        ({"GT": (0, 0), "AD": (1, 9), "DP": 10}, "A", "T", 100, ("A", "T"), ("A", "A")),
+        ({"GT": {}}, "A", "T", 100, ("A", "T"), "Unknown", ("A", "T")),
+        (
+            {"GT": (0, 1), "AD": (1, 9), "DP": 10},
+            "A",
+            "T",
+            100,
+            ("A", "T"),
+            "Unknown",
+            ("A", "T"),
+        ),
+        (
+            {"GT": (0, 0), "AD": (1, 9), "DP": 10},
+            "A",
+            "T",
+            100,
+            ("A", "T"),
+            "Unknown",
+            ("A", "A"),
+        ),
         (
             {"GT": (0, 1), "AD": (1, 9), "DP": 10},
             "AT",
             "A",
             100,
             ("AT", "A"),
+            "Unknown",
             ("T", "-"),
         ),
     ],
 )
-def test_format_alleles(genotype, ref_allele, var_allele, position, alleles, expected):
+def test_format_alleles(
+    genotype, ref_allele, var_allele, position, alleles, caller_id, expected
+):
     """
     Tests the function which formats alleles for MAF records
     """
     idx = Extractors.VariantAlleleIndexExtractor.extract(genotype)
-    gt, depths = Extractors.GenotypeAndDepthsExtractor.extract(idx, genotype, alleles)
+    gt, depths = Extractors.GenotypeAndDepthsExtractor.extract(
+        idx, genotype, alleles, caller_id
+    )
     loc = Extractors.LocationDataExtractor.extract(
         ref_allele, var_allele, position, alleles
     )
@@ -43,19 +64,26 @@ def test_format_alleles(genotype, ref_allele, var_allele, position, alleles, exp
 
 
 @pytest.mark.parametrize(
-    "genotype, alleles, expected",
+    "genotype, alleles, caller_id, expected",
     [
-        ({"GT": {}}, ("A", "T"), (0, None, None)),
-        ({"GT": (0, 1), "AD": (1, 9), "DP": 10}, ("A", "T"), (10, 1, 9)),
-        ({"GT": (0, 2), "AD": (1, 0, 9), "DP": 10}, ("A", "G", "T"), (10, 1, 9)),
+        ({"GT": {}}, ("A", "T"), "Unknown", (0, None, None)),
+        ({"GT": (0, 1), "AD": (1, 9), "DP": 10}, ("A", "T"), "Unknown", (10, 1, 9)),
+        (
+            {"GT": (0, 2), "AD": (1, 0, 9), "DP": 10},
+            ("A", "G", "T"),
+            "Unknown",
+            (10, 1, 9),
+        ),
     ],
 )
-def test_format_depths(genotype, alleles, expected):
+def test_format_depths(genotype, alleles, caller_id, expected):
     """
     Tests the function which formats depths for the MAF.
     """
     idx = Extractors.VariantAlleleIndexExtractor.extract(genotype)
-    gt, depths = Extractors.GenotypeAndDepthsExtractor.extract(idx, genotype, alleles)
+    gt, depths = Extractors.GenotypeAndDepthsExtractor.extract(
+        idx, genotype, alleles, caller_id
+    )
 
     dp, ref_ct, alt_ct = Formatters.format_depths(
         genotype=gt, depths=depths, var_allele_idx=idx, default_total_dp=0
