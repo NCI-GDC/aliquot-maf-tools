@@ -276,6 +276,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         tumor_sample_id = self.options["tumor_vcf_id"]
         normal_sample_id = self.options["normal_vcf_id"]
         is_tumor_only = self.options["tumor_only"]
+        caller_id = self.options["caller_id"]
 
         try:
             # Validate samples
@@ -316,6 +317,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
                     vep_key,
                     vcf_record,
                     is_tumor_only,
+                    caller_id,
                 )
 
                 # Skip rare occasions where VEP doesn't provide IMPACT or the consequence is ?
