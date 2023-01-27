@@ -296,14 +296,16 @@ class EffectsExtractor_102(EffectsExtractor):
             effect["Exon_Number"] = effect["EXON"]
             effect["Hugo_Symbol"] = effect["SYMBOL"]
             effect["TRANSCRIPT_STRAND"] = effect["STRAND"]
-            effect["1000G_AF"] = effect["AF"]
-            effect["1000G_AFR_AF"] = effect["AFR_AF"]
-            effect["1000G_AMR_AF"] = effect["AMR_AF"]
-            effect["1000G_EAS_AF"] = effect["EAS_AF"]
-            effect["1000G_EUR_AF"] = effect["EUR_AF"]
-            effect["1000G_SAS_AF"] = effect["SAS_AF"]
-            effect["ESP_AA_AF"] = effect["AA_AF"]
-            effect["ESP_EA_AF"] = effect["EA_AF"]
+
+            # these don't exist in Tumor-only
+            effect["1000G_AF"] = effect.get("AF", None)
+            effect["1000G_AFR_AF"] = effect.get("AFR_AF", None)
+            effect["1000G_AMR_AF"] = effect.get("AMR_AF", None)
+            effect["1000G_EAS_AF"] = effect.get("EAS_AF", None)
+            effect["1000G_EUR_AF"] = effect.get("EUR_AF", None)
+            effect["1000G_SAS_AF"] = effect.get("SAS_AF", None)
+            effect["ESP_AA_AF"] = effect.get("AA_AF", None)
+            effect["ESP_EA_AF"] = effect.get("EA_AF", None)
 
             # If VEP couldn't find this variant in dbSNP/etc., we'll say it's "novel"
             if effect["Existing_variation"]:

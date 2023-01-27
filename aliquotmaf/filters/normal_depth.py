@@ -11,7 +11,10 @@ class NormalDepth(Filter):
         super().__init__(name="NormalDepth")
         self.tags = ["ndp"]
         self.cutoff = cutoff
-        self.logger.info("Using normal depth cutoff of {0}".format(cutoff))
+        if cutoff is not None:
+            self.logger.info("Using normal depth cutoff of {0}".format(cutoff))
+        else:
+            self.logger.info("Normal depth cutoff not in use")
 
     @classmethod
     def setup(cls, cutoff):
@@ -19,6 +22,8 @@ class NormalDepth(Filter):
         return curr
 
     def filter(self, maf_record):
+        if self.cutoff is None:
+            return False
         ndp = maf_record["n_depth"].value
         return ndp is not None and ndp <= self.cutoff
 
