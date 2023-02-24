@@ -65,6 +65,9 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
             "--gatk4-mutect2-pair",
             help="Path to input protected GATK4 MuTect2 Pair MAF file",
         )
+        parser.add_argument(
+            "--gatk4-mutect2", help="Path to input protected GATK4 MuTect2 MAF file"
+        )
 
     def load_readers(self):
         """
@@ -81,6 +84,7 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
             "caveman",
             "sanger_pindel",
             "gatk4_mutect2_pair",
+            "gatk4_mutect2",
         ]
 
         for maf_key in maf_keys:
@@ -148,15 +152,18 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
             peekable_iterator_class=FilteringPeekableIterator,
         )
 
-        # ndp filter
-        ndp_filter = Filters.NormalDepth.setup(self.options["min_n_depth"])
+        # Set up Normal Depth Filter for tumor-only or tumor-normal operation
+        if self.options['tumor_only']:
+            ndp_filter = Filters.NormalDepth.setup(None)
+        else:
+            ndp_filter = Filters.NormalDepth.setup(self.options["min_n_depth"])
         ndp_tag = ndp_filter.tags[0]
 
         # Counts
         processed = 0
         try:
             for record in o_iter:
-
+                # progress update
                 if processed > 0 and processed % 1000 == 0:
                     self.logger.info(
                         "Processed {0} overlapping intervals...".format(processed)

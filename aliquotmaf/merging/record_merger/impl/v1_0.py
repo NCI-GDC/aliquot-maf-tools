@@ -184,10 +184,12 @@ class MafRecordMerger_1_0_0(
                 selected_caller = results[caller][0]
                 break
 
+        # iterate over columns as defined by schema
         for column in self.columns:
             if column in self.allele_columns() or column == "callers":
                 continue
 
+            # do something special with depth columns
             elif column in self.average_columns(tumor_only=tumor_only):
                 vals = []
                 for caller in callers:
