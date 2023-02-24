@@ -65,6 +65,9 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
             "--gatk4-mutect2-pair",
             help="Path to input protected GATK4 MuTect2 Pair MAF file",
         )
+        parser.add_argument(
+            "--gatk4-mutect2", help="Path to input protected GATK4 MuTect2 MAF file"
+        )
 
     def load_readers(self):
         """
@@ -81,6 +84,7 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
             "caveman",
             "sanger_pindel",
             "gatk4_mutect2_pair",
+            "gatk4_mutect2",
         ]
 
         for maf_key in maf_keys:
