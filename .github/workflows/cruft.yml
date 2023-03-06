@@ -1,0 +1,37 @@
+on:
+  schedule:
+    - cron: '0 0 0 ? * SUN *'
+
+jobs:
+  setup:
+    name: Initalize
+    runs-on: ubuntu-latest
+    env:
+      REPO_SETUP_TOKEN: ${{ secrets.REPO_SETUP_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ env.REPO_SETUP_TOKEN || secrets.GITHUB_TOKEN }}
+      
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      
+      - name: Install cruft
+        run: pip install cookiecutter cruft
+
+      - name: Cruft check
+        run: |
+          cruft check && \
+          echo "STATUS=$?" >> $GITHUB_ENV
+
+      - name: Create cruft branch
+        if: ${{ env.FOO  != 0 }}
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com" && \
+          git config --global user.name "github-actions[bot]" && \
+          git checkout -b chore/cruft-$(date -Idate) && \
+          cruft update -y --allow-untracked-files && \
+          git add . && \
+          git commit -m 'Initial commit' && \
+          git push -u origin HEAD
