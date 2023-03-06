@@ -29,6 +29,7 @@ jobs:
 
       - name: Create cruft branch
         if: ${{ env.FOO  != 0 }}
+        shell: bash
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com" && \
           git config --global user.name "github-actions[bot]" && \
