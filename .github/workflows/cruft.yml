@@ -15,7 +15,7 @@ jobs:
         with:
           token: ${{ env.REPO_SETUP_TOKEN || secrets.GITHUB_TOKEN }}
       
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.x'
       
