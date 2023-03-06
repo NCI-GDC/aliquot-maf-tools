@@ -23,6 +23,8 @@ jobs:
         run: pip install cookiecutter cruft
 
       - name: Cruft check
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cruft check && \
           echo "STATUS=$?" >> $GITHUB_ENV
