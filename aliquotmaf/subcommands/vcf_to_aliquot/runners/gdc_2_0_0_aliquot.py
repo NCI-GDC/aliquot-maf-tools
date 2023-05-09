@@ -55,6 +55,8 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             "hotspots": None,
             "gnomad": None,
             "entrez": None,
+            "entrez_gene_id": None,
+            "gnomad_noncancer": None
         }
 
         # Filters
