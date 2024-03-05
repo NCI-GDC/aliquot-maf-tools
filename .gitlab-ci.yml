@@ -5,7 +5,7 @@
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Python.gitlab-ci.yml
 include:
   - project: nci-gdc/gitlab-templates
-    ref: "0.1.0"
+    ref: 0.1.0
     file:
       - templates/global/full.yaml
       - templates/python/full.yaml
