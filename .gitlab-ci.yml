@@ -11,10 +11,10 @@ include:
       - templates/python/full.yaml
 
 variables:
-  BASE_CONTAINER_VERSION: "2.0.1"
-  DOCKER_BUILDKIT: 1
-  PIP_EXTRA_INDEX_URL: https://nexus.osdc.io/repository/pypi-all/simple
-  DOCKER_BUILD_OPTS: "--build-arg PIP_EXTRA_INDEX_URL=https://nexus.osdc.io/repository/pypi-all/simple"
+ BASE_CONTAINER_VERSION: "2.0.1"
+ DOCKER_BUILDKIT: 1
+ PIP_EXTRA_INDEX_URL: https://nexus.osdc.io/repository/pypi-all/simple
+ DOCKER_BUILD_OPTS: "--build-arg PIP_EXTRA_INDEX_URL=https://nexus.osdc.io/repository/pypi-all/simple"
 
 tox:
   image: ${BASE_CONTAINER_REGISTRY}/${REPO_PY_VERSION}-builder:${BASE_CONTAINER_VERSION}
