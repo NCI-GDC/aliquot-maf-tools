@@ -20,7 +20,7 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
     "click",
-    "bioinf-maflib",
+    "bioinf-maflib>=2.3.0",
     "pysam",
     "pandas",
     "pyarrow>=4.0.*",
