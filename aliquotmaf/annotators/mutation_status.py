@@ -4,7 +4,7 @@ MutationStatus annotator. Sets the Germline/Somatic/LOH/Unknown etc status for M
 from __future__ import absolute_import
 
 from aliquotmaf.converters.builder import get_builder
-
+from aliquotmaf.constants import variant_callers
 from .annotator import Annotator
 
 
@@ -13,16 +13,19 @@ class MutationStatus(Annotator):
         super().__init__(name="MutationStatus", scheme=scheme)
         self.caller = caller
         self.mapper = {
-            "MuTect2": self._mutect2,
-            "GATK4 MuTect2": self._mutect2,
-            "SomaticSniper": self._somaticsniper,
-            "MuSE": self._muse,
-            "VarScan2": self._varscan,
-            "Pindel": self._muse,
-            "VarDict": self._vardict,
-            "CaVEMan": self._mutect2,
-            "Sanger Pindel": self._mutect2,
-            "GATK4 MuTect2 Pair": self._mutect2,
+            variant_callers.MUTECT2: self._always_somatic,
+            variant_callers.GATK4_MUTECT2: self._always_somatic,
+            variant_callers.SOMATIC_SNIPER: self._somaticsniper,
+            variant_callers.MUSE: self._muse,
+            variant_callers.VARSCAN2: self._varscan,
+            variant_callers.PINDEL: self._muse,
+            variant_callers.VARDICT: self._vardict,
+            variant_callers.CAVEMAN: self._always_somatic,
+            variant_callers.SANGER_PINDEL: self._always_somatic,
+            variant_callers.GATK4_MUTECT2_PAIR: self._always_somatic,
+            variant_callers.SVABA: self._always_somatic
+            variant_callers.STRELKA2_MANTA: self._always_somatic, # needs validation
+
         }
 
     @classmethod
@@ -38,7 +41,7 @@ class MutationStatus(Annotator):
         )
         return maf_record
 
-    def _mutect2(self, record, tumor_sample):
+    def _always_somatic(self, record, tumor_sample):
         """Always somatic for MuTect2"""
         return "Somatic"
 
