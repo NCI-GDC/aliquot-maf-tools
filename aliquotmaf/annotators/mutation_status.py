@@ -13,19 +13,18 @@ class MutationStatus(Annotator):
         super().__init__(name="MutationStatus", scheme=scheme)
         self.caller = caller
         self.mapper = {
-            variant_callers.MUTECT2: self._always_somatic,
-            variant_callers.GATK4_MUTECT2: self._always_somatic,
-            variant_callers.SOMATIC_SNIPER: self._somaticsniper,
-            variant_callers.MUSE: self._muse,
-            variant_callers.VARSCAN2: self._varscan,
-            variant_callers.PINDEL: self._muse,
-            variant_callers.VARDICT: self._vardict,
-            variant_callers.CAVEMAN: self._always_somatic,
-            variant_callers.SANGER_PINDEL: self._always_somatic,
-            variant_callers.GATK4_MUTECT2_PAIR: self._always_somatic,
-            variant_callers.SVABA: self._always_somatic
-            variant_callers.STRELKA2_MANTA: self._always_somatic, # needs validation
-
+            variant_callers.MUTECT2.GDC_ENUM: self._always_somatic,
+            variant_callers.GATK4_MUTECT2.GDC_ENUM: self._always_somatic,
+            variant_callers.SOMATIC_SNIPER.GDC_ENUM: self._somaticsniper,
+            variant_callers.MUSE.GDC_ENUM: self._muse,
+            variant_callers.VARSCAN2.GDC_ENUM: self._varscan,
+            variant_callers.PINDEL.GDC_ENUM: self._muse,
+            variant_callers.VARDICT.GDC_ENUM: self._vardict,
+            variant_callers.CAVEMAN.GDC_ENUM: self._always_somatic,
+            variant_callers.SANGER_PINDEL.GDC_ENUM: self._always_somatic,
+            variant_callers.GATK4_MUTECT2_PAIR.GDC_ENUM: self._always_somatic,
+            variant_callers.SVABA_SOMATIC.GDC_ENUM: self._always_somatic,
+            variant_callers.STRELKA_SOMATIC.GDC_ENUM: self._always_somatic, # needs validation
         }
 
     @classmethod

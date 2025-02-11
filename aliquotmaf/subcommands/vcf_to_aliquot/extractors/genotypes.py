@@ -105,8 +105,10 @@ class GenotypeAndDepthsExtractor(Extractor):
             depths, dp = cls.__extract_pindel(genotype)
         if caller_id == variant_callers.SANGER_PINDEL:
             depths, dp = cls.__extract_sanger_pindel(genotype)
-        if caller_id == variant_callers.SVABA:
-            depths, dp = cls.__extract_svaba(genotype)
+        if caller_id == variant_callers.SVABA_SOMATIC:
+            depths, dp = cls.__extract_svaba_somatic(genotype)
+        if caller_id == variant_callers.STRELKA_SOMATIC:
+            depths, dp = cls.__strelka_somatic(genotype)
         
         # Set the formatted AD and alleles
         new_gt["AD"] = tuple([i if i != "" and i is not None else "." for i in depths])
@@ -255,7 +257,7 @@ class GenotypeAndDepthsExtractor(Extractor):
         return (allele_depths, dp)
 
     @classmethod
-    def __extract_svaba(cls, genotype):
+    def __extract_svaba_somatic(cls, genotype):
         """
         SvABA only reports the depth of the alt allele in 'AD' and reports
         total depth in 'DP' so we infer the ref allele depth from these.
@@ -266,6 +268,14 @@ class GenotypeAndDepthsExtractor(Extractor):
         allele_depths = [ref_depth, alt_depth]
         dp = total_depth
         return (allele_depths, dp)
+
+    def _extract_strelka_somatic(cls, genotype):
+        """
+        There are two subtypes we have to deal with 
+
+        Strelka reports total depth in DP
+        """
+        pass
 
     def extract_legacy(cls, var_allele_idx, genotype, alleles):
         """

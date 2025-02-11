@@ -17,6 +17,7 @@ from aliquotmaf.merging.filtering_iterator import FilteringPeekableIterator
 from aliquotmaf.merging.overlap_set import OverlapSet
 from aliquotmaf.merging.record_merger.impl.v1_0 import MafRecordMerger_1_0_0
 from aliquotmaf.subcommands.merge_aliquot.runners import BaseRunner
+from aliquotmaf.constants import variant_callers
 
 
 class GDC_1_0_0_Aliquot_Merged(BaseRunner):
@@ -34,19 +35,19 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
             "--tumor_only", action="store_true", help="If this is a tumor-only MAF"
         )
         parser.add_argument(
-            "--mutect2", help="Path to input protected MuTect2 MAF file"
+            variant_callers.MUTECT2.option(), help="Path to input protected MuTect2 MAF file"
         )
-        parser.add_argument("--muse", help="Path to input protected MuSE MAF file")
+        parser.add_argument(variant_callers.MUSE.option(), help="Path to input protected MuSE MAF file")
         parser.add_argument(
-            "--vardict", help="Path to input protected VarDict MAF file"
-        )
-        parser.add_argument(
-            "--varscan2", help="Path to input protected VarScan2 MAF file"
+            variant_callers.VARDICT.option(), help="Path to input protected VarDict MAF file"
         )
         parser.add_argument(
-            "--somaticsniper", help="Path to input protected SomaticSniper MAF file"
+            variant_callers.VARSCAN2.option(), help="Path to input protected VarScan2 MAF file"
         )
-        parser.add_argument("--pindel", help="Path to input protected Pindel MAF file")
+        parser.add_argument(
+            variant_callers.SOMATIC_SNIPER.option(), help="Path to input protected SomaticSniper MAF file"
+        )
+        parser.add_argument(variant_callers.PINDEL.option(), help="Path to input protected Pindel MAF file")
         parser.add_argument(
             "--min_n_depth",
             type=int,
@@ -56,17 +57,17 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
             + "depths across callers [7]",
         )
         parser.add_argument(
-            "--caveman", help="Path to input protected CaVEMan MAF file"
+            variant_callers.CAVEMAN.option(), help="Path to input protected CaVEMan MAF file"
         )
         parser.add_argument(
-            "--sanger-pindel", help="Path to input protected Sanger Pindel MAF file"
+            variant_callers.SANGER_PINDEL.option(), help="Path to input protected Sanger Pindel MAF file"
         )
         parser.add_argument(
-            "--gatk4-mutect2-pair",
+            variant_callers.GATK4_MUTECT2_PAIR.option(),
             help="Path to input protected GATK4 MuTect2 Pair MAF file",
         )
         parser.add_argument(
-            "--gatk4-mutect2", help="Path to input protected GATK4 MuTect2 MAF file"
+            variant_callers.GATK4_MUTECT2.option(), help="Path to input protected GATK4 MuTect2 MAF file"
         )
 
     def load_readers(self):
@@ -75,16 +76,16 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
         """
         # TODO: Add more callers
         maf_keys = [
-            "mutect2",
-            "muse",
-            "vardict",
-            "varscan2",
-            "somaticsniper",
-            "pindel",
-            "caveman",
-            "sanger_pindel",
-            "gatk4_mutect2_pair",
-            "gatk4_mutect2",
+            variant_callers.MUTECT2.snake(),
+            variant_callers.MUSE.snake(),
+            variant_callers.VARDICT.snake(),
+            variant_callers.VARSCAN2.snake(),
+            variant_callers.SOMATIC_SNIPER.snake(),
+            variant_callers.PINDEL.snake(),
+            variant_callers.CAVEMAN.snake(),
+            variant_callers.SANGER_PINDEL.snake(),
+            variant_callers.GATK4_MUTECT2_PAIR.snake(),
+            variant_callers.GATK4_MUTECT2.snake(),
         ]
 
         for maf_key in maf_keys:

@@ -1,6 +1,7 @@
 """
 Maf recorder merger implementation v1.0
 """
+from aliquotmaf.constants import variant_callers
 from aliquotmaf.converters.builder import get_builder
 from aliquotmaf.converters.utils import init_empty_maf_record
 from aliquotmaf.merging.record_merger.base import BaseMafRecordMerger
@@ -41,16 +42,16 @@ class MafRecordMerger_1_0_0(
         :return: a ``list`` of caller names in their order of priority.
         """
         return [
-            "vardict",
-            "pindel",
-            "mutect2",
-            "muse",
-            "varscan2",
-            "caveman",
-            "sanger_pindel",
-            "gatk4_mutect2_pair",
-            "gatk4_mutect2",
-            "somaticsniper",
+            variant_callers.VARDICT.snake(),
+            variant_callers.PINDEL.snake(),
+            variant_callers.MUTECT2.snake(),
+            variant_callers.MUSE.snake(),
+            variant_callers.VARSCAN2.snake(),
+            variant_callers.CAVEMAN.snake(),
+            variant_callers.SANGER_PINDEL.snake(),
+            variant_callers.GATK4_MUTECT2_PAIR.snake(),
+            variant_callers.GATK4_MUTECT2.snake(),
+            variant_callers.SOMATIC_SNIPER.snake()
         ]
 
     def caller_type_order(self):
@@ -60,37 +61,37 @@ class MafRecordMerger_1_0_0(
         """
         # TODO: add svaba?
         return [
-            ("mutect2", "MNP"),
-            ("gatk4_mutect2_pair", "MNP"),
-            ("gatk4_mutect2", "MNP"),
-            ("vardict", "MNP"),
-            ("pindel", "MNP"),
-            ("sanger_pindel", "MNP"),
-            ("caveman", "MNP"),
-            ("mutect2", "DEL"),
-            ("gatk4_mutect2_pair", "DEL"),
-            ("gatk4_mutect2", "DEL"),
-            ("vardict", "DEL"),
-            ("pindel", "DEL"),
-            ("sanger_pindel", "DEL"),
-            ("varscan2", "DEL"),
-            ("caveman", "DEL"),
-            ("mutect2", "INS"),
-            ("gatk4_mutect2_pair", "INS"),
-            ("gatk4_mutect2", "INS"),
-            ("vardict", "INS"),
-            ("pindel", "INS"),
-            ("sanger_pindel", "INS"),
-            ("varscan2", "INS"),
-            ("caveman", "INS"),
-            ("mutect2", "SNP"),
-            ("gatk4_mutect2_pair", "SNP"),
-            ("gatk4_mutect2", "SNP"),
-            ("muse", "SNP"),
-            ("vardict", "SNP"),
-            ("varscan2", "SNP"),
-            ("somaticsniper", "SNP"),
-            ("caveman", "SNP"),
+            (variant_callers.MUTECT2.snake(), "MNP"),
+            (variant_callers.GATK4_MUTECT2_PAIR.snake(), "MNP"),
+            (variant_callers.GATK4_MUTECT2.snake(), "MNP"),
+            (variant_callers.VARDICT.snake(), "MNP"),
+            (variant_callers.PINDEL.snake(), "MNP"),
+            (variant_callers.SANGER_PINDEL.snake(), "MNP"),
+            (variant_callers.CAVEMAN.snake(), "MNP"),
+            (variant_callers.MUTECT2.snake(), "DEL"),
+            (variant_callers.GATK4_MUTECT2_PAIR.snake(), "DEL"),
+            (variant_callers.GATK4_MUTECT2.snake(), "DEL"),
+            (variant_callers.VARDICT.snake(), "DEL"),
+            (variant_callers.PINDEL.snake(), "DEL"),
+            (variant_callers.SANGER_PINDEL.snake(), "DEL"),
+            (variant_callers.VARSCAN2.snake(), "DEL"),
+            (variant_callers.CAVEMAN.snake(), "DEL"),
+            (variant_callers.MUTECT2.snake(), "INS"),
+            (variant_callers.GATK4_MUTECT2_PAIR.snake(), "INS"),
+            (variant_callers.GATK4_MUTECT2.snake(), "INS"),
+            (variant_callers.VARDICT.snake(), "INS"),
+            (variant_callers.PINDEL.snake(), "INS"),
+            (variant_callers.SANGER_PINDEL.snake(), "INS"),
+            (variant_callers.VARSCAN2.snake(), "INS"),
+            (variant_callers.CAVEMAN.snake(), "INS"),
+            (variant_callers.MUTECT2.snake(), "SNP"),
+            (variant_callers.GATK4_MUTECT2_PAIR.snake(), "SNP"),
+            (variant_callers.GATK4_MUTECT2.snake(), "SNP"),
+            (variant_callers.MUSE.snake(), "SNP"),
+            (variant_callers.VARDICT.snake(), "SNP"),
+            (variant_callers.VARSCAN2.snake(), "SNP"),
+            (variant_callers.SOMATIC_SNIPER.snake(), "SNP"),
+            (variant_callers.CAVEMAN.snake(), "SNP"),
         ]
 
     def merge_records(self, results, tumor_only=False):
