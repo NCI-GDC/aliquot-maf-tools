@@ -261,6 +261,15 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             "Processing input vcf {0}...".format(self.options["input_vcf"])
         )
 
+        # Check for caller implemented
+        if self.options['caller_id'] in [variant_callers.STRELKA_SOMATIC]:
+            self.logger.error(
+                "Variant caller {} not yet implemented".format(
+                    self.options['caller_id']
+                )
+            )
+            return False
+
         # Initialize the maf file
         self.setup_maf_header()
 

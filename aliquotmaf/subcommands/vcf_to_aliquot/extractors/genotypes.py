@@ -263,7 +263,7 @@ class GenotypeAndDepthsExtractor(Extractor):
         total depth in 'DP' so we infer the ref allele depth from these.
         """
         total_depth = genotype['DP']
-        alt_depth = genotype['AD']
+        alt_depth = genotype['AD'][0]
         ref_depth = total_depth - alt_depth
         allele_depths = [ref_depth, alt_depth]
         dp = total_depth

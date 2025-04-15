@@ -46,7 +46,7 @@ def flatten_tuple(t):
 
 variant_callers = VariantCallerConstants()
 
-SPLICE_CONSEQUENCES = Final[set([
+SPLICE_CONSEQUENCES = frozenset([
     'splice_acceptor_variant',
     'splice_donor_variant'
-])]
+])
