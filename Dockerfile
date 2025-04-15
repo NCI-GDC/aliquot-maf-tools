@@ -19,7 +19,3 @@ WORKDIR /opt
 RUN pip install --no-deps -r requirements.txt \
 	&& pip install --no-deps *.whl \
 	&& rm -f *.whl requirements.txt
-
-ENTRYPOINT ["aliquotmaf"]
-
-CMD ["--help"]
