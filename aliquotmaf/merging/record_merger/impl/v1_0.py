@@ -42,6 +42,7 @@ class MafRecordMerger_1_0_0(
         :return: a ``list`` of caller names in their order of priority.
         """
         return [
+            variant_callers.SVABA_SOMATIC.snake(),
             variant_callers.VARDICT.snake(),
             variant_callers.PINDEL.snake(),
             variant_callers.MUTECT2.snake(),
@@ -51,7 +52,8 @@ class MafRecordMerger_1_0_0(
             variant_callers.SANGER_PINDEL.snake(),
             variant_callers.GATK4_MUTECT2_PAIR.snake(),
             variant_callers.GATK4_MUTECT2.snake(),
-            variant_callers.SOMATIC_SNIPER.snake()
+            variant_callers.STRELKA_SOMATIC.snake(),
+            variant_callers.SOMATIC_SNIPER.snake(),
         ]
 
     def caller_type_order(self):
@@ -59,26 +61,31 @@ class MafRecordMerger_1_0_0(
         :return: a ``list`` of ``tuples`` of the format (caller, variant type)
         in their order of priority.
         """
-        # TODO: add svaba?
+        # We only expect INS/DEL from SvABA
         return [
             (variant_callers.MUTECT2.snake(), "MNP"),
             (variant_callers.GATK4_MUTECT2_PAIR.snake(), "MNP"),
             (variant_callers.GATK4_MUTECT2.snake(), "MNP"),
+            (variant_callers.STRELKA_SOMATIC.snake(), "MNP"),
             (variant_callers.VARDICT.snake(), "MNP"),
             (variant_callers.PINDEL.snake(), "MNP"),
             (variant_callers.SANGER_PINDEL.snake(), "MNP"),
             (variant_callers.CAVEMAN.snake(), "MNP"),
+            (variant_callers.SVABA_SOMATIC.snake(), "DEL"),
             (variant_callers.MUTECT2.snake(), "DEL"),
             (variant_callers.GATK4_MUTECT2_PAIR.snake(), "DEL"),
             (variant_callers.GATK4_MUTECT2.snake(), "DEL"),
+            (variant_callers.STRELKA_SOMATIC.snake(), "DEL"),
             (variant_callers.VARDICT.snake(), "DEL"),
             (variant_callers.PINDEL.snake(), "DEL"),
             (variant_callers.SANGER_PINDEL.snake(), "DEL"),
             (variant_callers.VARSCAN2.snake(), "DEL"),
             (variant_callers.CAVEMAN.snake(), "DEL"),
+            (variant_callers.SVABA_SOMATIC.snake(), "INS"),
             (variant_callers.MUTECT2.snake(), "INS"),
             (variant_callers.GATK4_MUTECT2_PAIR.snake(), "INS"),
             (variant_callers.GATK4_MUTECT2.snake(), "INS"),
+            (variant_callers.STRELKA_SOMATIC.snake(), "INS"),
             (variant_callers.VARDICT.snake(), "INS"),
             (variant_callers.PINDEL.snake(), "INS"),
             (variant_callers.SANGER_PINDEL.snake(), "INS"),
@@ -87,6 +94,7 @@ class MafRecordMerger_1_0_0(
             (variant_callers.MUTECT2.snake(), "SNP"),
             (variant_callers.GATK4_MUTECT2_PAIR.snake(), "SNP"),
             (variant_callers.GATK4_MUTECT2.snake(), "SNP"),
+            (variant_callers.STRELKA_SOMATIC.snake(), "SNP"),
             (variant_callers.MUSE.snake(), "SNP"),
             (variant_callers.VARDICT.snake(), "SNP"),
             (variant_callers.VARSCAN2.snake(), "SNP"),

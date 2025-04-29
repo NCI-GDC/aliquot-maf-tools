@@ -20,20 +20,6 @@ CAVEMAN_NUCLEOTIDE_COUNTS: Final[List[str]] = [
     "RGZ",
     "RTZ",
 ]
-PINDEL_NUCLEOTIDE_COUNTS: Final[List[str]] = [
-    "ND",
-    "PD",
-    "NR",
-    "PR",
-    "NB",
-    "PB",
-    "NP",
-    "PP",
-    "NU",
-    "PU",
-    "FD",
-    "FC",
-]
 
 
 class VariantAlleleIndexExtractor(Extractor):
@@ -71,6 +57,40 @@ class GenotypeAndDepthsExtractor(Extractor):
     @classmethod
     def extract(cls, var_allele_idx, genotype, alleles, caller_id):
         """
+        Extracts genotype and allele depths from variant and normalizes
+        the formatting before returning the results.
+
+        :param var_allele_idx: the variant allele index
+        :param genotype: a dictionary or dictionary-like object containing
+                         various possible keys like AD, DP, etc.
+        :param alleles: an ordered list or tuple of the possible alleles
+                        at the locus
+        :param caller_id: a string identifying the variant caller that
+                          generated the vcf file
+        :returns: an updated genotype record and depths list
+        """
+        depths = []
+        new_gt = {}
+        dp = 0
+        if genotype.get("GT", {}):
+            # extract depths and dp from vcf
+            depths, dp = cls._dispatch_extractor(
+                var_allele_idx, genotype, alleles, caller_id
+            )
+            # Format allele depths for AD
+            new_gt["AD"] = tuple(
+                [i if i != "" and i is not None else "." for i in depths]
+            )
+            # Format numerical depths
+            depths = [i if i != "." and i is not None else 0 for i in new_gt["AD"]]
+            # Set other tags
+            new_gt["GT"] = genotype["GT"]
+            new_gt["DP"] = dp
+        return new_gt, depths
+
+    @classmethod
+    def _dispatch_extractor(cls, var_allele_idx, genotype, alleles, caller_id):
+        """
         Decides which extraction algorithm to use based on the caller_id.
 
         :param var_allele_idx: the variant allele index
@@ -78,66 +98,48 @@ class GenotypeAndDepthsExtractor(Extractor):
                          various possible keys like AD, DP, etc.
         :param alleles: an ordered list or tuple of the possible alleles
                         at the locus
-        :param caller_id: a string identifying the variant caller that 
+        :param caller_id: a string identifying the variant caller that
                           generated the vcf file
-        :returns: an updated genotype record and depths list
         """
         depths = []
-        new_gt = {}
-        if not genotype["GT"]:
-            return new_gt, depths
-        
+        dp = 0
         if caller_id == variant_callers.CAVEMAN:
-            depths, dp = cls.__extract_caveman(var_allele_idx, genotype, alleles)
+            depths, dp = cls._extract_caveman(var_allele_idx, genotype, alleles)
         if caller_id == variant_callers.GATK4_MUTECT2:
-            depths, dp = cls.__extract_mutect2(genotype)
+            depths, dp = cls._extract_mutect2(genotype)
         if caller_id == variant_callers.MUTECT2:
-            depths, dp = cls.__extract_mutect2(genotype)
+            depths, dp = cls._extract_mutect2(genotype)
         if caller_id == variant_callers.GATK4_MUTECT2_PAIR:
-            depths, dp = cls.__extract_mutect2(genotype)
+            depths, dp = cls._extract_mutect2(genotype)
         if caller_id == variant_callers.SOMATIC_SNIPER:
-            depths, dp = cls.__extract_somaticsniper(var_allele_idx, genotype, alleles)
+            depths, dp = cls._extract_somaticsniper(var_allele_idx, genotype, alleles)
         if caller_id == variant_callers.MUSE:
-            depths, dp = cls.__extract_muse(genotype)
+            depths, dp = cls._extract_muse(genotype)
         if caller_id == variant_callers.VARSCAN2:
-            depths, dp = cls.__extract_varscan2(var_allele_idx, genotype, alleles)
+            depths, dp = cls._extract_varscan2(var_allele_idx, genotype, alleles)
         if caller_id == variant_callers.PINDEL:
-            depths, dp = cls.__extract_pindel(genotype)
+            depths, dp = cls._extract_pindel(genotype)
         if caller_id == variant_callers.SANGER_PINDEL:
-            depths, dp = cls.__extract_sanger_pindel(genotype)
+            depths, dp = cls._extract_sanger_pindel(genotype)
         if caller_id == variant_callers.SVABA_SOMATIC:
-            depths, dp = cls.__extract_svaba_somatic(genotype)
+            depths, dp = cls._extract_svaba_somatic(genotype)
         if caller_id == variant_callers.STRELKA_SOMATIC:
-            depths, dp = cls.__strelka_somatic(genotype)
-        
-        # Set the formatted AD and alleles
-        new_gt["AD"] = tuple([i if i != "" and i is not None else "." for i in depths])
-        new_gt["GT"] = genotype["GT"]
-        new_gt["DP"] = dp
-        depths = [i if i != "." and i is not None else 0 for i in new_gt["AD"]]
-        return new_gt, depths
-
-
-
-            # if caller_id == variant_callers.VARDICT:
-            #     self.extract_legacy(cls, var_allele_idx, genotype, alleles)
-
-
-            # if caller_id == variant_callers.STRELKA2_MANTA:
-            #     self.extract_legacy(cls, var_allele_idx, genotype, alleles)
-
-            # if caller_id == variant_callers.ABSOLUTE:
-            #     self.extract_legacy(cls, var_allele_idx, genotype, alleles)
+            depths, dp = cls._extract_strelka_somatic(genotype)
+        # if caller_id == variant_callers.VARDICT:
+        #     self.extract_legacy(cls, var_allele_idx, genotype, alleles)
+        return depths, dp
 
     @classmethod
-    def __extract_mutect2(cls, genotype):
+    def _extract_mutect2(cls, genotype):
         '''
-        MuTect2 should always have the AD tag set and may or may not have 
-        the DP flag set. This function handles those cases, adding up 
+        MuTect2 should always have the AD tag set and may or may not have
+        the DP flag set. This function handles those cases, adding up
         allele-depths when necessary.
         '''
 
-        DP_IS_SET = ("DP" in genotype and genotype["DP"] is not None and genotype["DP"] != '.')
+        DP_IS_SET = (
+            "DP" in genotype and genotype["DP"] is not None and genotype["DP"] != '.'
+        )
         # set allele depths
         if isinstance(genotype["AD"], int):
             allele_depths = [genotype["AD"]]
@@ -149,9 +151,9 @@ class GenotypeAndDepthsExtractor(Extractor):
         else:
             dp = sum([i for i in allele_depths if i and i != "."])
         return (allele_depths, dp)
-    
+
     @classmethod
-    def __extract_muse(cls, genotype):
+    def _extract_muse(cls, genotype):
         '''
         MuSE reports AD and DP tags
         '''
@@ -163,7 +165,7 @@ class GenotypeAndDepthsExtractor(Extractor):
         return (allele_depths, dp)
 
     @classmethod
-    def __extract_caveman(cls, var_allele_idx, genotype, alleles):
+    def _extract_caveman(cls, var_allele_idx, genotype, alleles):
         '''
         CaVEMan provides genotype and counts for all nucleotides
         in forward and reverse strand so we need to add them up
@@ -187,7 +189,7 @@ class GenotypeAndDepthsExtractor(Extractor):
         return (allele_depths, dp)
 
     @classmethod
-    def __extract_somaticsniper(cls, var_allele_idx, genotype, alleles):
+    def _extract_somaticsniper(cls, var_allele_idx, genotype, alleles):
         '''
         SomaticSniper reports total depth as DP but allele depths must be
         extracted from BCOUNT
@@ -197,7 +199,9 @@ class GenotypeAndDepthsExtractor(Extractor):
         bcount = list(genotype["BCOUNT"])
         allele_depths = [bcount[b_idx[i]] if i in b_idx else None for i in alleles]
 
-        DP_IS_SET = ("DP" in genotype and genotype["DP"] is not None and genotype["DP"] != '.')
+        DP_IS_SET = (
+            "DP" in genotype and genotype["DP"] is not None and genotype["DP"] != '.'
+        )
         # set total depth
         if DP_IS_SET:
             dp = genotype["DP"]
@@ -206,14 +210,12 @@ class GenotypeAndDepthsExtractor(Extractor):
         return (allele_depths, dp)
 
     @classmethod
-    def __extract_varscan2(cls, var_allele_idx, genotype, alleles):
+    def _extract_varscan2(cls, var_allele_idx, genotype, alleles):
         '''
         VarScan2 only reports alt allele depth in 'AD'
         reference allele depth is in 'RD' tag
         overall depth is in 'DP'
         '''
-                # handle VarScan VCF lines where AD contains only 1 depth, and REF allele depth is in RD
-
         allele_depths = [None for i in alleles]
         allele_depths[0] = genotype["RD"]
         if isinstance(genotype["AD"], int):
@@ -222,9 +224,9 @@ class GenotypeAndDepthsExtractor(Extractor):
             allele_depths[var_allele_idx] = genotype["AD"][0]
         dp = genotype["DP"]
         return (allele_depths, dp)
-    
+
     @classmethod
-    def __extract_pindel(cls, genotype):
+    def _extract_pindel(cls, genotype):
         '''
         Pindel reports AD and DP tags
         '''
@@ -234,12 +236,12 @@ class GenotypeAndDepthsExtractor(Extractor):
             allele_depths = list(genotype["AD"])
         dp = genotype["DP"]
         return (allele_depths, dp)
-    
+
     @classmethod
-    def __extract_sanger_pindel(cls, genotype):
+    def _extract_sanger_pindel(cls, genotype):
         """
-        Sanger pindel reports an assortment of counts on reverse and 
-        forward strands. For Alt allele we use sum of 'Pindel' calls on 
+        Sanger pindel reports an assortment of counts on reverse and
+        forward strands. For Alt allele we use sum of 'Pindel' calls on
         both strands. Total depth is take from sum of 'Total' mapped reads
         on both strands, and Ref allele depths is the difference of these.
 
@@ -253,11 +255,11 @@ class GenotypeAndDepthsExtractor(Extractor):
         ref_count = total_depth - alt_count
         dp = total_depth
         allele_depths = [ref_count, alt_count]
- 
+
         return (allele_depths, dp)
 
     @classmethod
-    def __extract_svaba_somatic(cls, genotype):
+    def _extract_svaba_somatic(cls, genotype):
         """
         SvABA only reports the depth of the alt allele in 'AD' and reports
         total depth in 'DP' so we infer the ref allele depth from these.
@@ -269,16 +271,24 @@ class GenotypeAndDepthsExtractor(Extractor):
         dp = total_depth
         return (allele_depths, dp)
 
+    @classmethod
     def _extract_strelka_somatic(cls, genotype):
         """
-        There are two subtypes we have to deal with 
+        NOT YET IMPLEMENTED
+        There are two subtypes we have to deal with
 
         Strelka reports total depth in DP
         """
-        pass
+        return ([], 0)
 
     def extract_legacy(cls, var_allele_idx, genotype, alleles):
         """
+        DEPRECATED
+
+        This is the last version before the refactor, kept for reference.
+
+        =================================================================
+
         Extracts the information for the variant alleles based on the
         variant allele index. Creates a new, updated genotype record
         and depths list.
