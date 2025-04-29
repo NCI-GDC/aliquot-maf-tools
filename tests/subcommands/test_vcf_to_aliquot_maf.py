@@ -29,7 +29,7 @@ def test_validation_tumor_only():
         "./fake.maf.gz",
         "gdc-2.0.0-aliquot",
         "--caller_id",
-        "mutect",
+        "MuTect2",
         "--src_vcf_uuid",
         fake_uuid,
         "--case_uuid",

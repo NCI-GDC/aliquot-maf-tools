@@ -11,13 +11,13 @@ from maflib.validation import ValidationStringency
 from maflib.writer import MafWriter
 
 import aliquotmaf.filters as Filters
+from aliquotmaf.constants import variant_callers
 from aliquotmaf.converters.builder import get_builder
 from aliquotmaf.converters.utils import get_columns_from_header
 from aliquotmaf.merging.filtering_iterator import FilteringPeekableIterator
 from aliquotmaf.merging.overlap_set import OverlapSet
 from aliquotmaf.merging.record_merger.impl.v1_0 import MafRecordMerger_1_0_0
 from aliquotmaf.subcommands.merge_aliquot.runners import BaseRunner
-from aliquotmaf.constants import variant_callers
 
 
 class GDC_1_0_0_Aliquot_Merged(BaseRunner):
@@ -35,19 +35,28 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
             "--tumor_only", action="store_true", help="If this is a tumor-only MAF"
         )
         parser.add_argument(
-            variant_callers.MUTECT2.option(), help="Path to input protected MuTect2 MAF file"
-        )
-        parser.add_argument(variant_callers.MUSE.option(), help="Path to input protected MuSE MAF file")
-        parser.add_argument(
-            variant_callers.VARDICT.option(), help="Path to input protected VarDict MAF file"
+            variant_callers.MUTECT2.option(),
+            help="Path to input protected MuTect2 MAF file",
         )
         parser.add_argument(
-            variant_callers.VARSCAN2.option(), help="Path to input protected VarScan2 MAF file"
+            variant_callers.MUSE.option(), help="Path to input protected MuSE MAF file"
         )
         parser.add_argument(
-            variant_callers.SOMATIC_SNIPER.option(), help="Path to input protected SomaticSniper MAF file"
+            variant_callers.VARDICT.option(),
+            help="Path to input protected VarDict MAF file",
         )
-        parser.add_argument(variant_callers.PINDEL.option(), help="Path to input protected Pindel MAF file")
+        parser.add_argument(
+            variant_callers.VARSCAN2.option(),
+            help="Path to input protected VarScan2 MAF file",
+        )
+        parser.add_argument(
+            variant_callers.SOMATIC_SNIPER.option(),
+            help="Path to input protected SomaticSniper MAF file",
+        )
+        parser.add_argument(
+            variant_callers.PINDEL.option(),
+            help="Path to input protected Pindel MAF file",
+        )
         parser.add_argument(
             "--min_n_depth",
             type=int,
@@ -57,24 +66,26 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
             + "depths across callers [7]",
         )
         parser.add_argument(
-            variant_callers.CAVEMAN.option(), help="Path to input protected CaVEMan MAF file"
+            variant_callers.CAVEMAN.option(),
+            help="Path to input protected CaVEMan MAF file",
         )
         parser.add_argument(
-            variant_callers.SANGER_PINDEL.option(), help="Path to input protected Sanger Pindel MAF file"
+            variant_callers.SANGER_PINDEL.option(),
+            help="Path to input protected Sanger Pindel MAF file",
         )
         parser.add_argument(
             variant_callers.GATK4_MUTECT2_PAIR.option(),
             help="Path to input protected GATK4 MuTect2 Pair MAF file",
         )
         parser.add_argument(
-            variant_callers.GATK4_MUTECT2.option(), help="Path to input protected GATK4 MuTect2 MAF file"
+            variant_callers.GATK4_MUTECT2.option(),
+            help="Path to input protected GATK4 MuTect2 MAF file",
         )
 
     def load_readers(self):
         """
         Loads the array of MafReaders and sets the callers list.
         """
-        # TODO: Add more callers
         maf_keys = [
             variant_callers.MUTECT2.snake(),
             variant_callers.MUSE.snake(),
@@ -86,6 +97,8 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
             variant_callers.SANGER_PINDEL.snake(),
             variant_callers.GATK4_MUTECT2_PAIR.snake(),
             variant_callers.GATK4_MUTECT2.snake(),
+            variant_callers.SVABA_SOMATIC.snake(),
+            variant_callers.STRELKA_SOMATIC.snake(),
         ]
 
         for maf_key in maf_keys:
