@@ -11,6 +11,7 @@ from maflib.writer import MafWriter
 import aliquotmaf.annotators as Annotators
 import aliquotmaf.filters as Filters
 import aliquotmaf.subcommands.vcf_to_aliquot.extractors as Extractors
+from aliquotmaf.constants import variant_callers
 from aliquotmaf.converters.builder import get_builder
 from aliquotmaf.converters.collection import InputCollection
 from aliquotmaf.converters.formatters import (
@@ -106,6 +107,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             "--caller_id",
             required=True,
             help="Name of the caller used to detect mutations",
+            choices=variant_callers.astuple(),
         )
         vcf.add_argument(
             "--src_vcf_uuid", required=True, help="The UUID of the src VCF file"
@@ -259,6 +261,18 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             "Processing input vcf {0}...".format(self.options["input_vcf"])
         )
 
+        # Check for caller implemented
+        # Strelka workflow under development
+        # Vardict discontinued
+        if self.options['caller_id'] in [
+            variant_callers.STRELKA_SOMATIC,
+            variant_callers.VARDICT,
+        ]:
+            self.logger.error(
+                "Variant caller {} not implemented".format(self.options['caller_id'])
+            )
+            return False
+
         # Initialize the maf file
         self.setup_maf_header()
 
@@ -318,6 +332,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
                     vep_key,
                     vcf_record,
                     is_tumor_only,
+                    self.options["caller_id"],
                 )
 
                 # Skip rare occasions where VEP doesn't provide IMPACT or the consequence is ?
@@ -388,6 +403,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         vep_key,
         record,
         is_tumor_only,
+        caller_id,
     ):
         """
         Extract the VCF information needed to transform into MAF.
@@ -412,6 +428,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             var_allele_idx=var_allele_idx,
             genotype=record.samples[tumor_sample_id],
             alleles=record.alleles,
+            caller_id=caller_id,
         )
 
         if not is_tumor_only:
@@ -419,6 +436,7 @@ class GDC_2_0_0_Aliquot(BaseRunner):
                 var_allele_idx=var_allele_idx,
                 genotype=record.samples[normal_sample_id],
                 alleles=record.alleles,
+                caller_id=caller_id,
             )
         else:
             normal_gt, normal_depths = None, None

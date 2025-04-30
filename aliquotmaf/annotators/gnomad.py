@@ -61,7 +61,7 @@ class GnomAD(Annotator):
             if not os.path.exists(curr.file_template.format(chr))
         ]
         if missing:
-            curr.logger.warn(
+            curr.logger.warning(
                 "Missing reference files for chromosomes {}".format(missing)
             )
         else:
@@ -103,7 +103,7 @@ class GnomAD(Annotator):
             vdf = vdf.reset_index()
             target = f'{ref}|{alt}'
             # do as little work as possible to find a match
-            for idx, value in vdf['ref_alt'].iteritems():
+            for idx, value in vdf['ref_alt'].items():
                 if value == target:
                     return vdf.loc[idx][list(GNOMAD_SOURCE_COLUMNS)].fillna("")
             # failed to find match

@@ -23,7 +23,7 @@ dependencies = [
     "bioinf-maflib>=2.3.0",
     "pysam",
     "pandas",
-    "pyarrow>=4.0.*",
+    "pyarrow>=4.0",
 ]
 
 [project.urls]
