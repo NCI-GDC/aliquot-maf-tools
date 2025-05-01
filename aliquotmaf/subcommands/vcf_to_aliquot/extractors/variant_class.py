@@ -1,8 +1,6 @@
 """
 Extractor class for variant classification.
 """
-import re
-
 from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
 
 
@@ -15,7 +13,12 @@ class VariantClassExtractor(Extractor):
     def extract(cls, cons, var_type, inframe):
 
         # Splice_Site
-        if cons in ['splice_acceptor_variant', 'splice_donor_variant', 'transcript_ablation', 'exon_loss_variant']:
+        if cons in [
+            'splice_acceptor_variant',
+            'splice_donor_variant',
+            'transcript_ablation',
+            'exon_loss_variant',
+        ]:
             return "Splice_Site"
 
         # stop_gained == Nonsense_Mutation
@@ -57,11 +60,21 @@ class VariantClassExtractor(Extractor):
             return "In_Frame_Del"
 
         # Missense_Mutation
-        if cons in ["missense_variant", "coding_sequence_variant", "conservative_missense_variant", "rare_amino_acid_variant"]:
+        if cons in [
+            "missense_variant",
+            "coding_sequence_variant",
+            "conservative_missense_variant",
+            "rare_amino_acid_variant",
+        ]:
             return "Missense_Mutation"
 
         # Introns
-        if cons in ["transcript_amplification", "intron_variant", "INTRAGENIC", "intragenic_variant"]:
+        if cons in [
+            "transcript_amplification",
+            "intron_variant",
+            "INTRAGENIC",
+            "intragenic_variant",
+        ]:
             return "Intron"
 
         # Splice_Region
@@ -69,7 +82,12 @@ class VariantClassExtractor(Extractor):
             return "Splice_Region"
 
         # Silent
-        if cons in ["incomplete_terminal_codon_variant", "synonymous_variant", "stop_retained_variant", "NMD_transcript_variant"]:
+        if cons in [
+            "incomplete_terminal_codon_variant",
+            "synonymous_variant",
+            "stop_retained_variant",
+            "NMD_transcript_variant",
+        ]:
             return "Silent"
 
         # RNA
@@ -79,14 +97,14 @@ class VariantClassExtractor(Extractor):
             "non_coding_exon_variant",
             "non_coding_transcript_exon_variant",
             "non_coding_transcript_variant",
-            "nc_transcript_variant"
+            "nc_transcript_variant",
         ]:
             return "RNA"
 
         # 5'UTR
         if cons in [
             "5_prime_UTR_variant",
-            "5_prime_UTR_premature_start_codon_gain_variant"
+            "5_prime_UTR_premature_start_codon_gain_variant",
         ]:
             return "5'UTR"
 
@@ -100,7 +118,7 @@ class VariantClassExtractor(Extractor):
             "regulatory_region_variant",
             "regulatory_region",
             "intergenic_variant",
-            "intergenic_region"
+            "intergenic_region",
         ]:
             return "IGR"
 
