@@ -3,8 +3,9 @@ MutationStatus annotator. Sets the Germline/Somatic/LOH/Unknown etc status for M
 """
 from __future__ import absolute_import
 
-from aliquotmaf.converters.builder import get_builder
 from aliquotmaf.constants import variant_callers
+from aliquotmaf.converters.builder import get_builder
+
 from .annotator import Annotator
 
 
@@ -24,7 +25,7 @@ class MutationStatus(Annotator):
             variant_callers.SANGER_PINDEL.GDC_ENUM: self._always_somatic,
             variant_callers.GATK4_MUTECT2_PAIR.GDC_ENUM: self._always_somatic,
             variant_callers.SVABA_SOMATIC.GDC_ENUM: self._always_somatic,
-            variant_callers.STRELKA_SOMATIC.GDC_ENUM: self._always_somatic, # needs validation
+            variant_callers.STRELKA_SOMATIC.GDC_ENUM: self._always_somatic,  # needs validation
         }
 
     @classmethod

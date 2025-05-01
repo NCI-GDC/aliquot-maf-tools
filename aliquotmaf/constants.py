@@ -1,6 +1,7 @@
-from typing import Final
-from dataclasses import dataclass
 import dataclasses
+from dataclasses import dataclass
+from typing import Final
+
 
 @dataclass()
 class VariantCallerName:
@@ -14,15 +15,18 @@ class VariantCallerName:
 
     def __repr__(self):
         return self.GDC_ENUM
-    
+
     def __eq__(self, other):
         return self.__repr__() == other
+
 
 @dataclass(frozen=True)
 class VariantCallerConstants:
     MUTECT2: Final[VariantCallerName] = VariantCallerName("MuTect2")
     GATK4_MUTECT2: Final[VariantCallerName] = VariantCallerName("GATK4 MuTect2")
-    GATK4_MUTECT2_PAIR: Final[VariantCallerName] = VariantCallerName("GATK4 MuTect2 Pair")
+    GATK4_MUTECT2_PAIR: Final[VariantCallerName] = VariantCallerName(
+        "GATK4 MuTect2 Pair"
+    )
     SOMATIC_SNIPER: Final[VariantCallerName] = VariantCallerName("SomaticSniper")
     MUSE: Final[VariantCallerName] = VariantCallerName("MuSE")
     VARSCAN2: Final[VariantCallerName] = VariantCallerName("VarScan2")
@@ -37,16 +41,15 @@ class VariantCallerConstants:
     def astuple(self):
         return tuple(flatten_tuple(dataclasses.astuple(self)))
 
+
 def flatten_tuple(t):
     for x in t:
         if isinstance(x, tuple):
             yield from flatten_tuple(x)
         else:
-            yield x 
+            yield x
+
 
 variant_callers = VariantCallerConstants()
 
-SPLICE_CONSEQUENCES = frozenset([
-    'splice_acceptor_variant',
-    'splice_donor_variant'
-])
+SPLICE_CONSEQUENCES = frozenset(['splice_acceptor_variant', 'splice_donor_variant'])
