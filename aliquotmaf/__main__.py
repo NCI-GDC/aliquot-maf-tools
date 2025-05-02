@@ -1,6 +1,7 @@
 """
 Main entrypoint for all aliquot-maf-tools.
 """
+
 import argparse
 import datetime
 import sys
@@ -10,15 +11,10 @@ from aliquotmaf.subcommands.mask_merged_aliquot.__main__ import MaskMergedAliquo
 from aliquotmaf.subcommands.merge_aliquot.__main__ import MergeAliquotMafs
 from aliquotmaf.subcommands.vcf_to_aliquot.__main__ import VcfToAliquotMaf
 
-# from signal import SIG_DFL, SIGPIPE, signal
-
-
-# signal(SIGPIPE, SIG_DFL)
-
 try:
     from aliquotmaf import __version__
 except ImportError:
-    __version__ = '0'
+    __version__ = "0.0.0"
 
 
 def main(args=None):
