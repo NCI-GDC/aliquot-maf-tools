@@ -19,7 +19,6 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-    "click",
     "bioinf-maflib>=2.3.0",
     "pysam",
     "pandas",
@@ -47,9 +46,7 @@ test = [
     "pytest",
 ]
 
-type = [
-    "types-click",
-]
+type = []
 
 [project.urls]
 homepage = "https://github.com/NCI-GDC/aliquot-maf-tools"

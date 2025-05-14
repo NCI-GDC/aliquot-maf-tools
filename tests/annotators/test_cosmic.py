@@ -1,6 +1,7 @@
 """
 Tests for the ``aliquotmaf.annotators.Cosmic`` class.
 """
+
 from collections import OrderedDict, namedtuple
 
 import pysam

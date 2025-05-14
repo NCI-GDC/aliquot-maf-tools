@@ -1,6 +1,7 @@
 """
 Annotates the population frequency from the non-TCGA ExAC file.
 """
+
 from __future__ import absolute_import
 
 import pysam

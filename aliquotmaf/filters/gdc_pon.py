@@ -1,6 +1,7 @@
 """
 Applies the GDC PON filter. We don't care about alleles, just positions.
 """
+
 from __future__ import absolute_import
 
 from pysam import VariantFile

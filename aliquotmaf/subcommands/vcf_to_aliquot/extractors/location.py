@@ -1,6 +1,7 @@
 """
 Extractor class for genomic region data.
 """
+
 from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
 
 
@@ -23,7 +24,6 @@ class LocationDataExtractor(Extractor):
             and ref_allele[0] == var_allele[0]
             and ref_allele != var_allele
         ):
-
             ref_allele = ref_allele[1:] if len(ref_allele) > 1 else "-"
             var_allele = var_allele[1:] if len(var_allele) > 1 else "-"
             alleles = [i[1:] if len(i) > 1 else "-" for i in alleles]

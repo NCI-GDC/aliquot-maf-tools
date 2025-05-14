@@ -1,6 +1,7 @@
 """
 Base Class for merging MAF records.
 """
+
 from abc import ABCMeta, abstractmethod
 
 from aliquotmaf.converters.builder import get_builder

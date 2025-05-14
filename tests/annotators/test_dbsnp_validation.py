@@ -1,6 +1,7 @@
 """
 Tests for the ``aliquotmaf.annotators.DbSnpValidation`` class.
 """
+
 from collections import OrderedDict
 
 import pytest

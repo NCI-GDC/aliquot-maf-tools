@@ -8,10 +8,10 @@ class VariantCallerName:
     GDC_ENUM: str
 
     def snake(self):
-        return self.GDC_ENUM.lower().replace(' ', '_')
+        return self.GDC_ENUM.lower().replace(" ", "_")
 
     def option(self):
-        return '--' + self.GDC_ENUM.lower().replace(' ', '-')
+        return "--" + self.GDC_ENUM.lower().replace(" ", "-")
 
     def __repr__(self):
         return self.GDC_ENUM
@@ -52,4 +52,4 @@ def flatten_tuple(t):
 
 variant_callers = VariantCallerConstants()
 
-SPLICE_CONSEQUENCES = frozenset(['splice_acceptor_variant', 'splice_donor_variant'])
+SPLICE_CONSEQUENCES = frozenset(["splice_acceptor_variant", "splice_donor_variant"])

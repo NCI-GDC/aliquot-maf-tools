@@ -1,6 +1,7 @@
 """
 Applies the GDC Blacklist filter.
 """
+
 from __future__ import absolute_import
 
 import gzip
@@ -26,25 +27,25 @@ class GdcBlacklist(Filter):
             linect += 1
             if not head:
                 head = line.rstrip().lower().split("\t")
-                assert (
-                    "tumor_aliquot_id" in head
-                ), 'Required column "tumor_aliquot_id" missing from blacklist file {0}'.format(
-                    cls.source
+                assert "tumor_aliquot_id" in head, (
+                    'Required column "tumor_aliquot_id" missing from blacklist file {0}'.format(
+                        cls.source
+                    )
                 )
-                assert (
-                    "tag" in head
-                ), 'Required column "tag" missing from blacklist file {0}'.format(
-                    cls.source
+                assert "tag" in head, (
+                    'Required column "tag" missing from blacklist file {0}'.format(
+                        cls.source
+                    )
                 )
             else:
                 # Parse row into dict
                 row = dict(zip(head, line.rstrip("\r\n").split("\t")))
                 aliquot = row["tumor_aliquot_id"]
                 tags = row["tag"].split(";")
-                assert (
-                    aliquot
-                ), "Missing required field tumor_aliquot_id in blacklist file - Line {0}".format(
-                    linect
+                assert aliquot, (
+                    "Missing required field tumor_aliquot_id in blacklist file - Line {0}".format(
+                        linect
+                    )
                 )
                 # Set dict tumor_aliquot_id -> tag
                 if tags:

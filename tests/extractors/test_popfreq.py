@@ -1,6 +1,7 @@
 """
 Tests the extractors in aliquotmaf.subcommands.vcf_to_aliquot.extractors.population_frequency
 """
+
 import pytest
 
 from aliquotmaf.subcommands.vcf_to_aliquot.extractors.population_frequency import (

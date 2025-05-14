@@ -2,6 +2,7 @@
 Main logic for filtering merged aliquot MAFs for spec
 gdc-2.0.0-aliquot-merged-masked.
 """
+
 import json
 
 from maflib.reader import MafReader
@@ -14,8 +15,8 @@ from aliquotmaf.subcommands.mask_merged_aliquot.runners import (
 )
 
 SPLICE_CONSEQUENCES = (
-    'splice_acceptor_variant',
-    'splice_donor_variant',
+    "splice_acceptor_variant",
+    "splice_donor_variant",
 )
 
 
@@ -60,7 +61,6 @@ class GDC_2_0_0_Aliquot_Merged_Masked(GDC_1_0_0_Aliquot_Merged_Masked):
 
         try:
             for record in self.maf_reader:
-
                 if processed > 0 and processed % 1000 == 0:
                     self.logger.info("Processed {0} records...".format(processed))
 
@@ -69,7 +69,6 @@ class GDC_2_0_0_Aliquot_Merged_Masked(GDC_1_0_0_Aliquot_Merged_Masked):
                     len(callers) >= self.options["min_callers"]
                     and record["Mutation_Status"].value.value == "Somatic"
                 ):
-
                     self.metrics.add_sample_swap_metric(record)
 
                     gdc_filters = record["GDC_FILTER"].value
@@ -99,7 +98,6 @@ class GDC_2_0_0_Aliquot_Merged_Masked(GDC_1_0_0_Aliquot_Merged_Masked):
             print(json.dumps(self.metrics.to_json(), indent=2, sort_keys=True))
 
         finally:
-
             self.maf_reader.close()
             self.maf_writer.close()
 

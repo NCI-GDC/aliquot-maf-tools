@@ -1,4 +1,5 @@
 """Utility functions for subcommands"""
+
 import gzip
 import json
 import re
@@ -33,9 +34,9 @@ def assert_sample_in_header(vcf_object, sample, can_fail=False):
     """
     idx = None
     if not can_fail:
-        assert (
-            sample in vcf_object.header.samples
-        ), "Unable to find sample {0} in VCF header!".format(sample)
+        assert sample in vcf_object.header.samples, (
+            "Unable to find sample {0} in VCF header!".format(sample)
+        )
 
     # Get the index of the samples
     try:
@@ -72,9 +73,9 @@ def extract_annotation_from_header(vcf_object, vep_key="CSQ"):
                         ann_cols_format.append(ann)
 
     assert vep_key is not None, "Malformed header, unable to find VEP annotation key"
-    assert (
-        ann_cols_format
-    ), "Malformed header, unable to find VEP annotation column info"
+    assert ann_cols_format, (
+        "Malformed header, unable to find VEP annotation column info"
+    )
     return ann_cols_format, vep_key
 
 

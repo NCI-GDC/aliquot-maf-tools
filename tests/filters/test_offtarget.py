@@ -1,6 +1,7 @@
 """
 Tests for the ``aliquotmaf.filters.OffTarget`` class.
 """
+
 from collections import OrderedDict
 
 import pytest

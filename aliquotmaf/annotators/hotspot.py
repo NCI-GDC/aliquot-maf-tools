@@ -1,6 +1,7 @@
 """
 Implements the hotspots annotation.
 """
+
 from __future__ import absolute_import
 
 from aliquotmaf.converters.builder import get_builder

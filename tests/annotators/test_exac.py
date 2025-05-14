@@ -1,6 +1,7 @@
 """
 Tests for the ``aliquotmaf.annotators.NonTcgaExac`` class.
 """
+
 from collections import OrderedDict
 
 import pytest

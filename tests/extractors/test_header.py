@@ -1,6 +1,7 @@
 """
 Tests for functions parsing the VCF headers.
 """
+
 import pytest
 
 from aliquotmaf.subcommands.utils import (

@@ -2,6 +2,7 @@
 Main logic for filtering merged aliquot MAFs for spec
 gdc-1.0.0-aliquot-merged-masked.
 """
+
 import json
 
 from maflib.header import MafHeader
@@ -109,7 +110,6 @@ class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
 
         try:
             for record in self.maf_reader:
-
                 if processed > 0 and processed % 1000 == 0:
                     self.logger.info("Processed {0} records...".format(processed))
 
@@ -118,7 +118,6 @@ class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
                     len(callers) >= self.options["min_callers"]
                     and record["Mutation_Status"].value.value == "Somatic"
                 ):
-
                     self.metrics.add_sample_swap_metric(record)
 
                     gdc_filters = record["GDC_FILTER"].value
@@ -138,7 +137,6 @@ class GDC_1_0_0_Aliquot_Merged_Masked(BaseRunner):
             print(json.dumps(self.metrics.to_json(), indent=2, sort_keys=True))
 
         finally:
-
             self.maf_reader.close()
             self.maf_writer.close()
 

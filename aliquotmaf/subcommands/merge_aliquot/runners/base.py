@@ -1,6 +1,7 @@
 """
 Base class for all aliquot-level per-caller protected MAFs -> merged protected MAF runners.
 """
+
 import datetime
 from abc import ABCMeta, abstractmethod
 

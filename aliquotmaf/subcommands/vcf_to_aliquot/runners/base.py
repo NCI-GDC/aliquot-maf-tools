@@ -1,4 +1,5 @@
 """Base class for all vcf2maf runners"""
+
 import datetime
 from abc import ABCMeta, abstractmethod
 

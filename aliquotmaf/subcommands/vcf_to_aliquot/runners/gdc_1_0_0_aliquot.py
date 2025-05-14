@@ -1,4 +1,5 @@
 """Main vcf2maf logic for spec gdc-1.0.0-aliquot"""
+
 import urllib.parse
 from operator import itemgetter
 
@@ -290,7 +291,6 @@ class GDC_1_0_0_Aliquot(BaseRunner):
             # Convert
             line = 0
             for vcf_record in vcf_object.fetch():
-
                 line += 1
 
                 if line % 1000 == 0:
@@ -339,7 +339,6 @@ class GDC_1_0_0_Aliquot(BaseRunner):
 
             counter = 0
             for record in sorter:
-
                 counter += 1
 
                 if counter % 1000 == 0:

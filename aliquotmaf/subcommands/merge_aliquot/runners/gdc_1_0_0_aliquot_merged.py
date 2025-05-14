@@ -167,7 +167,7 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
         )
 
         # Set up Normal Depth Filter for tumor-only or tumor-normal operation
-        if self.options['tumor_only']:
+        if self.options["tumor_only"]:
             ndp_filter = Filters.NormalDepth.setup(None)
         else:
             ndp_filter = Filters.NormalDepth.setup(self.options["min_n_depth"])

@@ -1,6 +1,7 @@
 """
 Tests for the ``aliquotmaf.annotators.ReferenceContext`` class.
 """
+
 from collections import OrderedDict, namedtuple
 
 import pysam

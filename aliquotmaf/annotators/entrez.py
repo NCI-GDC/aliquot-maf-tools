@@ -12,8 +12,8 @@ from aliquotmaf.converters.builder import get_builder
 
 from .annotator import Annotator
 
-MAF_SYMBOL: str = 'Hugo_Symbol'
-MAF_FEATURE: str = 'Feature'
+MAF_SYMBOL: str = "Hugo_Symbol"
+MAF_FEATURE: str = "Feature"
 
 
 class Entrez(Annotator):
@@ -23,15 +23,15 @@ class Entrez(Annotator):
         self.ncbi: dict
 
     @classmethod
-    def setup(cls, scheme: MafScheme, source: str) -> 'Entrez':
+    def setup(cls, scheme: MafScheme, source: str) -> "Entrez":
         """
         Load annotation data
         """
         curr = cls(scheme, source)
-        with open(curr.source, 'r') as fh:
+        with open(curr.source, "r") as fh:
             tmp = load(fh)
-        curr.gencode = tmp['GENCODE']
-        curr.ncbi = tmp['NCBI']
+        curr.gencode = tmp["GENCODE"]
+        curr.ncbi = tmp["NCBI"]
         curr.logger.info(
             "Loaded {} GENCODE to ENTREZ mappings".format(len(curr.gencode))
         )
@@ -56,7 +56,7 @@ class Entrez(Annotator):
         # Replicating old VEP entrez filter behavior, if multiple entrez IDs
         # are available just select the first one in the list
         maf_record["Entrez_Gene_Id"] = get_builder(
-            "Entrez_Gene_Id", self.scheme, value=str(entrez_id[0]), default='0'
+            "Entrez_Gene_Id", self.scheme, value=str(entrez_id[0]), default="0"
         )
         return maf_record
 

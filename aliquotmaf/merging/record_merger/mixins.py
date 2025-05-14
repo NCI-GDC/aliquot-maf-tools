@@ -1,6 +1,7 @@
 """
 Mixins for `BaseMafRecordMerger` classes
 """
+
 from abc import ABCMeta, abstractmethod
 
 
