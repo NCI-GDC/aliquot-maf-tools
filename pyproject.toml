@@ -34,7 +34,7 @@ build = [
 
 dev = [
     "black",
-    "detect-secrets==1.4.0",
+    "detect-secrets",
     "ruff",
     "mypy",
     "pre-commit>=2.9.0",
@@ -80,7 +80,7 @@ exclude = [
 ]
 
 [tool.mypy]
-python_version = 3.8
+python_version = 3.12
 disallow_untyped_defs = true
 warn_return_any = true
 warn_unused_configs = true
@@ -123,7 +123,7 @@ exclude = [
 line-length = 88
 indent-width = 4
 
-target-version = 'py38'
+target-version = 'py312'
 
 [tool.ruff.lint]
 # Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.

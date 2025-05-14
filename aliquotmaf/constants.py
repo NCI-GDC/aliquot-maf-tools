@@ -1,11 +1,11 @@
 import dataclasses
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Final
 
 
-@dataclass()
+@dataclass(frozen=True)
 class VariantCallerName:
-    GDC_ENUM: str
+    GDC_ENUM: Final[str]
 
     def snake(self):
         return self.GDC_ENUM.lower().replace(" ", "_")
