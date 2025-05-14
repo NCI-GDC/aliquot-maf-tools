@@ -7,10 +7,10 @@ include:
       - templates/python/full.yaml
 
 variables:
-  BUILD_PY_VERSION: python3.8
-  RELEASE_PY_VERSION: python3.8
+  BUILD_PY_VERSION: python3.12
+  RELEASE_PY_VERSION: python3.12
 
 .parallel:
   parallel:
     matrix:
-      - BUILD_PY_VERSION: [python3.8]
+      - BUILD_PY_VERSION: [python3.12]
