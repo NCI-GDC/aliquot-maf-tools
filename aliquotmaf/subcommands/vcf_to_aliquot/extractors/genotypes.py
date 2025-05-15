@@ -359,7 +359,7 @@ class GenotypeAndDepthsExtractor(Extractor):
             "DP" in genotype
             and genotype["DP"] is not None
             and (
-                ([0] is not None and depths[0] > genotype["DP"])
+                ([0] != None and depths[0] > genotype["DP"])
                 or (
                     depths[var_allele_idx] is not None
                     and depths[var_allele_idx] > genotype["DP"]

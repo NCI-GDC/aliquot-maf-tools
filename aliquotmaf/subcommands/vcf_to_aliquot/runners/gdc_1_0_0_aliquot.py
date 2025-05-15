@@ -1,7 +1,6 @@
 """Main vcf2maf logic for spec gdc-1.0.0-aliquot"""
 
 import urllib.parse
-from operator import itemgetter
 
 import pysam
 from maflib.header import MafHeader, MafHeaderRecord
