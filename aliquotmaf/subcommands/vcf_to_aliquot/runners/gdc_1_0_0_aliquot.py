@@ -466,7 +466,7 @@ class GDC_1_0_0_Aliquot(BaseRunner):
 
         # Generic data
         collection = InputCollection()
-        keys = itemgetter("selected_effect", itemgetter("Hugo_Symbol"))
+        # keys = itemgetter("selected_effect", itemgetter("Hugo_Symbol"))
         collection.add(
             column="Hugo_Symbol",
             value=data["selected_effect"].get("Hugo_Symbol"),

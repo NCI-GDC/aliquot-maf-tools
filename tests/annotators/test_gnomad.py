@@ -415,6 +415,7 @@ def test_variant_on_nonexistant_chromosome(
     # annotate maf record
     with pytest.raises(KeyError, match=r"Unrecognized contig encountered: .+"):
         maf_record = annotator.annotate(get_empty_maf_record, vcf_record)
+        print(maf_record)
 
 
 def test_unannotated_variant_single_annotated_pos(
