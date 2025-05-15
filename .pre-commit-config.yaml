@@ -16,9 +16,9 @@ repos:
       - id: detect-private-key
       - id: end-of-file-fixer
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.9.7
+    rev: v0.11.10
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: [ '--select', 'I', '--fix' ]
       - id: ruff-format
   - repo: https://github.com/cruft/cruft
