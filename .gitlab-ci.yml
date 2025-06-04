@@ -9,6 +9,8 @@ include:
 variables:
   BUILD_PY_VERSION: python3.12
   RELEASE_PY_VERSION: python3.12
+  PIP_EXTRA_INDEX_URL: https://nexus.osdc.io/repository/pypi-all/simple
+  DOCKER_BUILD_OPTS: "--build-arg PIP_EXTRA_INDEX_URL=https://nexus.osdc.io/repository/pypi-all/simple"
 
 .parallel:
   parallel:
