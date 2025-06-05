@@ -60,8 +60,11 @@ local_scheme = "dirty-tag"
 version_scheme = "python-simplified-semver"
 fallback_version = "0"
 
-[tool.uv]
+[tool.uv.pip]
 extra-index-url = ["https://nexus.osdc.io/repository/pypi-all/simple"]
+emit-index-url = true
+output-file = "requirements.txt"
+no-binary = ["pysam"]
 
 [tool.coverage.run]
 source = ["aliquotmaf"]
