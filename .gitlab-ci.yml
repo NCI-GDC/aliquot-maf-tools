@@ -9,6 +9,7 @@ include:
 variables:
   BUILD_PY_VERSION: python3.12
   RELEASE_PY_VERSION: python3.12
+  PIP_INDEX_URL: https://nexus.osdc.io/repository/pypi-all/simple
 
 .parallel:
   parallel:
