@@ -5,21 +5,21 @@
 
 bioinf-maflib==2.3.4
     # via aliquot-maf-tools (pyproject.toml)
-click==8.1.3
+click==8.2.1
     # via bioinf-maflib
-numpy==1.23.3
-    # via
-    #   pandas
-    #   pyarrow
-pandas==1.5.0
-    # via aliquot-maf-tools (pyproject.toml)
-pyarrow==9.0.0
-    # via aliquot-maf-tools (pyproject.toml)
-pysam==0.19.1
-    # via aliquot-maf-tools (pyproject.toml)
-python-dateutil==2.8.2
+numpy==2.3.0
     # via pandas
-pytz==2022.2.1
+pandas==2.3.0
+    # via aliquot-maf-tools (pyproject.toml)
+pyarrow==20.0.0
+    # via aliquot-maf-tools (pyproject.toml)
+pysam==0.23.2
+    # via aliquot-maf-tools (pyproject.toml)
+python-dateutil==2.9.0.post0
     # via pandas
-six==1.16.0
+pytz==2025.2
+    # via pandas
+six==1.17.0
     # via python-dateutil
+tzdata==2025.2
+    # via pandas
