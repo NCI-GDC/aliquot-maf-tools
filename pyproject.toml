@@ -10,7 +10,7 @@ authors = [
 ]
 
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 license = {file = "LICENSE"}
 classifiers = [
     "License :: OSI Approved :: Apache Software License",
@@ -59,6 +59,9 @@ write_to = "aliquotmaf/_version.py"
 local_scheme = "dirty-tag"
 version_scheme = "python-simplified-semver"
 fallback_version = "0"
+
+[tool.uv]
+extra-index-url = ["https://nexus.osdc.io/repository/pypi-all/simple"]
 
 [tool.uv.pip]
 extra-index-url = ["https://nexus.osdc.io/repository/pypi-all/simple"]
