@@ -3,11 +3,14 @@ ARG BASE_CONTAINER_VERSION=latest
 
 FROM ${REGISTRY}/python3.12-builder:${BASE_CONTAINER_VERSION} as builder
 
+COPY --from=ghcr.io/astral-sh/uv:0.7.12 /uv /uvx /bin/
+
 COPY ./ /aliquotmaf
 
 WORKDIR /aliquotmaf
 
-RUN pip install tox && tox -e build
+#RUN pip install tox && tox -e build
+RUN uv build
 
 FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
 
