@@ -27,7 +27,7 @@ RUN --mount=from=builder,source=/aliquotmaf/dist/,target=/aliquotmaf/dist/ \
     --mount=source=uv.lock,target=/aliquotmaf/uv.lock \
     --mount=source=pyproject.toml,target=/aliquotmaf/pyproject.toml \
     --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
-      uv sync --locked --no-dev \
+      uv sync --locked --no-dev --active \
 	&& uv pip install --no-deps ./dist/*.whl
 
 RUN ls -l \
