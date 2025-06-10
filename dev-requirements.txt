@@ -95,7 +95,7 @@ pyyaml==6.0
     # via
     #   detect-secrets
     #   pre-commit
-requests==2.27.1
+requests==2.32.4
     # via detect-secrets
 six==1.16.0
     # via
