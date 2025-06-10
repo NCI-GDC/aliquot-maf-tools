@@ -24,9 +24,9 @@ WORKDIR /aliquotmaf
 ENV UV_SYSTEM_PYTHON=1 UV_COMPILE_BYTECODE=1 UV_NO_MANAGED_PYTHON=1
 
 RUN --mount=from=builder,source=/aliquotmaf/dist/,target=/aliquotmaf/dist/ \
-    --mount=source=uv.lock,target=/aliquotmaf/uv.lock \
+    --mount=source=requirements.txt,target=/aliquotmaf/requirements.txt \
     --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
-      uv sync --locked --no-dev \
+      uv pip install --no-deps requirements.txt \
 	&& uv pip install --no-deps ./dist/*.whl
 
 RUN ls -l \
