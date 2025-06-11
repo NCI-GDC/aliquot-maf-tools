@@ -10,7 +10,7 @@ WORKDIR /aliquotmaf
 ENV UV_SYSTEM_PYTHON=1 UV_COMPILE_BYTECODE=1 UV_NO_MANAGED_PYTHON=1
 
 RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
-  uv run -m setuptools_scm \
+  uv run --active -m setuptools_scm \
   && uv build
 
 FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
