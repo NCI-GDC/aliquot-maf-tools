@@ -23,16 +23,9 @@ LABEL org.opencontainers.image.title="aliquotmaf" \
 
 WORKDIR /aliquotmaf
 
-ENV UV_SYSTEM_PYTHON=1 UV_COMPILE_BYTECODE=1 UV_NO_MANAGED_PYTHON=1
-
 RUN --mount=from=builder,source=/aliquotmaf/dist/,target=/aliquotmaf/dist/ \
-    --mount=source=uv.lock,target=/aliquotmaf/uv.lock \
-    --mount=source=pyproject.toml,target=/aliquotmaf/pyproject.toml \
-    --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
-      uv sync --locked --no-dev --active \
-	&& uv pip install --no-deps ./dist/*.whl
-
-RUN ls -l \
-  && ls -l ./*
+    --mount=source=requirements.txt,target=/aliquotmaf/requirements.txt \
+      pip install --no-deps -r requirements.txt \
+      pip install --no-deps ./dist/*.whl
 
 USER app
