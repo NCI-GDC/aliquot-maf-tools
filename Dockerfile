@@ -23,8 +23,8 @@ LABEL org.opencontainers.image.title="aliquotmaf" \
 
 WORKDIR /aliquotmaf
 
-RUN --mount=from=builder,source=/aliquotmaf/dist/,target=/aliquotmaf/dist/ \
-    --mount=source=requirements.txt,target=/aliquotmaf/requirements.txt \
+RUN --mount=from=builder,source=/aliquotmaf/dist/,target=dist/ \
+    --mount=source=requirements.txt,target=requirements.txt \
       pip install --no-deps -r requirements.txt \
       pip install --no-deps ./dist/*.whl
 
