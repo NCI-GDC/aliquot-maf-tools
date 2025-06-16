@@ -1,6 +1,7 @@
 """
 Tests for the ``aliquotmaf.annotators.MutationStatus`` class.
 """
+
 from collections import OrderedDict
 
 import pytest

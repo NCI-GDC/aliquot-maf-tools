@@ -1,6 +1,7 @@
 """
 Maf recorder merger implementation v1.0
 """
+
 from aliquotmaf.constants import variant_callers
 from aliquotmaf.converters.builder import get_builder
 from aliquotmaf.converters.utils import init_empty_maf_record
@@ -223,14 +224,14 @@ class MafRecordMerger_1_0_0(
                 maf_dic[column] = get_builder(column, self.scheme, value=vals)
 
             # NOTE: Not a solution, just a temp place holder until we fully build out the RNA annotator
-            elif column == 'RNA_Support':
-                maf_dic[column] = get_builder(column, self.scheme, value='Unknown')
+            elif column == "RNA_Support":
+                maf_dic[column] = get_builder(column, self.scheme, value="Unknown")
 
             # NOTE: Not a solution, just a temp place holder until we fully build out the RNA annotator
             elif column in (
-                'RNA_ref_count',
-                'RNA_alt_count',
-                'RNA_depth',
+                "RNA_ref_count",
+                "RNA_alt_count",
+                "RNA_depth",
             ):
                 maf_dic[column] = get_builder(column, self.scheme, value=None)
 

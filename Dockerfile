@@ -1,21 +1,32 @@
-ARG REGISTRY=docker.osdc.io
-ARG BASE_CONTAINER_VERSION=2.0.1
+ARG REGISTRY=docker.osdc.io/ncigdc
+ARG BASE_CONTAINER_VERSION=latest
 
-FROM ${REGISTRY}/ncigdc/python3.8-builder:${BASE_CONTAINER_VERSION} as builder
+FROM ${REGISTRY}/python3.12-builder:${BASE_CONTAINER_VERSION} as builder
 
-COPY ./ /opt
+COPY --from=ghcr.io/astral-sh/uv:0.7.12 /uv /uvx /bin/
 
-WORKDIR /opt
+COPY ./ /aliquotmaf
 
-RUN pip install tox && tox -e build
+WORKDIR /aliquotmaf
 
-FROM ${REGISTRY}/ncigdc/python3.8:${BASE_CONTAINER_VERSION}
+#RUN pip install tox && tox -e build
+RUN uv build
 
-COPY --from=builder /opt/dist/*.whl /opt/
-COPY requirements.txt /opt/
+FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
 
-WORKDIR /opt
+LABEL org.opencontainers.image.title="aliquotmaf" \
+      org.opencontainers.image.description="Tools for creating and filtering aliquot-level MAFs" \
+      org.opencontainers.image.source="https://github.com/NCI-GDC/aliquot-maf-tools" \
+      org.opencontainers.image.vendor="NCI GDC"
 
-RUN pip install --no-deps -r requirements.txt \
-	&& pip install --no-deps *.whl \
+COPY --from=ghcr.io/astral-sh/uv:0.7.12 /uv /uvx /bin/
+COPY --from=builder /aliquotmaf/dist/*.whl /aliquotmaf/
+COPY requirements.txt /aliquotmaf/
+
+WORKDIR /aliquotmaf
+
+RUN uv pip install --no-deps -r requirements.txt \
+	&& uv pip install --no-deps *.whl \
 	&& rm -f *.whl requirements.txt
+
+USER app

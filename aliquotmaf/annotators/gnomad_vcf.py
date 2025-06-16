@@ -62,7 +62,7 @@ class GnomAD_VCF(Annotator):
                 found = True
                 for source_col, maf_col in GNOMAD_SRC_TO_MAF.items():
                     value = record.info.get(source_col)
-                    default = ''
+                    default = ""
 
                     if source_col == "POP_MAX_non_cancer_adj" and value is not None:
                         value = list(value)
@@ -81,7 +81,7 @@ class GnomAD_VCF(Annotator):
             return maf_record
         else:
             for source_col, maf_col in GNOMAD_SRC_TO_MAF.items():
-                default = ''
+                default = ""
 
                 if source_col == "POP_MAX_non_cancer_adj":
                     default = []

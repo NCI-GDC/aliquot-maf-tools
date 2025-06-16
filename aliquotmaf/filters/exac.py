@@ -1,6 +1,7 @@
 """
 Applies the common in non-tcga ExAC filter.
 """
+
 from __future__ import absolute_import
 
 from .filter_base import Filter

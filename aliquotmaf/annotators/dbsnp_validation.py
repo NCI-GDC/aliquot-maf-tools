@@ -1,6 +1,7 @@
 """
 Implements the dbSNP validation status annotations.
 """
+
 from __future__ import absolute_import
 
 import sqlite3 as lite

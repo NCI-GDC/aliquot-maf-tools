@@ -1,6 +1,7 @@
 """
 Base class for all annotators.
 """
+
 from abc import ABCMeta, abstractmethod
 
 from aliquotmaf.logger import Logger

@@ -1,6 +1,7 @@
 """
 Base class for all protected -> public MAF runners.
 """
+
 import datetime
 from abc import ABCMeta, abstractmethod
 

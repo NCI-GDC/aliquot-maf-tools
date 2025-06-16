@@ -1,6 +1,7 @@
 """
 Tests the extractors in aliquotmaf.subcommands.vcf_to_aliquot.extractors.variant_class
 """
+
 import pytest
 
 from aliquotmaf.subcommands.vcf_to_aliquot.extractors.variant_class import (

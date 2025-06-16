@@ -1,6 +1,7 @@
 """
 Implements the reference context annotation.
 """
+
 from __future__ import absolute_import
 
 import pysam

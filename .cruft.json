@@ -1,6 +1,6 @@
 {
   "template": "git@github.com:NCI-GDC/bio-python-template.git",
-  "commit": "4fb23e1d5a0c683559633b755385ab5ed388f063",
+  "commit": "e49c284478f5335c1d8b1b240c20b3cd2b58b733",
   "context": {
     "cookiecutter": {
       "full_name": "Charles Czysz",
@@ -11,8 +11,10 @@
       "project_short_description": "Tools for creating and filtering aliquot-level MAFs",
       "min_python_version": "3.8",
       "github_repo": "https://github.com/NCI-GDC/aliquot-maf-tools",
+      "docker_release_repo": "quay.io",
       "commit": "3e2a935acaac77407e66d747480e45ded0ab3f98",
-      "_template": "git@github.com:NCI-GDC/bio-python-template.git"
+      "_template": "git@github.com:NCI-GDC/bio-python-template.git",
+      "_commit": "e49c284478f5335c1d8b1b240c20b3cd2b58b733"
     }
   },
   "directory": null,

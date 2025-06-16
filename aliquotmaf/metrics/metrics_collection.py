@@ -1,4 +1,5 @@
 """Class for collecting metrics from a MAF file."""
+
 from collections import Counter
 
 

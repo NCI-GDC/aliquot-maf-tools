@@ -1,6 +1,7 @@
 """
 Tests for the ``aliquotmaf.filters.ExAC`` class.
 """
+
 from collections import OrderedDict
 
 import pytest

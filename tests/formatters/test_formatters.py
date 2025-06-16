@@ -2,6 +2,7 @@
 Tests for functions in `aliquotmaf.converters.formatters` which are used to
 format particular MAF column values.
 """
+
 import pytest
 
 import aliquotmaf.converters.formatters as Formatters

@@ -91,8 +91,8 @@ class GnomAD(Annotator):
         vdf = self.df.loc[pos]
         if isinstance(vdf, pd.Series):
             # single record at that position
-            target = f'{ref}|{alt}'
-            if vdf['ref_alt'] == target:
+            target = f"{ref}|{alt}"
+            if vdf["ref_alt"] == target:
                 # record matches variant
                 return vdf[list(GNOMAD_SOURCE_COLUMNS)].fillna("")
             else:
@@ -101,9 +101,9 @@ class GnomAD(Annotator):
         elif isinstance(vdf, pd.DataFrame):
             # multiple records at that position
             vdf = vdf.reset_index()
-            target = f'{ref}|{alt}'
+            target = f"{ref}|{alt}"
             # do as little work as possible to find a match
-            for idx, value in vdf['ref_alt'].items():
+            for idx, value in vdf["ref_alt"].items():
                 if value == target:
                     return vdf.loc[idx][list(GNOMAD_SOURCE_COLUMNS)].fillna("")
             # failed to find match
@@ -115,9 +115,9 @@ class GnomAD(Annotator):
         """
         if chrom in CHROM_LIST:
             filepath = self.file_template.format(chrom)
-            return pd.read_feather(filepath).set_index('pos')
+            return pd.read_feather(filepath).set_index("pos")
         else:
-            raise KeyError('Unrecognized contig encountered: {}'.format(chrom))
+            raise KeyError("Unrecognized contig encountered: {}".format(chrom))
 
     def annotate(self, maf_record, vcf_record):
         """
@@ -129,9 +129,9 @@ class GnomAD(Annotator):
 
         for source_col, maf_col in GNOMAD_SRC_TO_MAF.items():
             value = str(getattr(grec, source_col))
-            default = ''
+            default = ""
             if source_col == "POP_MAX_non_cancer_adj":
-                value = value.split(',')
+                value = value.split(",")
                 default = []
             maf_record[maf_col] = get_builder(
                 maf_col, self.scheme, value=value, default=default

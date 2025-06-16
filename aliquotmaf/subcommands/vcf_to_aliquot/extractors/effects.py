@@ -7,6 +7,7 @@ some input source, mostly engineered for VEP annotated VCF files.
                            dictionaries based on VEP v102 outputs.
 * SelectOneEffectExtractor Select a single transcript effect based on priorities
 """
+
 import re
 from typing import Dict, List, Optional
 
@@ -256,7 +257,7 @@ class EffectsExtractor_102(EffectsExtractor):
                 effect["HGVSp_Short"] = hgvs_p_short
             else:
                 # HGVSp_Short column is never established anywhere
-                effect["HGVSp_Short"] = ''
+                effect["HGVSp_Short"] = ""
             # Fix HGVSp_Short, CDS_position, and Protein_position for splice
             # acceptor/donor variants
             if (
@@ -343,7 +344,6 @@ class SelectOneEffectExtractor(Extractor):
 
     @classmethod
     def extract(cls, all_effects, effect_priority, biotype_priority, custom_enst=None):
-
         maf_effect = None
 
         # Sort effects first by transcript biotype, then by severity,

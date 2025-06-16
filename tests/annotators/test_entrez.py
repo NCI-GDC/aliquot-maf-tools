@@ -1,6 +1,7 @@
 """
 Tests for the ``aliquotmaf.annotators.Cosmic`` class.
 """
+
 from collections import OrderedDict
 
 import pytest
@@ -49,23 +50,22 @@ def test_entrez_symbol_and_feature(
     get_test_file,
     get_empty_maf_record,
 ):
-
     # setup annotator
     json_path = get_test_file("ex_entrez.json")
     annotator = setup_annotator(test_scheme, entrez_json_file=json_path)
 
     init_maf_record = get_empty_maf_record
     init_maf_record[MAF_SYMBOL] = get_builder(
-        MAF_SYMBOL, test_scheme, value='PRAMEF27', default=''
+        MAF_SYMBOL, test_scheme, value="PRAMEF27", default=""
     )
     init_maf_record[MAF_FEATURE] = get_builder(
-        MAF_FEATURE, test_scheme, value='ENST00000436041', default=''
+        MAF_FEATURE, test_scheme, value="ENST00000436041", default=""
     )
 
     # print(test_scheme.column_class('Entrez_Gene_Id').__name__)
     maf_record = annotator.annotate(init_maf_record)
 
-    assert maf_record['Entrez_Gene_Id'].value == 101929983
+    assert maf_record["Entrez_Gene_Id"].value == 101929983
 
 
 def test_entrez_symbol_only(
@@ -74,19 +74,18 @@ def test_entrez_symbol_only(
     get_test_file,
     get_empty_maf_record,
 ):
-
     # setup annotator
     json_path = get_test_file("ex_entrez.json")
     annotator = setup_annotator(test_scheme, entrez_json_file=json_path)
 
     init_maf_record = get_empty_maf_record
     init_maf_record[MAF_SYMBOL] = get_builder(
-        MAF_SYMBOL, test_scheme, value='PRAMEF27', default=''
+        MAF_SYMBOL, test_scheme, value="PRAMEF27", default=""
     )
     # print(test_scheme.column_class('Entrez_Gene_Id').__name__)
     maf_record = annotator.annotate(init_maf_record)
 
-    assert maf_record['Entrez_Gene_Id'].value == 101929983
+    assert maf_record["Entrez_Gene_Id"].value == 101929983
 
 
 def test_feature_only(
@@ -95,7 +94,6 @@ def test_feature_only(
     get_test_file,
     get_empty_maf_record,
 ):
-
     # setup annotator
     json_path = get_test_file("ex_entrez.json")
     annotator = setup_annotator(test_scheme, entrez_json_file=json_path)
@@ -103,13 +101,13 @@ def test_feature_only(
     init_maf_record = get_empty_maf_record
 
     init_maf_record[MAF_FEATURE] = get_builder(
-        MAF_FEATURE, test_scheme, value='ENST00000436041', default=''
+        MAF_FEATURE, test_scheme, value="ENST00000436041", default=""
     )
 
     # print(test_scheme.column_class('Entrez_Gene_Id').__name__)
     maf_record = annotator.annotate(init_maf_record)
 
-    assert maf_record['Entrez_Gene_Id'].value == 101929983
+    assert maf_record["Entrez_Gene_Id"].value == 101929983
 
 
 def test_neither_id_present_in_query(
@@ -118,7 +116,6 @@ def test_neither_id_present_in_query(
     get_test_file,
     get_empty_maf_record,
 ):
-
     # setup annotator
     json_path = get_test_file("ex_entrez.json")
     annotator = setup_annotator(test_scheme, entrez_json_file=json_path)
@@ -128,7 +125,7 @@ def test_neither_id_present_in_query(
     # print(test_scheme.column_class('Entrez_Gene_Id').__name__)
     maf_record = annotator.annotate(init_maf_record)
 
-    assert maf_record['Entrez_Gene_Id'].value is None
+    assert maf_record["Entrez_Gene_Id"].value is None
 
 
 def test_symbol_not_present_in_database(
@@ -143,13 +140,13 @@ def test_symbol_not_present_in_database(
 
     init_maf_record = get_empty_maf_record
     init_maf_record[MAF_SYMBOL] = get_builder(
-        MAF_SYMBOL, test_scheme, value='NOTAGENE', default=''
+        MAF_SYMBOL, test_scheme, value="NOTAGENE", default=""
     )
 
     # print(test_scheme.column_class('Entrez_Gene_Id').__name__)
     maf_record = annotator.annotate(init_maf_record)
 
-    assert maf_record['Entrez_Gene_Id'].value is None
+    assert maf_record["Entrez_Gene_Id"].value is None
 
 
 def test_gencode_id_not_present_in_database(
@@ -164,10 +161,10 @@ def test_gencode_id_not_present_in_database(
 
     init_maf_record = get_empty_maf_record
     init_maf_record[MAF_FEATURE] = get_builder(
-        MAF_FEATURE, test_scheme, value='ENST99999999999', default=''
+        MAF_FEATURE, test_scheme, value="ENST99999999999", default=""
     )
 
     # print(test_scheme.column_class('Entrez_Gene_Id').__name__)
     maf_record = annotator.annotate(init_maf_record)
 
-    assert maf_record['Entrez_Gene_Id'].value is None
+    assert maf_record["Entrez_Gene_Id"].value is None

@@ -1,4 +1,5 @@
 """Utilities for converters"""
+
 from maflib.record import MafRecord
 from maflib.validation import ValidationStringency
 

@@ -1,6 +1,7 @@
 """
 Applies the multiallelic filter.
 """
+
 from __future__ import absolute_import
 
 from .filter_base import Filter
@@ -18,7 +19,6 @@ class Multiallelic(Filter):
         return curr
 
     def filter(self, maf_record):
-        flag = False
         vcf_region = maf_record["vcf_region"].value.split(":")
         alleles = set(vcf_region[3].split(",") + vcf_region[4].split(","))
         return len(alleles) > 2

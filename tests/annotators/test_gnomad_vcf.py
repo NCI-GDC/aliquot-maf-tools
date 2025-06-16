@@ -1,6 +1,7 @@
 """
 Tests for the ``aliquotmaf.annotators.GnomAD_VCF`` class.
 """
+
 import math
 from collections import OrderedDict
 
@@ -60,7 +61,6 @@ def test_variant_with_maxAF(
     get_test_vcf_record,
     get_empty_maf_record,
 ):
-
     # setup annotator
     vcf_path = get_test_file("fake_noncancer_gnomad.vcf.gz")
     annotator = setup_annotator(test_scheme, vcf_path)
@@ -86,16 +86,16 @@ def test_variant_with_maxAF(
             math.isclose(maf_record["gnomAD_non_cancer_MID_AF"].value, 0.0),
             math.isclose(maf_record["gnomAD_non_cancer_SAS_AF"].value, 0.0),
             math.isclose(maf_record["gnomAD_non_cancer_NFE_AF"].value, 0.0),
-            '{0:.6f}'.format(maf_record["gnomAD_non_cancer_AF"].value)
-            == '{0:.6f}'.format(1.69742e-05),
+            "{0:.6f}".format(maf_record["gnomAD_non_cancer_AF"].value)
+            == "{0:.6f}".format(1.69742e-05),
             math.isclose(maf_record["gnomAD_non_cancer_AMR_AF"].value, 0.0),
             math.isclose(maf_record["gnomAD_non_cancer_OTH_AF"].value, 0.0),
             math.isclose(maf_record["gnomAD_non_cancer_ASJ_AF"].value, 0.0),
-            '{0:.6f}'.format(maf_record["gnomAD_non_cancer_FIN_AF"].value)
-            == '{0:.6f}'.format(0.000276778),
-            '{0:.6f}'.format(maf_record["gnomAD_non_cancer_MAX_AF_adj"].value)
-            == '{0:.6f}'.format(0.000276778),
-            maf_record["gnomAD_non_cancer_MAX_AF_POPS_adj"].value == ['fin'],
+            "{0:.6f}".format(maf_record["gnomAD_non_cancer_FIN_AF"].value)
+            == "{0:.6f}".format(0.000276778),
+            "{0:.6f}".format(maf_record["gnomAD_non_cancer_MAX_AF_adj"].value)
+            == "{0:.6f}".format(0.000276778),
+            maf_record["gnomAD_non_cancer_MAX_AF_POPS_adj"].value == ["fin"],
         ]
     )
 
@@ -107,7 +107,6 @@ def test_without_maxAF(
     get_test_vcf_record,
     get_empty_maf_record,
 ):
-
     # setup annotator
     vcf_path = get_test_file("fake_noncancer_gnomad.vcf.gz")
     annotator = setup_annotator(test_scheme, vcf_path)
@@ -127,12 +126,12 @@ def test_without_maxAF(
             math.isclose(maf_record["gnomAD_non_cancer_AMI_AF"].value, 0.0),
             math.isclose(maf_record["gnomAD_non_cancer_MID_AF"].value, 0.0),
             math.isclose(maf_record["gnomAD_non_cancer_SAS_AF"].value, 0.0),
-            '{0:.6f}'.format(maf_record["gnomAD_non_cancer_NFE_AF"].value)
-            == '{0:.6f}'.format(0.000685871),
-            '{0:.6f}'.format(maf_record["gnomAD_non_cancer_AF"].value)
-            == '{0:.6f}'.format(0.000890472),
-            '{0:.6f}'.format(maf_record["gnomAD_non_cancer_AMR_AF"].value)
-            == '{0:.6f}'.format(0.00595238),
+            "{0:.6f}".format(maf_record["gnomAD_non_cancer_NFE_AF"].value)
+            == "{0:.6f}".format(0.000685871),
+            "{0:.6f}".format(maf_record["gnomAD_non_cancer_AF"].value)
+            == "{0:.6f}".format(0.000890472),
+            "{0:.6f}".format(maf_record["gnomAD_non_cancer_AMR_AF"].value)
+            == "{0:.6f}".format(0.00595238),
             math.isclose(maf_record["gnomAD_non_cancer_OTH_AF"].value, 0.0),
             math.isclose(maf_record["gnomAD_non_cancer_ASJ_AF"].value, 0.0),
             math.isclose(maf_record["gnomAD_non_cancer_FIN_AF"].value, 0.0),

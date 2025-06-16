@@ -4,6 +4,7 @@ here are subclasses of `~maf_converter_lib.extractor.Extractor` objects.
 * ExtractVariantAlleleIndexParser   extracts the variant allele index
 * ExtractGenotypeAndDepthsParser    extracts the genotype and depths
 """
+
 from typing import Final, List
 
 from aliquotmaf.constants import variant_callers
@@ -131,14 +132,14 @@ class GenotypeAndDepthsExtractor(Extractor):
 
     @classmethod
     def _extract_mutect2(cls, genotype):
-        '''
+        """
         MuTect2 should always have the AD tag set and may or may not have
         the DP flag set. This function handles those cases, adding up
         allele-depths when necessary.
-        '''
+        """
 
         DP_IS_SET = (
-            "DP" in genotype and genotype["DP"] is not None and genotype["DP"] != '.'
+            "DP" in genotype and genotype["DP"] is not None and genotype["DP"] != "."
         )
         # set allele depths
         if isinstance(genotype["AD"], int):
@@ -154,9 +155,9 @@ class GenotypeAndDepthsExtractor(Extractor):
 
     @classmethod
     def _extract_muse(cls, genotype):
-        '''
+        """
         MuSE reports AD and DP tags
-        '''
+        """
         if isinstance(genotype["AD"], int):
             allele_depths = [genotype["AD"]]
         else:
@@ -166,11 +167,11 @@ class GenotypeAndDepthsExtractor(Extractor):
 
     @classmethod
     def _extract_caveman(cls, var_allele_idx, genotype, alleles):
-        '''
+        """
         CaVEMan provides genotype and counts for all nucleotides
         in forward and reverse strand so we need to add them up
         to get allele depths and overall depth
-        '''
+        """
         # Handle CaVEMan which provides genotype and counts for all nucleotides in forward and reverse strands
         var_allele = alleles[var_allele_idx]
         var_f_count_name = f"F{var_allele}Z"
@@ -190,17 +191,17 @@ class GenotypeAndDepthsExtractor(Extractor):
 
     @classmethod
     def _extract_somaticsniper(cls, var_allele_idx, genotype, alleles):
-        '''
+        """
         SomaticSniper reports total depth as DP but allele depths must be
         extracted from BCOUNT
-        '''
+        """
         # set allele-depths
         b_idx = {"A": 0, "C": 1, "G": 2, "T": 3}
         bcount = list(genotype["BCOUNT"])
         allele_depths = [bcount[b_idx[i]] if i in b_idx else None for i in alleles]
 
         DP_IS_SET = (
-            "DP" in genotype and genotype["DP"] is not None and genotype["DP"] != '.'
+            "DP" in genotype and genotype["DP"] is not None and genotype["DP"] != "."
         )
         # set total depth
         if DP_IS_SET:
@@ -211,11 +212,11 @@ class GenotypeAndDepthsExtractor(Extractor):
 
     @classmethod
     def _extract_varscan2(cls, var_allele_idx, genotype, alleles):
-        '''
+        """
         VarScan2 only reports alt allele depth in 'AD'
         reference allele depth is in 'RD' tag
         overall depth is in 'DP'
-        '''
+        """
         allele_depths = [None for i in alleles]
         allele_depths[0] = genotype["RD"]
         if isinstance(genotype["AD"], int):
@@ -227,9 +228,9 @@ class GenotypeAndDepthsExtractor(Extractor):
 
     @classmethod
     def _extract_pindel(cls, genotype):
-        '''
+        """
         Pindel reports AD and DP tags
-        '''
+        """
         if isinstance(genotype["AD"], int):
             allele_depths = [genotype["AD"]]
         else:
@@ -250,8 +251,8 @@ class GenotypeAndDepthsExtractor(Extractor):
 
         :returns: an updated genotype record and depths list
         """
-        total_depth = genotype['NR'] + genotype['PR']
-        alt_count = genotype['NP'] + genotype['PP']
+        total_depth = genotype["NR"] + genotype["PR"]
+        alt_count = genotype["NP"] + genotype["PP"]
         ref_count = total_depth - alt_count
         dp = total_depth
         allele_depths = [ref_count, alt_count]
@@ -264,8 +265,8 @@ class GenotypeAndDepthsExtractor(Extractor):
         SvABA only reports the depth of the alt allele in 'AD' and reports
         total depth in 'DP' so we infer the ref allele depth from these.
         """
-        total_depth = genotype['DP']
-        alt_depth = genotype['AD'][0]
+        total_depth = genotype["DP"]
+        alt_depth = genotype["AD"][0]
         ref_depth = total_depth - alt_depth
         allele_depths = [ref_depth, alt_depth]
         dp = total_depth
@@ -358,7 +359,7 @@ class GenotypeAndDepthsExtractor(Extractor):
             "DP" in genotype
             and genotype["DP"] is not None
             and (
-                ([0] is not None and depths[0] > genotype["DP"])
+                (depths[0] is not None and depths[0] > genotype["DP"])
                 or (
                     depths[var_allele_idx] is not None
                     and depths[var_allele_idx] > genotype["DP"]

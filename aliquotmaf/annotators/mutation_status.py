@@ -1,6 +1,7 @@
 """
 MutationStatus annotator. Sets the Germline/Somatic/LOH/Unknown etc status for MAFs.
 """
+
 from __future__ import absolute_import
 
 from aliquotmaf.constants import variant_callers

@@ -1,6 +1,7 @@
 """
 Tests for the ``aliquotmaf.filters.FilterGnomAD`` class.
 """
+
 from collections import OrderedDict
 
 import pytest
@@ -77,8 +78,8 @@ def test_filter_gnomad_null(test_scheme, setup_filter, get_empty_maf_record):
     filterer = setup_filter(cutoff)
     maf_record = get_empty_maf_record
     for key in GNOMAD_MAF_COLUMNS:
-        value = ''
-        if key == 'gnomAD_non_cancer_MAX_AF_POPS_adj':
+        value = ""
+        if key == "gnomAD_non_cancer_MAX_AF_POPS_adj":
             value = []
         maf_record[key] = get_builder(key, test_scheme, value=value)
     result = filterer.filter(maf_record)
@@ -93,10 +94,10 @@ def test_filter_gnomad_positive(test_scheme, setup_filter, get_empty_maf_record)
     filterer = setup_filter(cutoff)
     maf_record = get_empty_maf_record
     for key in GNOMAD_MAF_COLUMNS:
-        value = ''
-        if key == 'gnomAD_non_cancer_MAX_AF_adj':
+        value = ""
+        if key == "gnomAD_non_cancer_MAX_AF_adj":
             value = 0.5
-        if key == 'gnomAD_non_cancer_MAX_AF_POPS_adj':
+        if key == "gnomAD_non_cancer_MAX_AF_POPS_adj":
             value = []
         maf_record[key] = get_builder(key, test_scheme, value=value)
     result = filterer.filter(maf_record)
@@ -111,10 +112,10 @@ def test_filter_gnomad_on_cutoff(test_scheme, setup_filter, get_empty_maf_record
     filterer = setup_filter(cutoff)
     maf_record = get_empty_maf_record
     for key in GNOMAD_MAF_COLUMNS:
-        value = ''
-        if key == 'gnomAD_non_cancer_MAX_AF_adj':
+        value = ""
+        if key == "gnomAD_non_cancer_MAX_AF_adj":
             value = cutoff
-        if key == 'gnomAD_non_cancer_MAX_AF_POPS_adj':
+        if key == "gnomAD_non_cancer_MAX_AF_POPS_adj":
             value = []
         maf_record[key] = get_builder(key, test_scheme, value=value)
     result = filterer.filter(maf_record)
@@ -129,10 +130,10 @@ def test_filter_gnomad_negative(test_scheme, setup_filter, get_empty_maf_record)
     filterer = setup_filter(cutoff)
     maf_record = get_empty_maf_record
     for key in GNOMAD_MAF_COLUMNS:
-        value = ''
-        if key == 'gnomAD_non_cancer_MAX_AF_adj':
+        value = ""
+        if key == "gnomAD_non_cancer_MAX_AF_adj":
             value = 0.000399
-        if key == 'gnomAD_non_cancer_MAX_AF_POPS_adj':
+        if key == "gnomAD_non_cancer_MAX_AF_POPS_adj":
             value = []
         maf_record[key] = get_builder(key, test_scheme, value=value)
     result = filterer.filter(maf_record)

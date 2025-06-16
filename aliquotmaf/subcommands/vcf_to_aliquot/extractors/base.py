@@ -1,4 +1,5 @@
 """Abstract base class for extracting data"""
+
 from abc import ABCMeta, abstractmethod
 
 

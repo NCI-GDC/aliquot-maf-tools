@@ -1,6 +1,7 @@
 """
 Tests for functions parsing the VCF headers.
 """
+
 import pytest
 
 from aliquotmaf.subcommands.utils import (
@@ -19,6 +20,7 @@ def test_sample_in_header(get_test_vcf_header):
 
     with pytest.raises(AssertionError):
         fail_idx = assert_sample_in_header(vcf_record, "FAKE")
+        print(fail_idx)
 
     fail_ok_idx = assert_sample_in_header(vcf_record, "FAKE", can_fail=True)
     assert fail_ok_idx is None

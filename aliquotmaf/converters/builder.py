@@ -1,6 +1,7 @@
 """
 Builder classes assist in creating a MafColumnRecord.
 """
+
 import abc
 import sys
 

@@ -1,6 +1,7 @@
 """
 Extractor class for variant classification.
 """
+
 from aliquotmaf.subcommands.vcf_to_aliquot.extractors import Extractor
 
 
@@ -11,13 +12,12 @@ class VariantClassExtractor(Extractor):
 
     @classmethod
     def extract(cls, cons, var_type, inframe):
-
         # Splice_Site
         if cons in [
-            'splice_acceptor_variant',
-            'splice_donor_variant',
-            'transcript_ablation',
-            'exon_loss_variant',
+            "splice_acceptor_variant",
+            "splice_donor_variant",
+            "transcript_ablation",
+            "exon_loss_variant",
         ]:
             return "Splice_Site"
 

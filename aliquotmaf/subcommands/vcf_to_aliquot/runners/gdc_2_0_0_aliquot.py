@@ -1,4 +1,5 @@
 """Main vcf2maf logic for spec gdc-2.0.0-aliquot"""
+
 import urllib.parse
 
 import pysam
@@ -260,16 +261,12 @@ class GDC_2_0_0_Aliquot(BaseRunner):
         self.logger.info(
             "Processing input vcf {0}...".format(self.options["input_vcf"])
         )
-
-        # Check for caller implemented
-        # Strelka workflow under development
-        # Vardict discontinued
-        if self.options['caller_id'] in [
+        if self.options["caller_id"] in [
             variant_callers.STRELKA_SOMATIC,
             variant_callers.VARDICT,
         ]:
             self.logger.error(
-                "Variant caller {} not implemented".format(self.options['caller_id'])
+                "Variant caller {} not implemented".format(self.options["caller_id"])
             )
             return False
 
@@ -316,7 +313,6 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             # Convert
             line = 0
             for vcf_record in vcf_object.fetch():
-
                 line += 1
 
                 if line % 1000 == 0:
@@ -372,7 +368,6 @@ class GDC_2_0_0_Aliquot(BaseRunner):
 
             counter = 0
             for record in sorter:
-
                 counter += 1
 
                 if counter % 1000 == 0:

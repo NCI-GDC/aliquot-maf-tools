@@ -1,6 +1,7 @@
 """
 Tests the subcommand ABC.
 """
+
 import pytest
 
 from aliquotmaf.__main__ import main

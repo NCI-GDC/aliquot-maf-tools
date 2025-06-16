@@ -1,6 +1,7 @@
 """
 Tests for the ``aliquotmaf.annotators.GnomAD`` class.
 """
+
 import math
 import os
 from collections import OrderedDict
@@ -49,7 +50,7 @@ def test_scheme(get_test_scheme):
 
 
 def test_setup_gnomad(test_scheme, setup_annotator, get_test_file):
-    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    ref_prefix = os.path.join(get_test_file("gnomad"), "gnomad_test.")
     annotator = setup_annotator(test_scheme, ref_prefix)
     assert isinstance(annotator, GnomAD)
 
@@ -61,9 +62,8 @@ def test_variant_with_maxAF(
     get_test_vcf_record,
     get_empty_maf_record,
 ):
-
     # setup annotator
-    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    ref_prefix = os.path.join(get_test_file("gnomad"), "gnomad_test.")
     annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
@@ -111,7 +111,7 @@ def test_variant_with_maxAF(
             math.isclose(maf_record["gnomAD_non_cancer_ASJ_AF"].value, 0.0),
             math.isclose(maf_record["gnomAD_non_cancer_FIN_AF"].value, 0.0),
             math.isclose(maf_record["gnomAD_non_cancer_MAX_AF_adj"].value, 5.47106e-05),
-            maf_record["gnomAD_non_cancer_MAX_AF_POPS_adj"].value == ['nfe'],
+            maf_record["gnomAD_non_cancer_MAX_AF_POPS_adj"].value == ["nfe"],
         ]
     )
 
@@ -123,9 +123,8 @@ def test_without_maxAF(
     get_test_vcf_record,
     get_empty_maf_record,
 ):
-
     # setup annotator
-    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    ref_prefix = os.path.join(get_test_file("gnomad"), "gnomad_test.")
     annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
@@ -180,9 +179,8 @@ def test_none_keys(
     get_test_vcf_record,
     get_empty_maf_record,
 ):
-
     # setup annotator
-    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    ref_prefix = os.path.join(get_test_file("gnomad"), "gnomad_test.")
     annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
@@ -203,9 +201,8 @@ def test_multiple_variants_at_position(
     get_test_vcf_record,
     get_empty_maf_record,
 ):
-
     # setup annotator
-    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    ref_prefix = os.path.join(get_test_file("gnomad"), "gnomad_test.")
     annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
@@ -248,7 +245,7 @@ def test_variant_without_annotation(
     """
 
     # setup annotator
-    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    ref_prefix = os.path.join(get_test_file("gnomad"), "gnomad_test.")
     annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
@@ -285,9 +282,8 @@ def test_traverse_chromosomes(
     get_test_vcf_record,
     get_empty_maf_record,
 ):
-
     # setup annotator
-    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    ref_prefix = os.path.join(get_test_file("gnomad"), "gnomad_test.")
     annotator = setup_annotator(test_scheme, ref_prefix)
 
     # record on chr1
@@ -334,7 +330,7 @@ def test_traverse_chromosomes(
             math.isclose(maf_record["gnomAD_non_cancer_ASJ_AF"].value, 0.0),
             math.isclose(maf_record["gnomAD_non_cancer_FIN_AF"].value, 0.0),
             math.isclose(maf_record["gnomAD_non_cancer_MAX_AF_adj"].value, 0.000229253),
-            maf_record["gnomAD_non_cancer_MAX_AF_POPS_adj"].value == ['amr'],
+            maf_record["gnomAD_non_cancer_MAX_AF_POPS_adj"].value == ["amr"],
         ]
     )
 
@@ -346,9 +342,8 @@ def test_variant_with_multiple_max_pop(
     get_test_vcf_record,
     get_empty_maf_record,
 ):
-
     # setup annotator
-    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    ref_prefix = os.path.join(get_test_file("gnomad"), "gnomad_test.")
     annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
@@ -391,7 +386,7 @@ def test_variant_with_multiple_max_pop(
             math.isclose(maf_record["gnomAD_non_cancer_ASJ_AF"].value, 0.999326),
             math.isclose(maf_record["gnomAD_non_cancer_FIN_AF"].value, 0.998418),
             math.isclose(maf_record["gnomAD_non_cancer_MAX_AF_adj"].value, 1),
-            maf_record["gnomAD_non_cancer_MAX_AF_POPS_adj"].value == ['ami', 'mid'],
+            maf_record["gnomAD_non_cancer_MAX_AF_POPS_adj"].value == ["ami", "mid"],
         ]
     )
 
@@ -403,9 +398,8 @@ def test_variant_on_nonexistant_chromosome(
     get_test_vcf_record,
     get_empty_maf_record,
 ):
-
     # setup annotator
-    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    ref_prefix = os.path.join(get_test_file("gnomad"), "gnomad_test.")
     annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
@@ -419,8 +413,9 @@ def test_variant_on_nonexistant_chromosome(
     )
 
     # annotate maf record
-    with pytest.raises(KeyError, match=r'Unrecognized contig encountered: .+'):
+    with pytest.raises(KeyError, match=r"Unrecognized contig encountered: .+"):
         maf_record = annotator.annotate(get_empty_maf_record, vcf_record)
+        print(maf_record)
 
 
 def test_unannotated_variant_single_annotated_pos(
@@ -436,7 +431,7 @@ def test_unannotated_variant_single_annotated_pos(
     """
 
     # setup annotator
-    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    ref_prefix = os.path.join(get_test_file("gnomad"), "gnomad_test.")
     annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record
@@ -502,7 +497,7 @@ def test_unannotated_variant_multiply_annotated_pos(
     """
 
     # setup annotator
-    ref_prefix = os.path.join(get_test_file("gnomad"), 'gnomad_test.')
+    ref_prefix = os.path.join(get_test_file("gnomad"), "gnomad_test.")
     annotator = setup_annotator(test_scheme, ref_prefix)
 
     # setup vcf record

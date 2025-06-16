@@ -1,6 +1,7 @@
 """
 Applies the normal depth filter
 """
+
 from __future__ import absolute_import
 
 from .filter_base import Filter
