@@ -19,15 +19,15 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-    "cmake>=3.25",
     "bioinf-maflib",
     "pysam",
     "pandas",
-    "pyarrow>=4.0",
+    "pyarrow-core>=4.0",
 ]
 
 [project.optional-dependencies]
 build = [
+  "cmake>=3.25",
   "setuptools_scm",
   "flit",
   "twine",
