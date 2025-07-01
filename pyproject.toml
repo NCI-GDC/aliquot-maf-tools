@@ -19,6 +19,7 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
+    "cmake>=3.25",
     "bioinf-maflib",
     "pysam",
     "pandas",
