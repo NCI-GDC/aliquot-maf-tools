@@ -1,5 +1,5 @@
 [build-system]
-requires = ["flit_scm"]
+requires = ["flit_scm", "cmake>=3.25"]
 build-backend = "flit_scm:buildapi"
 
 [project]
@@ -22,12 +22,11 @@ dependencies = [
     "bioinf-maflib",
     "pysam",
     "pandas",
-    "pyarrow-core>=4.0",
+    "pyarrow>=4.0",
 ]
 
 [project.optional-dependencies]
 build = [
-  "cmake>=3.25",
   "setuptools_scm",
   "flit",
   "twine",
