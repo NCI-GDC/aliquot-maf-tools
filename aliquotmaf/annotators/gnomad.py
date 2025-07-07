@@ -1,5 +1,9 @@
 """
 Implements the gnomAD annotation.
+
+*** DEPRECATED AND UNUSED ***
+This implementation had performance and scaling issues and was
+abandoned in favor of the vcf implementation
 """
 
 from __future__ import absolute_import

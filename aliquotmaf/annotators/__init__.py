@@ -3,7 +3,8 @@ from __future__ import absolute_import
 from .cosmic import CosmicID
 from .dbsnp_validation import DbSnpValidation
 from .entrez import Entrez
-from .gnomad import GnomAD
+
+# from .gnomad import GnomAD
 from .gnomad_vcf import GnomAD_VCF
 from .hotspot import Hotspot
 from .mutation_status import MutationStatus
@@ -18,6 +19,6 @@ __all__ = [
     NonTcgaExac,
     Hotspot,
     Entrez,
-    GnomAD,
+    # GnomAD,
     GnomAD_VCF,
 ]

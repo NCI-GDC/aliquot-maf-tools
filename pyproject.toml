@@ -21,8 +21,6 @@ dynamic = ["version"]
 dependencies = [
     "bioinf-maflib",
     "pysam",
-    "pandas",
-    "pyarrow>=4.0,<20.0.0",
 ]
 
 [project.optional-dependencies]
@@ -67,7 +65,7 @@ extra-index-url = ["https://nexus.osdc.io/repository/pypi-all/simple"]
 extra-index-url = ["https://nexus.osdc.io/repository/pypi-all/simple"]
 emit-index-url = true
 output-file = "requirements.txt"
-no-binary = [":all:"]
+no-binary = ["pysam"]
 
 [tool.coverage.run]
 source = ["aliquotmaf"]
