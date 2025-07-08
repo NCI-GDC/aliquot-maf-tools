@@ -10,7 +10,7 @@ COPY ./ /aliquotmaf
 WORKDIR /aliquotmaf
 
 #RUN pip install tox && tox -e build
-RUN uv build
+RUN uv build --no-binary :all:
 
 FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
 
