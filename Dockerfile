@@ -25,7 +25,7 @@ COPY requirements.txt /aliquotmaf/
 
 WORKDIR /aliquotmaf
 
-RUN uv pip install --no-binary pysam -r requirements.txt \
+RUN uv pip install --no-deps --no-binary pysam -r requirements.txt \
 	&& uv pip install --no-deps *.whl \
 	&& rm -f *.whl requirements.txt
 
