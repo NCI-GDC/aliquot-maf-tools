@@ -12,7 +12,7 @@ WORKDIR /aliquotmaf
 #RUN pip install tox && tox -e build
 RUN uv build --no-binary
 
-FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
+FROM ${REGISTRY}/python3.12-builder:${BASE_CONTAINER_VERSION}
 
 LABEL org.opencontainers.image.title="aliquotmaf" \
       org.opencontainers.image.description="Tools for creating and filtering aliquot-level MAFs" \
