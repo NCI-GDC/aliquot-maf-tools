@@ -25,7 +25,7 @@ COPY requirements.txt /aliquotmaf/
 
 WORKDIR /aliquotmaf
 
-RUN uv pip install --no-deps -r requirements.txt \
+RUN uv pip install --no-binary ":all:" --no-deps -r requirements.txt \
 	&& uv pip install --no-deps *.whl \
 	&& rm -f *.whl requirements.txt
 
