@@ -12,7 +12,12 @@ WORKDIR /aliquotmaf
 #RUN pip install tox && tox -e build
 RUN uv build --no-binary
 
-FROM ${REGISTRY}/python3.12-builder:${BASE_CONTAINER_VERSION}
+WORKDIR /deps
+
+# having problems with pysam wheel, others are fine, 
+RUN uvx pip wheel --no-binary ":all:" -r ../aliquot-maf-tools/requirements.txt
+
+FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
 
 LABEL org.opencontainers.image.title="aliquotmaf" \
       org.opencontainers.image.description="Tools for creating and filtering aliquot-level MAFs" \
@@ -21,12 +26,12 @@ LABEL org.opencontainers.image.title="aliquotmaf" \
 
 COPY --from=ghcr.io/astral-sh/uv:0.7.12 /uv /uvx /bin/
 COPY --from=builder /aliquotmaf/dist/*.whl /aliquotmaf/
-COPY requirements.txt /aliquotmaf/
+COPY --from=builder /deps/*.whl /aliquotmaf
+# COPY requirements.txt /aliquotmaf/
 
 WORKDIR /aliquotmaf
 
-RUN uv pip install --no-deps --no-binary pysam -r requirements.txt \
-	&& uv pip install --no-deps *.whl \
-	&& rm -f *.whl requirements.txt
+RUN uv pip install --no-deps *.whl \
+	&& rm -f *.whl
 
 USER app
