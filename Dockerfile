@@ -9,13 +9,12 @@ COPY ./ /aliquotmaf
 
 WORKDIR /aliquotmaf
 
-#RUN pip install tox && tox -e build
 RUN uv build --no-binary
 
 WORKDIR /deps
 
-# having problems with pysam wheel, others are fine, 
-RUN uv venv -p python3.12 && source .venv/bin/activate && uvx pip wheel --no-binary pysam -r /aliquotmaf/requirements.txt
+RUN uv venv -p python3.12 && source .venv/bin/activate \
+      && uvx pip wheel --no-binary pysam -r /aliquotmaf/requirements.txt
 
 FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
 
@@ -27,7 +26,6 @@ LABEL org.opencontainers.image.title="aliquotmaf" \
 COPY --from=ghcr.io/astral-sh/uv:0.7.12 /uv /uvx /bin/
 COPY --from=builder /aliquotmaf/dist/*.whl /aliquotmaf/
 COPY --from=builder /deps/*.whl /aliquotmaf
-# COPY requirements.txt /aliquotmaf/
 
 WORKDIR /aliquotmaf
 
