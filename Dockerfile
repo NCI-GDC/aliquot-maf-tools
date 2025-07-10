@@ -15,7 +15,7 @@ RUN uv build --no-binary
 WORKDIR /deps
 
 # having problems with pysam wheel, others are fine, 
-RUN uvx pip wheel --no-binary pysam -r /aliquotmaf/requirements.txt
+RUN uv venv -p python3.12 && source .venv/bin/activate && uvx pip wheel --no-binary pysam -r /aliquotmaf/requirements.txt
 
 FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
 
