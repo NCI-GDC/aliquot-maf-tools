@@ -1,0 +1,5 @@
+language-settings:
+  python:
+    pip:
+      major: 3
+      minor: 12
