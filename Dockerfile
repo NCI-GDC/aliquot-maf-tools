@@ -3,14 +3,18 @@ ARG BASE_CONTAINER_VERSION=latest
 
 FROM ${REGISTRY}/python3.12-builder:${BASE_CONTAINER_VERSION} as builder
 
-COPY --from=ghcr.io/astral-sh/uv:0.7.12 /uv /uvx /bin/
-
 COPY ./ /aliquotmaf
 
 WORKDIR /aliquotmaf
 
-#RUN pip install tox && tox -e build
-RUN uv build
+ARG PIP_INDEX_URL
+RUN pip install tox && tox -e build
+
+WORKDIR /deps
+
+ENV PIP_NO_BINARY=pysam
+
+RUN pip wheel -r /aliquotmaf/requirements.txt
 
 FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
 
@@ -19,14 +23,12 @@ LABEL org.opencontainers.image.title="aliquotmaf" \
       org.opencontainers.image.source="https://github.com/NCI-GDC/aliquot-maf-tools" \
       org.opencontainers.image.vendor="NCI GDC"
 
-COPY --from=ghcr.io/astral-sh/uv:0.7.12 /uv /uvx /bin/
 COPY --from=builder /aliquotmaf/dist/*.whl /aliquotmaf/
-COPY requirements.txt /aliquotmaf/
+COPY --from=builder /deps/*.whl /aliquotmaf
 
 WORKDIR /aliquotmaf
 
-RUN uv pip install --no-deps -r requirements.txt \
-	&& uv pip install --no-deps *.whl \
-	&& rm -f *.whl requirements.txt
+RUN pip install --no-deps *.whl \
+	&& rm -f *.whl
 
 USER app
