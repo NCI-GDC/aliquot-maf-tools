@@ -7,6 +7,9 @@ COPY ./ /aliquotmaf
 
 WORKDIR /aliquotmaf
 
+ENV PIP_INDEX_URL=https://pypi.org/simple
+ENV PIP_EXTRA_INDEX_URL=https://nexus.osdc.io/repository/pypi-all/simple
+
 RUN pip install tox && tox -e build
 
 WORKDIR /deps
