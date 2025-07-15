@@ -81,6 +81,14 @@ class GDC_1_0_0_Aliquot_Merged(BaseRunner):
             variant_callers.GATK4_MUTECT2.option(),
             help="Path to input protected GATK4 MuTect2 MAF file",
         )
+        parser.add_argument(
+            variant_callers.SVABA_SOMATIC.option(),
+            help="Path to input protected SvABA Somatic MAF file",
+        )
+        parser.add_argument(
+            variant_callers.STRELKA_SOMATIC.option(),
+            help="Path to input protected Strelka Somatic MAF file",
+        )
 
     def load_readers(self):
         """
