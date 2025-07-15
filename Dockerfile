@@ -3,18 +3,16 @@ ARG BASE_CONTAINER_VERSION=latest
 
 FROM ${REGISTRY}/python3.12-builder:feat_uv-base-container as builder
 
-COPY ./ /aliquotmaf
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --locked --no-install-project --no-dev
 
-WORKDIR /aliquotmaf
+COPY . /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-dev
 
-ARG PIP_INDEX_URL
-RUN pip install tox && tox -e build
-
-WORKDIR /deps
-
-ENV PIP_NO_BINARY=pysam
-
-RUN pip wheel -r /aliquotmaf/requirements.txt
+WORKDIR /app
 
 FROM ${REGISTRY}/python3.12:feat_uv-base-container
 
@@ -23,12 +21,6 @@ LABEL org.opencontainers.image.title="aliquotmaf" \
       org.opencontainers.image.source="https://github.com/NCI-GDC/aliquot-maf-tools" \
       org.opencontainers.image.vendor="NCI GDC"
 
-COPY --from=builder /aliquotmaf/dist/*.whl /aliquotmaf/
-COPY --from=builder /deps/*.whl /aliquotmaf
-
-WORKDIR /aliquotmaf
-
-RUN pip install --no-deps *.whl \
-	&& rm -f *.whl
+COPY --from=builder /venv /venv
 
 USER app
