@@ -3,6 +3,7 @@ ARG BASE_CONTAINER_VERSION=latest
 
 FROM ${REGISTRY}/python3.12-builder:feat_uv-base-container as builder
 
+WORKDIR /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
@@ -11,8 +12,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 COPY . /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-dev
-
-WORKDIR /app
 
 FROM ${REGISTRY}/python3.12:feat_uv-base-container
 
