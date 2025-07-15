@@ -1,7 +1,7 @@
 ARG REGISTRY=docker.osdc.io/ncigdc
 ARG BASE_CONTAINER_VERSION=latest
 
-FROM ${REGISTRY}/python3.12-builder:${BASE_CONTAINER_VERSION} as builder
+FROM ${REGISTRY}/python3.12-builder:feat_uv-base-container as builder
 
 COPY ./ /aliquotmaf
 
@@ -16,7 +16,7 @@ ENV PIP_NO_BINARY=pysam
 
 RUN pip wheel -r /aliquotmaf/requirements.txt
 
-FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
+FROM ${REGISTRY}/python3.12:feat_uv-base-container
 
 LABEL org.opencontainers.image.title="aliquotmaf" \
       org.opencontainers.image.description="Tools for creating and filtering aliquot-level MAFs" \
