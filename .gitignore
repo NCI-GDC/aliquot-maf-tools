@@ -118,3 +118,8 @@ gl-code-quality-report.html
 
 # Added in base-container builder image
 aws-lc
+
+#wheel fix
+
+gl-sast-report.json
+gl-secret-detection-report.json
