@@ -35,7 +35,6 @@ class VariantCallerConstants:
     SANGER_PINDEL: Final[VariantCallerName] = VariantCallerName("Sanger Pindel")
     PINDEL: Final[VariantCallerName] = VariantCallerName("Pindel")
     SVABA_SOMATIC: Final[VariantCallerName] = VariantCallerName("SvABA Somatic")
-    # provisional below
     STRELKA_SOMATIC: Final[VariantCallerName] = VariantCallerName("Strelka Somatic")
 
     def astuple(self):
