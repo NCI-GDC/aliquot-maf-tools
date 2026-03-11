@@ -84,8 +84,12 @@ class GenotypeAndDepthsExtractor(Extractor):
             )
             # Format numerical depths
             depths = [i if i != "." and i is not None else 0 for i in new_gt["AD"]]
-            # Set other tags
-            new_gt["GT"] = genotype["GT"]
+            # require all genotype alleles be definite or none should be
+            if all(genotype["GT"]):
+                new_gt["GT"] = genotype["GT"]
+            else:
+                new_gt["GT"] = None
+            # copy depth as-is
             new_gt["DP"] = dp
         return new_gt, depths
 
@@ -125,7 +129,7 @@ class GenotypeAndDepthsExtractor(Extractor):
         if caller_id == variant_callers.SVABA_SOMATIC:
             depths, dp = cls._extract_svaba_somatic(genotype)
         if caller_id == variant_callers.STRELKA_SOMATIC:
-            depths, dp = cls._extract_strelka_somatic(genotype)
+            depths, dp = cls._extract_strelka_somatic(var_allele_idx, genotype, alleles)
         # if caller_id == variant_callers.VARDICT:
         #     self.extract_legacy(cls, var_allele_idx, genotype, alleles)
         return depths, dp
@@ -263,24 +267,66 @@ class GenotypeAndDepthsExtractor(Extractor):
     def _extract_svaba_somatic(cls, genotype):
         """
         SvABA only reports the depth of the alt allele in 'AD' and reports
-        total depth in 'DP' so we infer the ref allele depth from these.
+        total depth in 'DP'. However, SvABA vcfs should have had their format
+        adjusted upstream by the filtration workflow to comply with standards.
+        Thus we can simply grab these values from the relevant tags.
         """
-        total_depth = genotype["DP"]
-        alt_depth = genotype["AD"][0]
-        ref_depth = total_depth - alt_depth
-        allele_depths = [ref_depth, alt_depth]
-        dp = total_depth
+        dp = genotype["DP"]
+        allele_depths = genotype["AD"]
         return (allele_depths, dp)
 
     @classmethod
-    def _extract_strelka_somatic(cls, genotype):
+    def _extract_strelka_somatic(cls, var_allele_idx, genotype, alleles):
         """
-        NOT YET IMPLEMENTED
-        There are two subtypes we have to deal with
+        Strelka independently calls Indels and SNVs then both are combined
+        into one vcf with two styles of calls.
 
-        Strelka reports total depth in DP
+        For SNVs
+        Strelka reports per-nucleotide counts, the nucleotide corresponding
+        to ref and alt alleles must be used to extract these counts and
+        construct needed values.
+
+        For Indels
+        Strelka VCF headers are in direct conflict with documentation, but
+        the documentation seems to make the most sense.
+
+        from: https://github.com/Illumina/strelka/blob/v2.9.x/docs/userGuide/README.md#vcf-files
+        tier1RefCounts = First comma-delimited value from FORMAT/TAR
+        tier1AltCounts = First comma-delimited value from FORMAT/TIR
+        Somatic allele freqeuncy is $tier1AltCounts / ($tier1AltCounts + $tier1RefCounts)
         """
-        return ([], 0)
+
+        indel_format_key_set = {
+            "DP2",
+            "TAR",
+            "TIR",
+            "TOR",
+            "DP50",
+            "FDP50",
+            "SUBDP50",
+            "BCN50",
+        }
+        snv_format_key_set = {"FDP", "SDP", "SUBDP", "AU", "CU", "GU", "TU"}
+        common_format_key_set = {"GT", "DP"}
+        allele_depths = ()
+        dp = 0
+        if set(genotype.keys()) - indel_format_key_set == common_format_key_set:
+            # Indel case
+            ref_count = genotype["TAR"][0]
+            alt_count = genotype["TIR"][0]
+            dp = ref_count + alt_count
+            allele_depths = ref_count, alt_count
+        if set(genotype.keys()) - snv_format_key_set == common_format_key_set:
+            # SNV case
+            alt_allele = alleles[var_allele_idx]
+            alt_count_name = f"{alt_allele}U"
+            alt_count = genotype[alt_count_name][0]
+            ref_allele = [al for al in alleles if al != alt_allele][0]
+            ref_count_name = f"{ref_allele}U"
+            ref_count = genotype[ref_count_name][0]
+            dp = alt_count + ref_count
+            allele_depths = ref_count, alt_count
+        return (allele_depths, dp)
 
     def extract_legacy(cls, var_allele_idx, genotype, alleles):
         """

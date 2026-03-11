@@ -262,7 +262,6 @@ class GDC_2_0_0_Aliquot(BaseRunner):
             "Processing input vcf {0}...".format(self.options["input_vcf"])
         )
         if self.options["caller_id"] in [
-            variant_callers.STRELKA_SOMATIC,
             variant_callers.VARDICT,
         ]:
             self.logger.error(
