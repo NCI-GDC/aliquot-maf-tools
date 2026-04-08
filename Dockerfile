@@ -1,20 +1,20 @@
 ARG REGISTRY=docker.osdc.io/ncigdc
-ARG BASE_CONTAINER_VERSION=latest
+ARG BASE_CONTAINER_VERSION=4.4.1
 
 FROM ${REGISTRY}/python3.12-builder:${BASE_CONTAINER_VERSION} as builder
+
+# Create virtual environment for the builder
+ENV VIRTUAL_ENV=/app
 
 COPY ./ /aliquotmaf
 
 WORKDIR /aliquotmaf
 
 ARG PIP_INDEX_URL
-RUN pip install tox && tox -e build
+RUN uv pip install tox-uv && tox -e build
 
-WORKDIR /deps
-
-ENV PIP_NO_BINARY=pysam
-
-RUN pip wheel -r /aliquotmaf/requirements.txt
+# Install the built package into the virtual environment
+RUN uv pip install --no-binary=pysam /aliquotmaf/dist/*.whl
 
 FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
 
@@ -23,12 +23,11 @@ LABEL org.opencontainers.image.title="aliquotmaf" \
       org.opencontainers.image.source="https://github.com/NCI-GDC/aliquot-maf-tools" \
       org.opencontainers.image.vendor="NCI GDC"
 
-COPY --from=builder /aliquotmaf/dist/*.whl /aliquotmaf/
-COPY --from=builder /deps/*.whl /aliquotmaf
+# Copy the virtual environment from builder (includes all installed packages)
+COPY --from=builder /app /app
 
-WORKDIR /aliquotmaf
-
-RUN pip install --no-deps *.whl \
-	&& rm -f *.whl
+# Set up the virtual environment to be used
+ENV VIRTUAL_ENV=/app \
+    PATH="/app/bin:$PATH"
 
 USER app
