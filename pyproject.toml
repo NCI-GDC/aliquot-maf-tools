@@ -60,6 +60,7 @@ fallback_version = "0"
 [tool.uv]
 extra-index-url = ["https://nexus.osdc.io/repository/pypi-all/simple"]
 no-binary-package = ["pysam"]
+no-binary = true
 
 [tool.uv.pip]
 extra-index-url = ["https://nexus.osdc.io/repository/pypi-all/simple"]
