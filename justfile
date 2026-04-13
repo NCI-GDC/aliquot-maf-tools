@@ -33,7 +33,7 @@ compile-requirements:
 
 tox:
 	@echo
-	TOX_PARALLEL_NO_SPINNER=1 tox -p --recreate
+	TOX_PARALLEL_NO_SPINNER=1 uv tool run --with tox-uv tox -p --recreate
 
 upload:
 	tox -e upload
