@@ -11,7 +11,7 @@ COPY ./ /aliquotmaf
 WORKDIR /aliquotmaf
 
 ARG PIP_INDEX_URL
-RUN uv pip install tox-uv && tox -e build
+RUN ls -la && git status && uv tool run --with tox-uv-bare tox -e build
 
 # Install the built package into the virtual environment
 RUN uv pip install --no-binary=pysam /aliquotmaf/dist/*.whl
