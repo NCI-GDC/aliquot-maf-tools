@@ -26,4 +26,4 @@ USER app
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-CMD ["generate_version", "--help"]
+CMD ["aliquotmaf", "--help"]
