@@ -115,6 +115,8 @@ test-reports/
 # Gitlab CI - automatically created, break flit validation
 vars.env
 gl-code-quality-report.html
+gl-sast-report.json
+gl-secret-detection-report.json
 
 # Added in base-container builder image
 aws-lc
