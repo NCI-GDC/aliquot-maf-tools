@@ -3,41 +3,13 @@ ARG BASE_CONTAINER_VERSION=4
 
 FROM ${REGISTRY}/python3.12-builder:${BASE_CONTAINER_VERSION}
 
-ARG HTSLIB_VERSION=1.23.1
-ADD https://nexus.osdc.io/repository/github/samtools/htslib/releases/download/${HTSLIB_VERSION}/htslib-${HTSLIB_VERSION}.tar.bz2 /htslib.tar.bz2
-WORKDIR /
-RUN tar xf htslib.tar.bz2 -C .
-WORKDIR /htslib-${HTSLIB_VERSION}
-RUN <<EOR
-./configure --prefix=/usr/local
-make
-make install
-EOR
-
-ARG SAMTOOLS_VERSION=1.23.1
-ADD https://nexus.osdc.io/repository/github/samtools/samtools/releases/download/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2 /samtools.tar.bz2
-WORKDIR /
-RUN tar xf samtools.tar.bz2 -C .
-WORKDIR /samtools-${SAMTOOLS_VERSION}
-RUN <<EOR
-./configure --prefix=/usr/local
-make
-make install
-EOR
-
-ENV HTSLIB_LIBRARY_DIR=/usr/local/lib \
-    HTSLIB_INCLUDE_DIR=/usr/local/include \
-    UV_COMPILE_BYTECODE=1 \
-    UV_LINK_MODE=copy \
-    LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib"
-
 WORKDIR /app
 RUN --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --no-install-project --no-dev --active --no-binary
 
 COPY . /app
-RUN uv sync --no-dev --active
+RUN uv sync --no-dev --active --no-binary
 
 LABEL org.opencontainers.image.title="aliquotmaf" \
       org.opencontainers.image.description="Tools for creating and filtering aliquot-level MAFs" \
@@ -46,8 +18,7 @@ LABEL org.opencontainers.image.title="aliquotmaf" \
 
 RUN chown -R app /app
 
-ENV PATH="/app/.venv/bin:$PATH" \
-    LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib"
+ENV PATH="/app/.venv/bin:$PATH"
 
 USER app
 
