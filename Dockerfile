@@ -26,12 +26,15 @@ make install
 EOR
 
 ENV HTSLIB_LIBRARY_DIR=/usr/local/lib \
-    HTSLIB_INCLUDE_DIR=/usr/local/include
+    HTSLIB_INCLUDE_DIR=/usr/local/include \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib"
 
 WORKDIR /app
 RUN --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --no-install-project --no-dev --active
+    uv sync --no-install-project --no-dev --active --no-binary
 
 COPY . /app
 RUN uv sync --no-dev --active
@@ -46,7 +49,8 @@ LABEL org.opencontainers.image.title="aliquotmaf" \
 COPY --from=builder /usr/local /usr/local
 COPY --from=builder --chown=app /app /app
 
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/app/.venv/bin:$PATH" \
+    LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib"
 
 USER app
 
