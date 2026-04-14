@@ -24,6 +24,8 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 USER app
 
+RUN aliquotmaf --help
+
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 CMD ["aliquotmaf", "--help"]
