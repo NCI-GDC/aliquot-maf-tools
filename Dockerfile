@@ -1,7 +1,7 @@
 ARG REGISTRY=docker.osdc.io/ncigdc
 ARG BASE_CONTAINER_VERSION=4
 
-FROM ${REGISTRY}/python3.12-builder:${BASE_CONTAINER_VERSION} AS builder
+FROM ${REGISTRY}/python3.12-builder:${BASE_CONTAINER_VERSION}
 
 ARG HTSLIB_VERSION=1.23.1
 ADD https://nexus.osdc.io/repository/github/samtools/htslib/releases/download/${HTSLIB_VERSION}/htslib-${HTSLIB_VERSION}.tar.bz2 /htslib.tar.bz2
@@ -39,15 +39,12 @@ RUN --mount=type=bind,source=uv.lock,target=uv.lock \
 COPY . /app
 RUN uv sync --no-dev --active
 
-FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
-
 LABEL org.opencontainers.image.title="aliquotmaf" \
       org.opencontainers.image.description="Tools for creating and filtering aliquot-level MAFs" \
       org.opencontainers.image.source="https://github.com/NCI-GDC/aliquot-maf-tools" \
       org.opencontainers.image.vendor="NCI GDC"
 
-COPY --from=builder /usr/local /usr/local
-COPY --from=builder --chown=app /app /app
+RUN chown -R app /app
 
 ENV PATH="/app/.venv/bin:$PATH" \
     LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib"
