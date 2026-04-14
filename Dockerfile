@@ -11,7 +11,7 @@ RUN --mount=type=bind,source=uv.lock,target=uv.lock \
 COPY . /app
 RUN uv sync --no-dev --active
 
-FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
+FROM ${REGISTRY}/python3.12-builder:${BASE_CONTAINER_VERSION}
 
 LABEL org.opencontainers.image.title="aliquotmaf" \
       org.opencontainers.image.description="Tools for creating and filtering aliquot-level MAFs" \
