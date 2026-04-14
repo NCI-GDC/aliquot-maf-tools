@@ -10,7 +10,7 @@ variables:
   BUILD_PY_VERSION: python3.12
   RELEASE_PY_VERSION: python3.12
   PIP_INDEX_URL: https://nexus.osdc.io/repository/pypi-all/simple
-  BASE_CONTAINER_VERSION: 4.4.1
+  BASE_CONTAINER_VERSION: "4.3"
 
 .parallel:
   parallel:
