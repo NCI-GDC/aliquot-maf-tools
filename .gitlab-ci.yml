@@ -15,4 +15,4 @@ variables:
 .parallel:
   parallel:
     matrix:
-      - BUILD_PY_VERSION: [python3.12]
+      - BUILD_PY_VERSION: [python3.13]
