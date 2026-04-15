@@ -148,7 +148,7 @@ env_list = [ "py312" ]
 [tool.tox.env_run_base]
 description = "Run test under {base_python}"
 runner = "virtualenv"
-passenv = ["PIP_*", "UV_*"]
+passenv = [ "PIP_*", "UV_*" ]
 install_command = [ "python", "-I", "-m", "pip", "install", "--no-binary", ":all:", "{opts}", "{packages}" ]
 extras = [ "test" ]
 commands = [ [ "pytest", "-vv" ] ]
