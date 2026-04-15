@@ -38,7 +38,6 @@ dev = [
   "tox-uv",
 ]
 test = [
-  "coverage[toml]",
   "pytest",
 ]
 type = []
