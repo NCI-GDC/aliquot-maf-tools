@@ -70,10 +70,9 @@ exclude = [
 [tool.uv]
 extra-index-url = [ "https://nexus.osdc.io/repository/pypi-all/simple" ]
 no-binary = true
-no-binary-package = [ "pysam" ]
 [tool.uv.pip]
 extra-index-url = [ "https://nexus.osdc.io/repository/pypi-all/simple" ]
-no-binary = [ "pysam" ]
+no-binary = [ ":all:" ]
 emit-index-url = true
 output-file = "requirements.txt"
 
@@ -149,6 +148,6 @@ env_list = [ "3.12" ]
 [tool.tox.env_run_base]
 description = "Run test under {base_python}"
 runner = "uv-venv-runner"
-install_command = [ "uv", "pip", "install", "--no-binary", ":all:" ]
+install_command = [ "uv", "pip", "install", "--no-binary", "pysam" ]
 extras = [ "test" ]
 commands = [ [ "pytest", "-vv" ] ]
