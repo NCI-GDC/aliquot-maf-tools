@@ -7,7 +7,7 @@ include:
     inputs:
       python_version: "3.12"
       use_uv: false
-      image_version: "3.2.3"
+      image_version: "3.3.0"
   - component: $CI_SERVER_FQDN/nci-gdc/gitlab-templates/docker-build@feat/components
   - component: $CI_SERVER_FQDN/nci-gdc/gitlab-templates/docker-release@feat/components
   - component: $CI_SERVER_FQDN/nci-gdc/gitlab-templates/docker-release-latest@feat/components
