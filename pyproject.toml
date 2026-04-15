@@ -143,13 +143,10 @@ parallel = true
 source = [ "aliquotmaf" ]
 
 [tool.tox]
-requires = [ "tox-uv-bare" ]
 env_list = [ "py312" ]
 [tool.tox.env_run_base]
 description = "Run test under {base_python}"
-runner = "uv-venv-lock-runner"
-passenv = [ "PIP_*", "UV_*" ]
-uv_seed = true
-uv_sync_flags = [ "--no-binary" ]
+passenv = [ "PIP_*" ]
 extras = [ "test" ]
+install_command = ["python", "-m", "pip", "install", "--no-binary", ":all:", "{opts}", "{packages}"]
 commands = [ [ "pytest", "-vv" ] ]
