@@ -148,5 +148,5 @@ env_list = [ "py312" ]
 description = "Run test under {base_python}"
 passenv = [ "PIP_*" ]
 extras = [ "test" ]
-install_command = ["python", "-m", "pip", "install", "--no-binary", ":all:", "{opts}", "{packages}"]
+install_command = ["python", "-m", "pip", "install", "--no-binary", "':all:'", "{opts}", "{packages}"]
 commands = [ [ "pytest", "-vv" ] ]
