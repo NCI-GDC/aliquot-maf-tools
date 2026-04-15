@@ -150,6 +150,6 @@ description = "Run test under {base_python}"
 runner = "uv-venv-lock-runner"
 passenv = [ "PIP_*", "UV_*" ]
 uv_seed = true
-uv_sync_flags = ["--no-binary" ]
+uv_sync_flags = [ "--no-binary" ]
 extras = [ "test" ]
 commands = [ [ "pytest", "-vv" ] ]
