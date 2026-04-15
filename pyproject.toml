@@ -151,6 +151,6 @@ requires = [ "tox-uv-bare" ]
 env_list = [ "3.12" ]
 env_run_base.description = "Run test under {base_python}"
 env_run_base.runner = "uv-venv-lock-runner"
-env_run_base.uv_sync_flags = [ "--no-binary-package", "pysam" ]
+env_run_base.uv_sync_flags = [ "--no-binary-package", "pysam", "--python", "3.12" ]
 env_run_base.extras = [ "test" ]
 env_run_base.commands = [ [ "pytest", "-vv" ] ]
