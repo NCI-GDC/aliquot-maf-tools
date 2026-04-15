@@ -22,6 +22,6 @@ repos:
         args: [ '--select', 'I', '--fix' ]
       - id: ruff-format
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "v2.5.0"
+    rev: "v2.21.1"
     hooks:
       - id: pyproject-fmt
