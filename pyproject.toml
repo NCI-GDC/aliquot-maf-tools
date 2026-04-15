@@ -7,9 +7,6 @@ name = "aliquot-maf-tools"
 description = "Tools for creating and filtering aliquot-level MAFs"
 readme = "README.md"
 license = { file = "LICENSE" }
-authors = [
-  { name = "Charles Czysz", email = "czysz@uchicago.edu" },
-]
 requires-python = ">=3.12"
 classifiers = [
   "License :: OSI Approved :: Apache Software License",
@@ -23,12 +20,16 @@ dependencies = [
   "bioinf-maflib",
   "pysam",
 ]
-optional-dependencies.build = [
+[[project.authors]]
+name = "Charles Czysz"
+email = "czysz@uchicago.edu"
+[project.optional-dependencies]
+build = [
   "flit",
   "setuptools-scm",
   "twine",
 ]
-optional-dependencies.dev = [
+dev = [
   "black",
   "detect-secrets",
   "mypy",
@@ -36,13 +37,15 @@ optional-dependencies.dev = [
   "ruff",
   "tox-uv",
 ]
-optional-dependencies.test = [
+test = [
   "coverage[toml]",
   "pytest",
 ]
-optional-dependencies.type = []
-urls.homepage = "https://github.com/NCI-GDC/aliquot-maf-tools"
-scripts.aliquotmaf = "aliquotmaf.__main__:main"
+type = []
+[project.scripts]
+aliquotmaf = "aliquotmaf.__main__:main"
+[project.urls]
+homepage = "https://github.com/NCI-GDC/aliquot-maf-tools"
 
 [tool.setuptools_scm]
 write_to = "aliquotmaf/_version.py"
@@ -51,9 +54,11 @@ version_scheme = "python-simplified-semver"
 fallback_version = "0"
 
 [tool.flit]
-module.name = "aliquotmaf"
-sdist.include = [ "aliquotmaf/_version.py" ]
-sdist.exclude = [
+[tool.flit.module]
+name = "aliquotmaf"
+[tool.flit.sdist]
+include = [ "aliquotmaf/_version.py" ]
+exclude = [
   ".*",
   "dev-requirements.*",
   "Dockerfile",
@@ -66,10 +71,11 @@ sdist.exclude = [
 extra-index-url = [ "https://nexus.osdc.io/repository/pypi-all/simple" ]
 no-binary = true
 no-binary-package = [ "pysam" ]
-pip.emit-index-url = true
-pip.extra-index-url = [ "https://nexus.osdc.io/repository/pypi-all/simple" ]
-pip.no-binary = [ "pysam" ]
-pip.output-file = "requirements.txt"
+[tool.uv.pip]
+extra-index-url = [ "https://nexus.osdc.io/repository/pypi-all/simple" ]
+no-binary = [ "pysam" ]
+emit-index-url = true
+output-file = "requirements.txt"
 
 [tool.ruff]
 target-version = "py312"
@@ -105,34 +111,23 @@ exclude = [
   "site-packages",
   "venv",
 ]
-# Like Black, indent with spaces, rather than tabs.
-format.indent-style = "space"
-# Like Black, use double quotes for strings.
-format.quote-style = "double"
-# Like Black, automatically detect the appropriate line ending.
-format.line-ending = "auto"
-# Like Black, respect magic trailing commas.
-format.skip-magic-trailing-comma = false
-# Set the line length limit used when formatting code snippets in
-# docstrings.
-#
-# This only has an effect when the `docstring-code-format` setting is
-# enabled.
-format.docstring-code-line-length = "dynamic"
-# Enable auto-formatting of code examples in docstrings. Markdown,
-# reStructuredText code/literal blocks and doctests are all supported.
-#
-# This is currently disabled by default, but it is planned for this
-# to be opt-out in the future.
-format.docstring-code-format = false
-# Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
-lint.select = [ "E4", "E7", "E9", "F" ]
-lint.ignore = [ "E501" ]
-lint.per-file-ignores."__init__.py" = [ "E402" ]
-# Allow autofix for all enabled rules (when `--fix`) is provided.
-lint.fixable = [ "ALL" ]
-lint.unfixable = []
-lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+[tool.ruff.format]
+indent-style = "space"
+quote-style = "double"
+line-ending = "auto"
+skip-magic-trailing-comma = false
+docstring-code-line-length = "dynamic"
+docstring-code-format = false
+[tool.ruff.lint]
+select = [ "E4", "E7", "E9", "F" ]
+ignore = [ "E501" ]
+per-file-ignores."__init__.py" = [ "E402" ]
+fixable = [ "ALL" ]
+unfixable = []
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.pyproject-fmt]
+table_format = "long"
 
 [tool.mypy]
 python_version = 3.12
@@ -141,16 +136,17 @@ warn_return_any = true
 warn_unused_configs = true
 
 [tool.coverage]
-run.branch = true
-run.parallel = true
-run.source = [ "aliquotmaf" ]
-report.show_missing = true
+[tool.coverage.report]
+show_missing = true
+[tool.coverage.run]
+branch = true
+parallel = true
+source = [ "aliquotmaf" ]
 
 [tool.tox]
 requires = [ "tox-uv-bare" ]
 env_list = [ "3.12" ]
-env_run_base.description = "Run test under {base_python}"
-env_run_base.runner = "uv-venv-lock-runner"
-env_run_base.uv_sync_flags = [ "--no-binary-package", "pysam", "--python", "3.12" ]
-env_run_base.extras = [ "test" ]
-env_run_base.commands = [ [ "pytest", "-vv" ] ]
+[tool.tox.env_run_base]
+description = "Run test under {base_python}"
+extras = [ "test" ]
+commands = [ [ "pytest", "-vv" ] ]
