@@ -148,6 +148,6 @@ env_list = [ "3.12" ]
 [tool.tox.env_run_base]
 description = "Run test under {base_python}"
 runner = "uv-venv-runner"
-install_command = [ "uv", "pip", "install", "--no-binary", "pysam" ]
+install_command = [ "uv", "pip", "install", "--no-binary", ":all:" ]
 extras = [ "test" ]
 commands = [ [ "pytest", "-vv" ] ]
