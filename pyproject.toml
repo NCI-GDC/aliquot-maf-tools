@@ -147,8 +147,9 @@ requires = [ "tox-uv-bare" ]
 env_list = [ "py312" ]
 [tool.tox.env_run_base]
 description = "Run test under {base_python}"
-runner = "virtualenv"
+runner = "uv-venv-lock-runner"
 passenv = [ "PIP_*", "UV_*" ]
-install_command = [ "python", "-I", "-m", "pip", "install", "--no-binary", ":all:", "{opts}", "{packages}" ]
+uv_seed = true
+uv_sync_flags = ["--no-binary" ]
 extras = [ "test" ]
 commands = [ [ "pytest", "-vv" ] ]
