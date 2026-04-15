@@ -181,5 +181,6 @@ env_list = ["3.12"]
 [tool.tox.env_run_base]
 description = "Run test under {base_python}"
 runner = "uv-venv-lock-runner"
+uv_sync_flags = ["--no-binary-package", "pysam"]
 extras = ["test"]
 commands = [["pytest", "-vv"]]
