@@ -18,7 +18,7 @@ classifiers = [
 dynamic = [ "version" ]
 dependencies = [
   "bioinf-maflib",
-  "pysam==0.21.0",
+  "pysam",
 ]
 [[project.authors]]
 name = "Charles Czysz"
