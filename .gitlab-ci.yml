@@ -5,7 +5,7 @@ include:
   - component: $CI_SERVER_FQDN/nci-gdc/gitlab-templates/pre-commit@feat/components
   - component: $CI_SERVER_FQDN/nci-gdc/gitlab-templates/tox@feat/components
     inputs:
-      python_version: "3.12"
+      python_version: "3.13"
       image_version: "3.3.0"
   - component: $CI_SERVER_FQDN/nci-gdc/gitlab-templates/docker-build@feat/components
   - component: $CI_SERVER_FQDN/nci-gdc/gitlab-templates/docker-release@feat/components
