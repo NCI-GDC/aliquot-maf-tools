@@ -16,3 +16,7 @@ stages:
   - build
   - release
   - tag
+
+tox:
+  before_script: 
+    - dnf install -y python3.13-devel
