@@ -85,11 +85,18 @@ class GenotypeAndDepthsExtractor(Extractor):
             # Format numerical depths
             depths = [i if i != "." and i is not None else 0 for i in new_gt["AD"]]
             # require all genotype alleles be definite or none should be
-            if all(genotype["GT"]):
-                new_gt["GT"] = genotype["GT"]
+            ex_gt = genotype.get("GT", None)
+            if ex_gt is None:
+                new_gt["GT"] = None
+            elif isinstance(ex_gt, str):
+                if ex_gt == "":
+                    new_gt["GT"] = None
+                else:
+                    new_gt["GT"] = ex_gt
+            elif isinstance(ex_gt, list) or isinstance(ex_gt, tuple):
+                new_gt["GT"] = tuple([gti for gti in ex_gt if gti is not None])
             else:
                 new_gt["GT"] = None
-            # copy depth as-is
             new_gt["DP"] = dp
         return new_gt, depths
 
@@ -272,7 +279,7 @@ class GenotypeAndDepthsExtractor(Extractor):
         Thus we can simply grab these values from the relevant tags.
         """
         dp = genotype["DP"]
-        allele_depths = genotype["AD"]
+        allele_depths = list(genotype["AD"])
         return (allele_depths, dp)
 
     @classmethod
