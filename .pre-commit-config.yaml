@@ -21,9 +21,7 @@ repos:
       - id: ruff-check
         args: [ '--select', 'I', '--fix' ]
       - id: ruff-format
-  - repo: https://github.com/cruft/cruft
-    rev: 2.16.0
+  - repo: https://github.com/tox-dev/pyproject-fmt
+    rev: "v2.21.1"
     hooks:
-      - id: cruft
-        name: cruft
-        entry: bash -c 'cruft check || true' --
+      - id: pyproject-fmt
