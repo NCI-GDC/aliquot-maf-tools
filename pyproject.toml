@@ -37,10 +37,7 @@ dev = [
   "ruff",
   "tox-uv",
 ]
-test = [
-  "pytest",
-  "coverage[toml]"
-]
+test = [ "coverage[toml]", "pytest" ]
 type = []
 [project.scripts]
 aliquotmaf = "aliquotmaf.__main__:main"
