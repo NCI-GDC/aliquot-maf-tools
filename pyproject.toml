@@ -39,6 +39,7 @@ dev = [
 ]
 test = [
   "pytest",
+  "coverage[toml]"
 ]
 type = []
 [project.scripts]
