@@ -24,7 +24,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 USER app
 
-RUN ls -la /app && ls -la /app/.venv
+RUN ls -la /app && ls -la /app/.venv/bin
 
 RUN aliquotmaf --help
 
