@@ -8,6 +8,7 @@ ENV UV_PYTHON=3.12
 USER app
 
 WORKDIR /app
+ENV UV_CACHE_DIR=/app/.cache/uv
 RUN --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --no-install-project --no-dev --active --no-binary
