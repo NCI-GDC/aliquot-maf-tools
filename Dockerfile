@@ -1,7 +1,7 @@
 ARG REGISTRY=docker.osdc.io/ncigdc
 ARG BASE_CONTAINER_VERSION=4
 
-FROM ${REGISTRY}/python3.12-builder:${BASE_CONTAINER_VERSION}
+FROM ${REGISTRY}/amzn2023-builder:${BASE_CONTAINER_VERSION}
 
 WORKDIR /app
 RUN --mount=type=bind,source=uv.lock,target=uv.lock \
