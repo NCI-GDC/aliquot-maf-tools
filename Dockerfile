@@ -18,7 +18,7 @@ LABEL org.opencontainers.image.title="aliquotmaf" \
       org.opencontainers.image.source="https://github.com/NCI-GDC/aliquot-maf-tools" \
       org.opencontainers.image.vendor="NCI GDC"
 
-RUN chown -R app /app
+RUN chown -R app:app /app
 
 ENV PATH="/app/.venv/bin:$PATH"
 
