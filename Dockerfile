@@ -5,6 +5,8 @@ FROM ${REGISTRY}/amzn2023-builder:${BASE_CONTAINER_VERSION}
 
 ENV UV_PYTHON=3.12
 
+USER app
+
 WORKDIR /app
 RUN --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
@@ -21,8 +23,6 @@ LABEL org.opencontainers.image.title="aliquotmaf" \
 RUN chown -R app:app /app
 
 ENV PATH="/app/.venv/bin:$PATH"
-
-USER app
 
 RUN ls -la /app && ls -la /app/.venv/bin
 
