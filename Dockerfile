@@ -3,6 +3,8 @@ ARG BASE_CONTAINER_VERSION=4
 
 FROM ${REGISTRY}/amzn2023-builder:${BASE_CONTAINER_VERSION}
 
+ENV UV_PYTHON=3.12
+
 WORKDIR /app
 RUN --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
