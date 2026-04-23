@@ -2,6 +2,7 @@ include:
   - component: $CI_SERVER_FQDN/nci-gdc/platform-engineering/generate-version/generate_version@0.4.2
     inputs:
       stage: tag
+  - component: $CI_SERVER_FQDN/nci-gdc/gitlab-templates/workflow@feat/components
   - component: $CI_SERVER_FQDN/nci-gdc/gitlab-templates/pre-commit@feat/components
   - component: $CI_SERVER_FQDN/nci-gdc/gitlab-templates/tox@feat/components
     inputs:
