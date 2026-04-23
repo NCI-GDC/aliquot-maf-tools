@@ -1,33 +1,32 @@
 ARG REGISTRY=docker.osdc.io/ncigdc
-ARG BASE_CONTAINER_VERSION=4.4.1
+ARG BASE_CONTAINER_VERSION=4
 
-FROM ${REGISTRY}/python3.12-builder:${BASE_CONTAINER_VERSION} as builder
+FROM ${REGISTRY}/amzn2023-builder:${BASE_CONTAINER_VERSION}
 
-# Create virtual environment for the builder
-ENV VIRTUAL_ENV=/app
+ENV UV_PYTHON=3.12
 
-COPY ./ /aliquotmaf
+USER app
 
-WORKDIR /aliquotmaf
+WORKDIR /app
+ENV UV_CACHE_DIR=/app/.cache/uv
+RUN --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --no-install-project --no-dev --active --no-binary
 
-ARG PIP_INDEX_URL
-RUN uv pip install tox-uv && tox -e build
-
-# Install the built package into the virtual environment
-RUN uv pip install --no-binary=pysam /aliquotmaf/dist/*.whl
-
-FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
+COPY . /app
+RUN uv sync --no-dev --active --no-binary
 
 LABEL org.opencontainers.image.title="aliquotmaf" \
       org.opencontainers.image.description="Tools for creating and filtering aliquot-level MAFs" \
       org.opencontainers.image.source="https://github.com/NCI-GDC/aliquot-maf-tools" \
       org.opencontainers.image.vendor="NCI GDC"
 
-# Copy the virtual environment from builder (includes all installed packages)
-COPY --from=builder /app /app
+ENV PATH="/app/.venv/bin:$PATH"
 
-# Set up the virtual environment to be used
-ENV VIRTUAL_ENV=/app \
-    PATH="/app/bin:$PATH"
+RUN ls -la /app && ls -la /app/.venv/bin
 
-USER app
+RUN aliquotmaf --help
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
+CMD ["aliquotmaf", "--help"]

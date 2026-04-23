@@ -286,7 +286,7 @@ class TestGenotypeExtractor(TestCase):
             1, {"GT": "0/1"}, [], caller
         )
         # Validate results
-        extract_fn.assert_called_once_with({"GT": "0/1"})
+        extract_fn.assert_called_once_with(1, {"GT": "0/1"}, [])
 
     def test__extract_mutect2_dp_set(self):
         """
@@ -544,7 +544,7 @@ class TestGenotypeExtractor(TestCase):
         # Prepare
         genotype = {
             "GT": "0/1",
-            "AD": (6,),
+            "AD": (61, 6),
             "CR": 6,
             "DP": 67,
             "GQ": 2,
