@@ -1,34 +1,32 @@
 ARG REGISTRY=docker.osdc.io/ncigdc
-ARG BASE_CONTAINER_VERSION=latest
+ARG BASE_CONTAINER_VERSION=4
 
-FROM ${REGISTRY}/python3.12-builder:${BASE_CONTAINER_VERSION} as builder
+FROM ${REGISTRY}/amzn2023-builder:${BASE_CONTAINER_VERSION}
 
-COPY ./ /aliquotmaf
+ENV UV_PYTHON=3.12
 
-WORKDIR /aliquotmaf
+USER app
 
-ARG PIP_INDEX_URL
-RUN pip install tox && tox -e build
+WORKDIR /app
+ENV UV_CACHE_DIR=/app/.cache/uv
+RUN --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --no-install-project --no-dev --active --no-binary
 
-WORKDIR /deps
-
-ENV PIP_NO_BINARY=pysam
-
-RUN pip wheel -r /aliquotmaf/requirements.txt
-
-FROM ${REGISTRY}/python3.12:${BASE_CONTAINER_VERSION}
+COPY . /app
+RUN uv sync --no-dev --active --no-binary
 
 LABEL org.opencontainers.image.title="aliquotmaf" \
       org.opencontainers.image.description="Tools for creating and filtering aliquot-level MAFs" \
       org.opencontainers.image.source="https://github.com/NCI-GDC/aliquot-maf-tools" \
       org.opencontainers.image.vendor="NCI GDC"
 
-COPY --from=builder /aliquotmaf/dist/*.whl /aliquotmaf/
-COPY --from=builder /deps/*.whl /aliquotmaf
+ENV PATH="/app/.venv/bin:$PATH"
 
-WORKDIR /aliquotmaf
+RUN ls -la /app && ls -la /app/.venv/bin
 
-RUN pip install --no-deps *.whl \
-	&& rm -f *.whl
+RUN aliquotmaf --help
 
-USER app
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
+CMD ["aliquotmaf", "--help"]
