@@ -50,21 +50,6 @@ local_scheme = "dirty-tag"
 version_scheme = "python-simplified-semver"
 fallback_version = "0"
 
-[tool.uv]
-extra-index-url = ["https://nexus.osdc.io/repository/pypi-all/simple"]
-no-binary-package = ["pysam"]
-
-[tool.uv.pip]
-extra-index-url = ["https://nexus.osdc.io/repository/pypi-all/simple"]
-emit-index-url = true
-output-file = "requirements.txt"
-no-binary = ["pysam"]
-
-[tool.coverage.run]
-source = ["aliquotmaf"]
-branch = true
-parallel = true
-
 [tool.flit.module]
 name = "aliquotmaf"
 [tool.flit.sdist]
@@ -80,10 +65,10 @@ exclude = [
 
 [tool.uv]
 extra-index-url = [ "https://nexus.osdc.io/repository/pypi-all/simple" ]
-no-binary = true
+no-binary-package = [ "pysam" ]
 [tool.uv.pip]
 extra-index-url = [ "https://nexus.osdc.io/repository/pypi-all/simple" ]
-no-binary = [ ":all:" ]
+no-binary = [ "pysam" ]
 emit-index-url = true
 output-file = "requirements.txt"
 
@@ -149,6 +134,6 @@ warn_unused_configs = true
 [tool.coverage.report]
 show_missing = true
 [tool.coverage.run]
+source = [ "aliquotmaf" ]
 branch = true
 parallel = true
-source = [ "aliquotmaf" ]
