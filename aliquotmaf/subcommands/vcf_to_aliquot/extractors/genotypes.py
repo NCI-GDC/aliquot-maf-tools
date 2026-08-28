@@ -147,6 +147,9 @@ class GenotypeAndDepthsExtractor(Extractor):
         MuTect2 should always have the AD tag set and may or may not have
         the DP flag set. This function handles those cases, adding up
         allele-depths when necessary.
+
+        In some cases the AD field is set to '.' and this results in a genotype
+        value of (None,). In these cases set allele_depths to 0 for each allele.
         """
 
         DP_IS_SET = (
@@ -155,6 +158,9 @@ class GenotypeAndDepthsExtractor(Extractor):
         # set allele depths
         if isinstance(genotype["AD"], int):
             allele_depths = [genotype["AD"]]
+        elif genotype["AD"] == (None,):
+            # handle case where 'AD' is '.'
+            allele_depths = [0] * len(genotype["GT"])
         else:
             allele_depths = list(genotype["AD"])
         # set total depth
@@ -171,6 +177,9 @@ class GenotypeAndDepthsExtractor(Extractor):
         """
         if isinstance(genotype["AD"], int):
             allele_depths = [genotype["AD"]]
+        elif genotype["AD"] == (None,):
+            # handle case where 'AD' is '.'
+            allele_depths = [0] * len(genotype["GT"])
         else:
             allele_depths = list(genotype["AD"])
         dp = genotype["DP"]
@@ -232,6 +241,9 @@ class GenotypeAndDepthsExtractor(Extractor):
         allele_depths[0] = genotype["RD"]
         if isinstance(genotype["AD"], int):
             allele_depths[var_allele_idx] = genotype["AD"]
+        elif genotype["AD"] == (None,):
+            # handle case where 'AD' is '.'
+            allele_depths = [0] * len(genotype["GT"])
         else:
             allele_depths[var_allele_idx] = genotype["AD"][0]
         dp = genotype["DP"]
@@ -244,6 +256,9 @@ class GenotypeAndDepthsExtractor(Extractor):
         """
         if isinstance(genotype["AD"], int):
             allele_depths = [genotype["AD"]]
+        elif genotype["AD"] == (None,):
+            # handle case where 'AD' is '.'
+            allele_depths = [0] * len(genotype["GT"])
         else:
             allele_depths = list(genotype["AD"])
         dp = genotype["DP"]
