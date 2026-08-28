@@ -9,6 +9,8 @@ include:
       python_version: "3.12"
       image_version: "4.4.1"
   - component: $CI_SERVER_FQDN/nci-gdc/gitlab-templates/docker-build@1.6.1
+    inputs:
+      image_version: "4"
   - component: $CI_SERVER_FQDN/nci-gdc/gitlab-templates/docker-release@1.6.1
   - component: $CI_SERVER_FQDN/nci-gdc/gitlab-templates/docker-release-latest@1.6.1
 
